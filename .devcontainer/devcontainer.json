@@ -1,0 +1,17 @@
+{
+    "name": "casa_amarela",
+    "dockerComposeFile": "../docker-compose.yml",aph
+    "service": "web",
+    "workspaceFolder": "/code",
+    "settings": {
+      "python.defaultInterpreterPath": "/usr/local/bin/python"
+    },
+    "extensions": [
+      "ms-python.python",
+      "ms-python.vscode-pylance",
+      "ms-toolsai.jupyter" // opcional se usar notebooks
+    ],
+    "postCreateCommand": "pip install -r requirements.txt",
+    "remoteUser": "root"
+  }
+  

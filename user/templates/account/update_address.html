@@ -1,0 +1,11 @@
+{% extends "vitrine/base.html" %}
+
+
+{% block content %}
+    <h1>Atualizar Endereço</h1>
+    <form method="post" action="{% url 'update_address' user.address.slug user.address.pk %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Salvar</button>
+    </form>
+{% endblock %}

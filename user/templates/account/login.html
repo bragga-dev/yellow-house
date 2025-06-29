@@ -1,0 +1,124 @@
+{% extends "vitrine/base.html" %}
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block content %}
+<section id="login-register" class="my-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-6">
+        <div class="card shadow rounded-4">
+          <div class="card-body p-4">
+
+            <!-- Nav Tabs -->
+            <ul class="nav nav-tabs mb-4 justify-content-center" role="tablist">
+              <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-login" role="tab">
+                  {% trans "Login" %}
+                </button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-signup" role="tab">
+                  {% trans "Sign Up" %}
+                </button>
+              </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+
+              <!-- Login Tab -->
+              <div class="tab-pane fade show active" id="tab-login" role="tabpanel">
+                <form method="POST" action="{% url 'account_login' %}" autocomplete="off">
+                  {% csrf_token %}
+                  {{ redirect_field }}
+
+                  <h2 class="text-center mb-4">{% trans "Sign In" %}</h2>
+
+                  {% if form.errors %}
+                  <div class="alert alert-danger">
+                    <strong>{% trans "Error:" %}</strong> {% trans "Please correct the errors below." %}
+                    <ul>
+                      {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                          <li>{{ error }}</li>
+                        {% endfor %}
+                      {% endfor %}
+                    </ul>
+                  </div>
+                  {% endif %}
+
+                  <label for="id_login">{% trans "E-mail:" %}</label>
+                  <input type="email" class="form-control mb-3" id="id_login" name="login"
+                         placeholder="{% trans 'Enter your email' %}"
+                         value="{{ form.login.value|default_if_none:'' }}" autocomplete="off">
+
+                  <label for="id_password">{% trans "Password:" %}</label>
+                  <div class="input-group mb-3">
+                    <input type="password" class="form-control" id="id_password" name="password" autocomplete="new-password">
+                    <button type="button" class="btn btn-outline-secondary" id="show-password">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </div>
+
+                  <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                      const btn = document.getElementById("show-password");
+                      const input = document.getElementById("id_password");
+                      btn.addEventListener("click", function () {
+                        input.type = input.type === "password" ? "text" : "password";
+                      });
+                    });
+                  </script>
+
+                  <div class="d-flex justify-content-between mb-3">
+                    <a href="{% url 'account_reset_password' %}" class="text-decoration-none">
+                      {% trans "Forgot your password?" %}
+                    </a>
+                  </div>
+
+                  <button type="submit" class="btn btn-dark w-100">{% trans "Login" %}</button>
+                </form>
+
+                <!-- Social Login -->
+                <div class="social-login mt-4">
+                  <hr>
+                  {% get_providers as socialaccount_providers %}
+                  {% if socialaccount_providers %}
+                  <div class="d-flex justify-content-center flex-wrap">
+                    {% for provider in socialaccount_providers %}
+                    <a href="{% provider_login_url provider.id process='login' %}"
+                       class="btn btn-outline-primary mx-2 my-1 px-4 py-2 shadow-sm rounded-pill"
+                       style="min-width: 220px; font-weight: 500;">
+                      {% if provider.id == "google" %}
+                        {% trans "Entrar com o Google" %}
+                      {% else %}
+                        Entrar com {{ provider.name }}
+                      {% endif %}
+                    </a>
+                    {% endfor %}
+                  </div>
+                  {% else %}
+                    <p class="text-center text-muted">{% trans "No social providers configured." %}</p>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Sign Up Tab -->
+              <div class="tab-pane fade" id="tab-signup" role="tabpanel">
+                <p class="text-center">
+                  {% trans "Don't have an account?" %}
+                </p>
+                <a href="{% url 'account_signup' %}" class="btn btn-dark w-100">
+                  {% trans "Go to Registration" %}
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
