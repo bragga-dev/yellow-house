@@ -173,17 +173,20 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Configurações Django-Allauth
 
+# ADAPTERS
 
 ACCOUNT_ADAPTER = 'user.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = "user.adapters.CustomSocialAccountAdapter"
+
 
 
 AUTH_USER_MODEL = 'user.User'
 
 ACCOUNT_RATE_LIMITS = {
-    "signup": "5/h",
+    "signup": "10/h",
     "login": "5/m",
-    "reset_password_email": "3/h",
-    "confirm_email": "5/h",
+    "reset_password_email": "5/h",
+    "confirm_email": "10/h",
 }
 
 
