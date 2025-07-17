@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Address
+from .models import ClientAddress
 from .forms import UserUpdateForm, AddressForm, AddressUpdateForm
 from .models import User
 
@@ -45,7 +45,7 @@ def create_address(request):
 
 @login_required
 def update_address(request, slug, pk):
-    address = get_object_or_404(Address, slug=slug, pk=pk)
+    address = get_object_or_404(ClientAddress, slug=slug, pk=pk)
     if request.method == 'POST':
         if request.user != address.user:
             messages.error(request, 'Você não tem permissão para editar este endereço.')

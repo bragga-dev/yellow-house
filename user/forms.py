@@ -1,11 +1,12 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from .models import User
+from .models import Client
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
 from .models import User
 from validate_docbr import CPF
-from .models import Address
+from .models import ClientAddress
+from .models import BaseAddress
 
 
 class CustomSignupForm(SignupForm):
@@ -91,11 +92,11 @@ class CustomUserChangeForm(UserChangeForm):
 
 class AddressForm(forms.ModelForm):
     class Meta:
-        model = Address
+        model = ClientAddress
         fields = ['cep', 'road', 'number', 'district', 'city', 'state', 'country']
 
 
 class AddressUpdateForm(forms.ModelForm):
     class Meta:
-        model = Address
+        model = BaseAddress
         fields = ['cep', 'road', 'number', 'district', 'city', 'state', 'country']
