@@ -1,8 +1,8 @@
 # user/urls.py
 
 from django.urls import path
-from .views import update_profile_artist, create_address, update_address, ClientSignupView, ArtistSignupView
-
+from user.views.accounts_views.create_accounts import ClientSignupView, ArtistSignupView
+from user.views.accounts_views.update_profile import update_profile_artist, create_address, update_address
 
 urlpatterns = [
 

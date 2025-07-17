@@ -79,6 +79,7 @@ class UserUpdateForm(forms.ModelForm):
             'first_name': forms.TextInput(attrs={'placeholder': 'Digite seu nome'}),
             'last_name': forms.TextInput(attrs={'placeholder': 'Digite seu sobrenome'}),
             'username': forms.TextInput(attrs={'placeholder': 'Nome de usuário'}),
+            'date_of_birth': forms.DateInput(attrs={'placeholder': 'DD/MM/AAAA', 'type': 'date'}),
             'cpf': forms.TextInput(attrs={'placeholder': 'Apenas números'}),
             'phone': forms.TextInput(attrs={'placeholder': 'DDD + número'}),
             'photo': forms.ClearableFileInput(attrs={'placeholder': 'Foto de perfil'}),
