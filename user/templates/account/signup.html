@@ -1,73 +1,29 @@
 {% extends "vitrine/base.html" %}
 {% load i18n %}
 {% block content %}
-<section id="signup" class="my-5">
+<section id="signup-choose" class="my-5">
   <div class="container">
-    <div class="row justify-content-center">
+    <div class="row justify-content-center text-center">
       <div class="col-md-10 col-lg-8 col-xl-6">
         <div class="card shadow rounded-4">
-          <div class="card-body p-4">
+          <div class="card-body p-5">
 
-            <h2 class="text-center mb-4">{% trans "Create Your Account" %}</h2>
+            <h2 class="mb-4">{% trans "Como você deseja se cadastrar?" %}</h2>
 
-            <form method="POST" action="{% url 'account_signup' %}" autocomplete="off">
-              {% csrf_token %}
-              {{ redirect_field }}
+            <p class="lead mb-4">{% trans "Escolha o tipo de conta que deseja criar:" %}</p>
 
-              {% if form.errors %}
-              <div class="alert alert-danger">
-                <strong>{% trans "Error:" %}</strong> {% trans "Please correct the errors below." %}
-                <ul>
-                  {% for field, errors in form.errors.items %}
-                    {% for error in errors %}
-                      <li>{{ error }}</li>
-                    {% endfor %}
-                  {% endfor %}
-                </ul>
-              </div>
-              {% endif %}
+            <div class="d-grid gap-3">
+              <a href="{% url 'account_signup_client' %}" class="btn btn-outline-primary btn-lg">
+                {% trans "Sou Cliente" %}
+              </a>
+              <a href="{% url 'account_signup_artist' %}" class="btn btn-outline-secondary btn-lg">
+                {% trans "Sou Artista" %}
+              </a>
+            </div>
 
-              <div class="mb-3">
-                <label for="id_first_name" class="form-label">{% trans "First name" %}</label>
-                <input type="text" class="form-control" name="first_name" id="id_first_name"
-                       placeholder="{% trans 'Enter your first name' %}" required>
-              </div>
-
-              <div class="mb-3">
-                <label for="id_last_name" class="form-label">{% trans "Last name" %}</label>
-                <input type="text" class="form-control" name="last_name" id="id_last_name"
-                       placeholder="{% trans 'Enter your last name' %}" required>
-              </div>
-
-              <div class="mb-3">
-                <label for="id_username" class="form-label">{% trans "Username" %}</label>
-                <input type="text" class="form-control" name="username" id="id_username"
-                       placeholder="{% trans 'Choose a username' %}" required>
-              </div>
-
-              <div class="mb-3">
-                <label for="id_email" class="form-label">{% trans "Email" %}</label>
-                <input type="email" class="form-control" name="email" id="id_email"
-                       placeholder="{% trans 'Enter your email' %}" required>
-              </div>
-
-              <div class="mb-3">
-                <label for="id_password1" class="form-label">{% trans "Password" %}</label>
-                <input type="password" class="form-control" name="password1" id="id_password1"
-                       placeholder="{% trans 'Create a password' %}" required>
-              </div>
-
-              <div class="mb-4">
-                <label for="id_password2" class="form-label">{% trans "Confirm password" %}</label>
-                <input type="password" class="form-control" name="password2" id="id_password2"
-                       placeholder="{% trans 'Confirm your password' %}" required>
-              </div>
-
-              <button type="submit" class="btn btn-dark w-100">{% trans "Register" %}</button>
-            </form>
-
-            <p class="mt-3 text-center">
-              {% trans "Already have an account?" %} <a href="{% url 'account_login' %}">{% trans "Log in here" %}</a>
+            <p class="mt-4">
+              {% trans "Já possui uma conta?" %}
+              <a href="{% url 'account_login' %}">{% trans "Entrar" %}</a>
             </p>
 
           </div>
