@@ -2,14 +2,14 @@
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Address
+from .models import Client, ClientAddress, User
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
-    model = User
+    model = Client
 
     list_display = ('username', 'email', 'cpf', 'phone', 'is_staff', 'is_active', 'photo')
     list_filter = ('is_staff', 'is_active')
@@ -30,7 +30,7 @@ class CustomUserAdmin(UserAdmin):
     )
 
 
-@admin.register(Address)
+@admin.register(ClientAddress)
 class AddressAdmin(admin.ModelAdmin):
     list_display = ('cep', 'road', 'number', 'district', 'city', 'state', 'country')
     search_fields = ('cep', 'road', 'number', 'district', 'city', 'state', 'country')

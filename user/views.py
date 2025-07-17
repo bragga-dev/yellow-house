@@ -2,25 +2,52 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import ClientAddress
-from .forms import UserUpdateForm, AddressForm, AddressUpdateForm
-from .models import User
+from .forms import UserUpdateForm, AddressForm, AddressUpdateForm, ArtistUpdateForm
+from .models import User, Client, Artist
+from allauth.account.views import SignupView
+from .forms import ClientSignupForm, ArtistSignupForm
+
+
+
+
+
+
+
+
+class ClientSignupView(SignupView):
+    form_class = ClientSignupForm
+    template_name = 'account/signup_client.html'
+
+
+class ArtistSignupView(SignupView):
+    form_class = ArtistSignupForm
+    template_name = 'account/signup_artist.html'
+
+
+
+
+
+
+
+
+
 
 @login_required
-def update_profile(request, slug, pk):
-    user = get_object_or_404(User, slug=slug, pk=pk)
+def update_profile_artist(request, slug, pk):
+    user = get_object_or_404(Artist, slug=slug, pk=pk)
 
     if request.user != user:
         messages.error(request, 'Você não tem permissão para editar este perfil.')
         return redirect('/')  # substitua por '/' se preferir
 
     if request.method == 'POST':
-        form = UserUpdateForm(request.POST, request.FILES, instance=user)
+        form = ArtistUpdateForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Perfil atualizado com sucesso!')
             return redirect('/')  
     else:
-        form = UserUpdateForm(instance=user)
+        form = ArtistUpdateForm(instance=user)
 
     context = {
         'form': form,

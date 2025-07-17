@@ -1,50 +1,77 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from .models import Client
+from .models import Client, Artist
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
 from .models import User
 from validate_docbr import CPF
 from .models import ClientAddress
 from .models import BaseAddress
+from phonenumber_field.formfields import PhoneNumberField
 
 
-class CustomSignupForm(SignupForm):
+class ClientSignupForm(SignupForm):
     email = forms.EmailField(label='E-mail', required=True)
+    username = forms.CharField(max_length=15, label='Nome de usuário')
     first_name = forms.CharField(max_length=30, label='Nome')
     last_name = forms.CharField(max_length=30, label='Sobrenome')
-    username = forms.CharField(max_length=15, label='Nome de usuário')
-    password1 = forms.CharField(label='Senha', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Confirme a senha', widget=forms.PasswordInput)
+    
+    def clean_cpf(self):
+        cpf = self.cleaned_data.get('cpf')
+        validator = CPF(repeated_digits=True)
+        if not validator.validate(cpf):
+            raise forms.ValidationError("CPF inválido.")
+        return cpf
 
-    # Esta propriedade garante que o formulário seja tratado como multipart para upload de arquivos
-    is_multipart = True
-    
-    
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        password1 = cleaned_data.get("password1")
-        password2 = cleaned_data.get("password2")
-        if password1 and password2 and password1 != password2:
-            self.add_error("password2", "As senhas não coincidem.")
-        return cleaned_data
-
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        if User.objects.filter(phone=phone).exists():
+            raise forms.ValidationError("Telefone já está em uso.")
+        return phone
 
     def save(self, request):
         user = super().save(request)
+        user.username = self.cleaned_data['username']
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
-        user.username = self.cleaned_data['username']
-        user.email = self.cleaned_data['email']
-        
+        user.is_client = True
         user.save()
+        Client.objects.create(user=user)
         return user
 
 
+# Artist 
+
+class ArtistSignupForm(SignupForm):
+    email = forms.EmailField(label='E-mail', required=True)
+    username = forms.CharField(max_length=15, label='Nome de usuário')
+    first_name = forms.CharField(max_length=30, label='Nome')
+    last_name = forms.CharField(max_length=30, label='Sobrenome')
+
+    def clean_cpf(self):
+        cpf = self.cleaned_data.get('cpf')
+        validator = CPF(repeated_digits=True)
+        if not validator.validate(cpf):
+            raise forms.ValidationError("CPF inválido.")
+        return cpf
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        if User.objects.filter(phone=phone).exists():
+            raise forms.ValidationError("Telefone já está em uso.")
+        return phone
+
+    def save(self, request):
+        user = super().save(request)
+        user.username = self.cleaned_data['username']
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.is_artist = False
+        user.save()
+        Artist.objects.create(user=user)
+        return user
+
 class UserUpdateForm(forms.ModelForm):
-
-
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'username', 'cpf', 'phone', 'photo']
@@ -73,6 +100,29 @@ class UserUpdateForm(forms.ModelForm):
                 raise forms.ValidationError("Este telefone já está em uso por outro usuário.")
         return phone
 
+
+
+class ClientUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Client
+        fields = []  
+
+class ArtistUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Artist
+        fields = ['is_verified']
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)  
+        super().__init__(*args, **kwargs)
+
+        if not self.user or not self.user.is_staff:
+            self.fields['is_verified'].disabled = True
+
+    def clean_is_verified(self):
+        if not self.user or not self.user.is_staff:
+            return self.instance.is_verified
+        return self.cleaned_data.get('is_verified')
 
 
 class CustomUserCreationForm(UserCreationForm):
