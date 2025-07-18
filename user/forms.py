@@ -106,7 +106,11 @@ class UserUpdateForm(forms.ModelForm):
 class ClientUpdateForm(forms.ModelForm):
     class Meta:
         model = Client
-        fields = []  
+        fields = ["wants_to_be_artist"]  
+        widgets = {
+            'wants_to_be_artist': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
 
 class ArtistUpdateForm(forms.ModelForm):
     class Meta:

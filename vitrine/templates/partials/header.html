@@ -86,16 +86,17 @@
             <!-- Account -->
             <div class="dropdown account-dropdown">
               <button class="header-action-btn" data-bs-toggle="dropdown">
-               {% if user.is_authenticated and user.photo %}
-                     <img src="{{ user.photo.url }}" alt="banner" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
-                {% else %}
-                    <i class="bi bi-person-plus-fill "></i>
-                {% endif %}               
+              {% if request.user.is_authenticated and request.user.photo %}
+    <img src="{{ request.user.photo.url }}" alt="banner" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+{% else %}
+    <i class="bi bi-person-plus-fill"></i>
+{% endif %}
+          
               </button>
               <div class="dropdown-menu">
                 <div class="dropdown-header">
-                {% if user.is_authenticated %}
-                  <h6>Olá, <span class="sitename">{{ user.first_name }} {{ user.last_name }}</span></h6>
+                {% if request.user.is_authenticated %}
+                  <h6>Olá, <span class="sitename">{{ request.user.first_name }} {{ request.user.last_name }}</span></h6>
                   <p class="mb-0">Seja bem-vindo(a) de volta!</p>
                 {% else %}
                   <h6>Seja Bem-Vindo(a) <span class="sitename">Casa Amarela</span></h6>
@@ -103,8 +104,8 @@
                 {% endif %}
                 </div>
                 <div class="dropdown-body">
-                {% if user.is_authenticated %}
-                  <a class="dropdown-item d-flex align-items-center" href="{% url 'update_profile' user.slug user.pk %}">
+                {% if request.user.is_authenticated %}
+                 <a class="dropdown-item d-flex align-items-center" href="{% url 'update_profile' request.user.slug request.user.pk %}">
                     <i class="bi bi-person-circle me-2"></i>
                     <span>My Profile</span>
                   </a>                  
@@ -122,7 +123,7 @@
                   </a>
                 {% endif %}
                 </div>
-                {% if not user.is_authenticated %}
+                {% if not request.user.is_authenticated %}
                 <div class="dropdown-footer">
                   <a href="{% url 'account_login' %}" class="btn btn-primary w-100 mb-2">Sign In</a>
                   <a href="{% url 'account_signup' %}" class="btn btn-outline-primary w-100">Register</a>

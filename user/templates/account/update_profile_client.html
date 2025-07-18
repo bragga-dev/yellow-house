@@ -1,0 +1,90 @@
+{% extends "vitrine/base.html" %}
+{% load static %}
+
+{% block content %}
+<section id="profile-update" class="my-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-6">
+        <div class="card shadow rounded-4">
+          <div class="card-body p-4">
+
+            <h2 class="text-center mb-4">Atualizar Perfil</h2>
+
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ form.non_field_errors }}
+
+              <div class="mb-3">
+                <label for="{{ form.first_name.id_for_label }}" class="form-label">Primeiro nome</label>
+                {{ form.first_name }}
+                {% for error in form.first_name.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ form.last_name.id_for_label }}" class="form-label">Último nome</label>
+                {{ form.last_name }}
+                {% for error in form.last_name.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ form.username.id_for_label }}" class="form-label">Usuário</label>
+                {{ form.username }}
+                {% for error in form.username.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+                {% if form.username.help_text %}
+                  <div class="form-text">{{ form.username.help_text }}</div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ form.cpf.id_for_label }}" class="form-label">CPF</label>
+                {{ form.cpf }}
+                {% for error in form.cpf.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ form.phone.id_for_label }}" class="form-label">Telefone</label>
+                {{ form.phone }}
+                {% for error in form.phone.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+                <div class="form-text">Digite um número com DDD. Ex: +55 11 91234-5678</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Foto atual:</label><br>
+                {% if form.instance.photo %}
+                  <img src="{{ form.instance.photo.url }}" alt="Foto atual" class="img-thumbnail mb-2" style="max-width: 150px;">
+                {% else %}
+                  <p>Nenhuma foto enviada.</p>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ form.photo.id_for_label }}" class="form-label">Alterar foto</label>
+                {{ form.photo }}
+                {% for error in form.photo.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
