@@ -131,6 +131,10 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.slug = unique_slug
         super().save(*args, **kwargs)
 
+        # Cria perfil de artista automaticamente se marcado
+        if self.is_artist and not hasattr(self, 'artist'):
+            Artist.objects.create(user=self)
+
 
 class BaseAddress(models.Model):
         id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -171,6 +175,8 @@ class BaseAddress(models.Model):
 
 class Client(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="client")
+    wants_to_be_artist = models.BooleanField(_('Quero ser Artista!'), default=False)
+
 
     class Meta:
         verbose_name = "Cliente"
