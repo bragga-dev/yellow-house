@@ -137,13 +137,43 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class BaseAddress(models.Model):
+        class States(models.TextChoices):
+            AC = "AC", "Acre"
+            AL = "AL", "Alagoas"
+            AP = "AP", "Amapá"
+            AM = "AM", "Amazonas"
+            BA = "BA", "Bahia"
+            CE = "CE", "Ceará"
+            DF = "DF", "Distrito Federal"
+            ES = "ES", "Espírito Santo"
+            GO = "GO", "Goiás"
+            MA = "MA", "Maranhão"
+            MT = "MT", "Mato Grosso"
+            MS = "MS", "Mato Grosso do Sul"
+            MG = "MG", "Minas Gerais"
+            PA = "PA", "Pará"
+            PB = "PB", "Paraíba"
+            PR = "PR", "Paraná"
+            PE = "PE", "Pernambuco"
+            PI = "PI", "Piauí"
+            RJ = "RJ", "Rio de Janeiro"
+            RN = "RN", "Rio Grande do Norte"
+            RS = "RS", "Rio Grande do Sul"
+            RO = "RO", "Rondônia"
+            RR = "RR", "Roraima"
+            SC = "SC", "Santa Catarina"
+            SP = "SP", "São Paulo"
+            SE = "SE", "Sergipe"
+            TO = "TO", "Tocantins"
+
+
         id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
         cep = models.CharField(_('CEP'), max_length=9, null=False)  
         road = models.CharField(_('Rua'), max_length=255, null=False, blank=False)
         number = models.CharField(_('N°'), max_length=10, null=False, blank=False)
         district = models.CharField(_('Bairro'), max_length=100, null=False, blank=False)
         city = models.CharField(_('Cidade'), max_length=100, null=False, blank=False)
-        state = models.CharField(_('Estado'), max_length=2, null=False, blank=False)  
+        state = models.CharField(_('Estado'),  max_length=2, choices=States.choices, null=False,  blank=False)
         country = models.CharField(_('País'), max_length=100, default="Brasil")
         principal = models.BooleanField(_('Endereço Padrão?'), default=False)
         slug = models.SlugField(max_length=255, unique=True, editable=False)
@@ -166,7 +196,7 @@ class BaseAddress(models.Model):
                 base_slug = slugify(f"{self.road}-{self.number}-{self.district}-{self.city}-{self.state}-{self.country}")
                 unique_slug = base_slug
                 num = 1
-                while BaseAddress.objects.filter(slug=unique_slug).exists():
+                while self.__class__.objects.filter(slug=unique_slug).exists():
                     unique_slug = f'{base_slug}-{num}'
                     num += 1
                 self.slug = unique_slug
@@ -184,6 +214,7 @@ class Client(models.Model):
 
 class ClientAddress(BaseAddress):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='addresses')
+    
 
 
 class Artist(models.Model):

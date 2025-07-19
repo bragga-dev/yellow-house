@@ -11,74 +11,63 @@
 
             <h2 class="text-center mb-4">Atualizar Perfil</h2>
 
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST" enctype="multipart/form-data" action="{% url 'update_profile_artist' slug=user_form.instance.slug pk=user_form.instance.pk %}">
               {% csrf_token %}
-              {{ form.non_field_errors }}
 
-              <div class="mb-3">
-                <label for="{{ form.first_name.id_for_label }}" class="form-label">Primeiro nome</label>
-                {{ form.first_name }}
-                {% for error in form.first_name.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
+              {% if user_form.non_field_errors or address_form.non_field_errors %}
+                <div class="alert alert-danger">
+                  {{ user_form.non_field_errors }}
+                  {{ address_form.non_field_errors }}
+                </div>
+              {% endif %}
 
-              <div class="mb-3">
-                <label for="{{ form.last_name.id_for_label }}" class="form-label">Último nome</label>
-                {{ form.last_name }}
-                {% for error in form.last_name.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
+              <!-- 🎭 Campos do Perfil -->
+              {% for field in user_form %}
+                <div class="mb-3">
+                  <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.errors %}
+                    <div class="text-danger small">
+                      {{ field.errors.as_text|linebreaksbr }}
+                    </div>
+                  {% endif %}
+                  {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                  {% endif %}
+                </div>
+              {% endfor %}
 
-              <div class="mb-3">
-                <label for="{{ form.username.id_for_label }}" class="form-label">Usuário</label>
-                {{ form.username }}
-                {% for error in form.username.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-                {% if form.username.help_text %}
-                  <div class="form-text">{{ form.username.help_text }}</div>
-                {% endif %}
-              </div>
-
-              <div class="mb-3">
-                <label for="{{ form.cpf.id_for_label }}" class="form-label">CPF</label>
-                {{ form.cpf }}
-                {% for error in form.cpf.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
-
-              <div class="mb-3">
-                <label for="{{ form.phone.id_for_label }}" class="form-label">Telefone</label>
-                {{ form.phone }}
-                {% for error in form.phone.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-                <div class="form-text">Digite um número com DDD. Ex: +55 11 91234-5678</div>
-              </div>
-
+              <!-- 📸 Foto atual -->
               <div class="mb-3">
                 <label class="form-label">Foto atual:</label><br>
-                {% if form.instance.photo %}
-                  <img src="{{ form.instance.photo.url }}" alt="Foto atual" class="img-thumbnail mb-2" style="max-width: 150px;">
+                {% if user_form.instance.photo %}
+                  <img src="{{ user_form.instance.photo.url }}" alt="Foto atual" class="img-thumbnail mb-2" style="max-width: 150px;">
                 {% else %}
                   <p>Nenhuma foto enviada.</p>
                 {% endif %}
               </div>
 
-              <div class="mb-3">
-                <label for="{{ form.photo.id_for_label }}" class="form-label">Alterar foto</label>
-                {{ form.photo }}
-                {% for error in form.photo.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
+              <!-- 📝 Campos do Endereço -->
+              <hr>
+              <h3 class="mb-3">Endereço</h3>
 
+              {% for field in address_form %}
+                <div class="mb-3{% if field.widget_type == 'checkbox' %} form-check{% endif %}">
+                  {{ field }}
+                  <label for="{{ field.id_for_label }}" class="{% if field.widget_type == 'checkbox' %}form-check-label{% else %}form-label{% endif %}">{{ field.label }}</label>
+                  {% if field.errors %}
+                    <div class="text-danger small">
+                      {{ field.errors.as_text|linebreaksbr }}
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+
+              <!-- Botão -->
               <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Salvar</button>
               </div>
+
             </form>
 
           </div>

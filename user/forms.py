@@ -5,8 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
 from .models import User
 from validate_docbr import CPF
-from .models import ClientAddress
-from .models import BaseAddress
+from .models import ClientAddress, ArtistAddress
 from phonenumber_field.formfields import PhoneNumberField
 
 
@@ -143,15 +142,38 @@ class CustomUserChangeForm(UserChangeForm):
 
 
 
-# Endereço
-
 class AddressForm(forms.ModelForm):
     class Meta:
-        model = ClientAddress
-        fields = ['cep', 'road', 'number', 'district', 'city', 'state', 'country']
+        model = ClientAddress  # padrão, pode ser alterado dinamicamente
+        fields = ['cep', 'road', 'number', 'district', 'city', 'state', 'country', 'principal']
+        widgets = {
+            'cep': forms.TextInput(attrs={'placeholder': 'CEP'}),
+            'road': forms.TextInput(attrs={'placeholder': 'Rua'}),
+            'number': forms.TextInput(attrs={'placeholder': 'Número'}),
+            'district': forms.TextInput(attrs={'placeholder': 'Bairro'}),
+            'city': forms.TextInput(attrs={'placeholder': 'Cidade'}),
+            'state': forms.Select(attrs={'placeholder': 'Estado'}),
+            'country': forms.TextInput(attrs={'placeholder': 'País'}),
+            'principal': forms.CheckboxInput(),
+        }
 
+    def __init__(self, *args, **kwargs):
+        address_type = kwargs.pop('address_type', 'client')  # 'artist' ou 'client'
+        self.address_type = address_type
+        super().__init__(*args, **kwargs)
+        if address_type == 'artist':
+            self._meta.model = ArtistAddress
+        else:
+            self._meta.model = ClientAddress
 
-class AddressUpdateForm(forms.ModelForm):
-    class Meta:
-        model = BaseAddress
-        fields = ['cep', 'road', 'number', 'district', 'city', 'state', 'country']
+    def save(self, commit=True, owner=None):  # <- adicionamos o owner (client ou artist)
+        instance = super().save(commit=False)
+        if owner:
+            if self.address_type == 'client':
+                instance.client = owner
+            else:
+                instance.artist = owner
+        if commit:
+            instance.save()
+        return instance
+
