@@ -31,7 +31,7 @@ def update_profile_artist(request, slug, pk):
             return redirect('/')# redirecione para onde quiser
     else:
         user_form = UserUpdateForm(instance=user)
-        artist_form = ClientUpdateForm(instance=artist)
+        artist_form = ArtistUpdateForm(instance=artist, user=request.user)
         address_form = AddressForm(
             instance=address,
             address_type='artist'

@@ -14,14 +14,15 @@
             <form method="POST" enctype="multipart/form-data" action="{% url 'update_profile_artist' slug=user_form.instance.slug pk=user_form.instance.pk %}">
               {% csrf_token %}
 
-              {% if user_form.non_field_errors or address_form.non_field_errors %}
+              {% if user_form.non_field_errors or address_form.non_field_errors or artist_form.non_field_errors %}
                 <div class="alert alert-danger">
                   {{ user_form.non_field_errors }}
                   {{ address_form.non_field_errors }}
+                  {{ artist_form.non_field_errors }}
                 </div>
               {% endif %}
 
-              <!-- 🎭 Campos do Perfil -->
+              <!-- 🎭 Campos do Perfil (User) -->
               {% for field in user_form %}
                 <div class="mb-3">
                   <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
@@ -47,24 +48,56 @@
                 {% endif %}
               </div>
 
-              <!-- 📝 Campos do Endereço -->
+              <!-- 📝 Campos do Artista -->
               <hr>
-              <h3 class="mb-3">Endereço</h3>
+              <h3 class="mb-3">Perfil do Artista</h3>
 
-              {% for field in address_form %}
-                <div class="mb-3{% if field.widget_type == 'checkbox' %} form-check{% endif %}">
-                  {{ field }}
-                  <label for="{{ field.id_for_label }}" class="{% if field.widget_type == 'checkbox' %}form-check-label{% else %}form-label{% endif %}">{{ field.label }}</label>
+              {% for field in artist_form %}
+                <div class="mb-3{% if field.field.widget.input_type == 'checkbox' %} form-check{% endif %}">
+                  {% if field.field.widget.input_type == 'checkbox' %}
+                    {{ field }}
+                    <label for="{{ field.id_for_label }}" class="form-check-label">{{ field.label }}</label>
+                  {% else %}
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                  {% endif %}
                   {% if field.errors %}
                     <div class="text-danger small">
                       {{ field.errors.as_text|linebreaksbr }}
                     </div>
                   {% endif %}
+                  {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+
+              <!-- 📝 Campos do Endereço -->
+              <hr>
+              <h3 class="mb-3">Endereço</h3>
+
+              {% for field in address_form %}
+                <div class="mb-3{% if field.field.widget.input_type == 'checkbox' %} form-check{% endif %}">
+                  {% if field.field.widget.input_type == 'checkbox' %}
+                    {{ field }}
+                    <label for="{{ field.id_for_label }}" class="form-check-label">{{ field.label }}</label>
+                  {% else %}
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                  {% endif %}
+                  {% if field.errors %}
+                    <div class="text-danger small">
+                      {{ field.errors.as_text|linebreaksbr }}
+                    </div>
+                  {% endif %}
+                  {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                  {% endif %}
                 </div>
               {% endfor %}
 
               <!-- Botão -->
-              <div class="d-grid">
+              <div class="d-grid mt-4">
                 <button type="submit" class="btn btn-primary">Salvar</button>
               </div>
 

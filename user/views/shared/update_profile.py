@@ -9,14 +9,12 @@ from user.decorators import is_staff_required
 @login_required
 def update_profile_redirect(request, slug, pk):
     user = request.user
-    print(f"Autenticado: {user.is_authenticated}")
-    print(f"User: {user}, slug: {user.slug}, pk: {user.pk}")
-    print(f"is_client: {getattr(user, 'is_client', 'N/A')}, is_artist: {getattr(user, 'is_artist', 'N/A')}")
-
     if getattr(user, 'is_artist', False):
         return redirect('update_profile_artist', slug=user.slug, pk=user.pk)
     elif getattr(user, 'is_client', False):
         return redirect('update_profile_client', slug=user.slug, pk=user.pk)
+    # elif user.is_staff:
+    #     return redirect('update_profile_staff', slug=user.slug, pk=user.pk)
     else:
         messages.error(request, "Tipo de usuário não reconhecido.")
         return redirect('/')

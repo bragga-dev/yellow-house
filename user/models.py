@@ -220,6 +220,8 @@ class ClientAddress(BaseAddress):
 class Artist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="artist")
     is_verified = models.BooleanField(_('Autorizado?'), default=False, help_text="Indica se o artista foi verificado pela plataforma.")
+    bio = models.TextField(_('Biografia'), blank=True, null=True, help_text=_('Conte um pouco sobre você.'))
+
 
     class Meta:
         verbose_name = "Artista"
@@ -227,3 +229,4 @@ class Artist(models.Model):
 
 class ArtistAddress(BaseAddress):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='addresses')
+    

@@ -114,7 +114,11 @@ class ClientUpdateForm(forms.ModelForm):
 class ArtistUpdateForm(forms.ModelForm):
     class Meta:
         model = Artist
-        fields = ['is_verified']
+        fields = ['is_verified', 'bio']
+        widgets = {
+            'is_verified': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'bio': forms.Textarea(attrs={'placeholder': 'Conte um pouco sobre você.', 'rows': 4}),
+        }
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)  
