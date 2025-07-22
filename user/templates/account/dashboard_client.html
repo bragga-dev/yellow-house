@@ -1,0 +1,93 @@
+{% extends "vitrine/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row">
+    <!-- Coluna lateral esquerda -->
+    <div class="col-md-4 bg-success text-white rounded-start py-4 px-3">
+      <div class="text-center mb-4">
+        <img src="{% if user.photo %}{{ user.photo.url }}{% else %}{% static 'photos/default.jpg' %}{% endif %}"
+             alt="Foto do Cliente" class="rounded-circle border border-white mb-3" width="120" height="120">
+        <h3 class="fw-bold">{{ user.get_full_name }}</h3>
+        <p class="text-white-50 small">{{ user.email }}</p>
+        <span class="badge bg-light text-success">{{ user.username }}</span>
+      </div>
+
+      <ul class="list-unstyled text-center mb-4">
+        <li><i class="bi bi-phone"></i> {{ user.phone|default:"Sem telefone" }}</li>
+        <li><i class="bi bi-calendar"></i> Entrou em {{ user.date_joined|date:"d/m/Y" }}</li>
+        <li><i class="bi bi-credit-card-2-front"></i> CPF: {{ user.cpf|default:"Não informado" }}</li>
+      </ul>
+
+      <div class="text-center">
+        <a href="{% url 'account_logout' %}" class="btn btn-danger btn-sm mt-3">
+          <i class="bi bi-box-arrow-right"></i> Sair
+        </a>
+      </div>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="col-md-8 bg-white rounded-end shadow-sm py-4 px-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold">Informações do Cliente</h4>
+        <a href="{% url 'update_profile_client' slug=user.slug pk=user.pk %}" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-pencil"></i> Editar Perfil
+        </a>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+          <strong>Nome completo:</strong><br>
+          {{ user.get_full_name }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>Email:</strong><br>
+          {{ user.email }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>Data de nascimento:</strong><br>
+          {{ user.date_of_birth|date:"d/m/Y"|default:"Não informado" }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>Telefone:</strong><br>
+          {{ user.phone|default:"Não informado" }}
+        </div>
+      </div>
+
+      <h5 class="fw-bold mt-4 mb-3">Endereços</h5>
+      <div class="row">
+        {% for address in client.addresses.all %}
+          <div class="col-md-6 mb-3">
+            <div class="border p-3 rounded shadow-sm">
+              <h6 class="fw-bold mb-2">
+                Endereço {{ forloop.counter }}
+                {% if address.principal %}
+                  <span class="badge bg-success ms-2">Padrão</span>
+                {% endif %}
+              </h6>
+              <p class="mb-1">{{ address.road }}, {{ address.number }}</p>
+              <p class="mb-1">{{ address.district }} – {{ address.city }} / {{ address.state }}</p>
+              <p class="mb-1">{{ address.cep }} – {{ address.country }}</p>
+              <div class="d-flex gap-2 mt-2">
+                <a href="#" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil"></i> Editar</a>
+                <a href="#" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Remover</a>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="col-12">
+            <p class="text-muted">Nenhum endereço cadastrado.</p>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if client.wants_to_be_artist %}
+        <div class="alert alert-info mt-4" role="alert">
+          Este usuário manifestou interesse em se tornar artista!
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

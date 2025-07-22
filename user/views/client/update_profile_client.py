@@ -26,7 +26,7 @@ def update_profile_client(request, slug, pk):
             user_form.save()
             client_form.save()
             address_form.save(owner=client)  # repassando o client
-            return redirect('/')# redirecione para onde quiser
+            return redirect('dashboard_client', slug=user.slug, pk=user.pk)# redirecione para onde quiser
     else:
         user_form = UserUpdateForm(instance=user)
         client_form = ClientUpdateForm(instance=client)
