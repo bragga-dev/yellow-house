@@ -10,9 +10,9 @@ from user.decorators import is_staff_required
 def profile_redirect(request, slug, pk):
     user = request.user
     if getattr(user, 'is_artist', False):
-        return redirect('update_profile_artist', slug=user.slug, pk=user.pk)
+        return redirect('artist:dashboard_artist', slug=user.slug, pk=user.pk)
     elif getattr(user, 'is_client', False):
-        return redirect('dashboard_client', slug=user.slug, pk=user.pk)
+        return redirect('client:dashboard_client', slug=user.slug, pk=user.pk)
     # elif user.is_staff:
     #     return redirect('update_profile_staff', slug=user.slug, pk=user.pk)
     else:

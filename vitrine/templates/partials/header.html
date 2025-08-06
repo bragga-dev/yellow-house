@@ -86,12 +86,15 @@
             <!-- Account -->
             <div class="dropdown account-dropdown">
               <button class="header-action-btn" data-bs-toggle="dropdown">
-              {% if request.user.is_authenticated and request.user.photo %}
-    <img src="{{ request.user.photo.url }}" alt="banner" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
-{% else %}
-    <i class="bi bi-person-plus-fill"></i>
-{% endif %}
-          
+              {% if request.user.is_authenticated %}
+                  {% if request.user.photo and request.user.photo %}
+                    <img src="{{ request.user.photo.url }}" alt="banner" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                  {% else %}
+                   <i class="bi bi-person-plus-fill"></i>
+                  {% endif %}
+            {% else %}
+              <i class="bi bi-person-plus-fill"></i>
+            {% endif %}            
               </button>
               <div class="dropdown-menu">
                 <div class="dropdown-header">
@@ -105,7 +108,7 @@
                 </div>
                 <div class="dropdown-body">
                 {% if request.user.is_authenticated %}
-                 <a class="dropdown-item d-flex align-items-center" href="{% url 'update_profile' request.user.slug request.user.pk %}">
+                 <a class="dropdown-item d-flex align-items-center" href="{% url 'shared:profile_redirect' request.user.slug request.user.pk %}">
                     <i class="bi bi-person-circle me-2"></i>
                     <span>My Profile</span>
                   </a>                  

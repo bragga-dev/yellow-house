@@ -13,10 +13,10 @@
             <p class="lead mb-4">{% trans "Escolha o tipo de conta que deseja criar:" %}</p>
 
             <div class="d-grid gap-3">
-              <a href="{% url 'account_signup_client' %}" class="btn btn-outline-primary btn-lg">
+              <a href="{% url 'shared:account_signup_client' %}" class="btn btn-outline-primary btn-lg">
                 {% trans "Sou Cliente" %}
               </a>
-              <a href="{% url 'account_signup_artist' %}" class="btn btn-outline-secondary btn-lg">
+              <a href="{% url 'shared:account_signup_artist' %}" class="btn btn-outline-secondary btn-lg">
                 {% trans "Sou Artista" %}
               </a>
             </div>

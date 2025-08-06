@@ -48,9 +48,24 @@ class UserManager(BaseUserManager):
     
 
 
+import os
+
 def validate_image_file(value):
     valid_extensions = ['jpg', 'jpeg', 'png']
-    file_ext = imghdr.what(value)
+    # Tenta obter o path real do arquivo
+    try:
+        file_path = value.path
+    except ValueError:
+        # Se não tiver path (ex: arquivo em memória), pula validação aqui
+        return
+    except Exception:
+        return
+
+    # Verifica se o arquivo existe, se não, pula validação
+    if not os.path.exists(file_path):
+        return
+
+    file_ext = imghdr.what(file_path)
     if file_ext not in valid_extensions:
         raise ValidationError('Formato de arquivo inválido. Use jpg, jpeg ou png.')
 

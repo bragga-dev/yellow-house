@@ -11,7 +11,7 @@
 
             <h2 class="text-center mb-4">Atualizar Perfil</h2>
 
-          <form method="POST" enctype="multipart/form-data" action="{% url 'update_profile_client' slug=user_form.instance.slug pk=user_form.instance.pk %}">
+          <form method="POST" enctype="multipart/form-data" action="{% url 'client:update_profile_client' slug=user_form.instance.slug pk=user_form.instance.pk %}">
               {% csrf_token %}
               {{ user_form.non_field_errors }}
               {{ address_form.non_field_errors }}

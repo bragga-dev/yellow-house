@@ -156,7 +156,7 @@ class AddressForm(forms.ModelForm):
             'number': forms.TextInput(attrs={'placeholder': 'Número'}),
             'district': forms.TextInput(attrs={'placeholder': 'Bairro'}),
             'city': forms.TextInput(attrs={'placeholder': 'Cidade'}),
-            'state': forms.Select(attrs={'placeholder': 'Estado'}),
+            'state': forms.Select(attrs={'class': 'form-select'}),
             'country': forms.TextInput(attrs={'placeholder': 'País'}),
             'principal': forms.CheckboxInput(),
         }
