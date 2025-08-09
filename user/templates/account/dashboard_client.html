@@ -32,8 +32,23 @@
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold">Informações do Cliente</h4>
         <a href="{% url 'client:update_profile_client' slug=user.slug pk=user.pk %}" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-pencil"></i> Editar Perfil
+          <i class="bi bi-pencil"></i><i class="ms-1"></i> Editar Perfil
         </a>
+
+        <!-- Botão que abre o modal -->
+          <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+            <i class="bi bi-house-add"></i> <i class="ms-1"></i> Adicionar Endereço
+          </button>
+          {% include 'account/create_address.html' with form=form %}
+          {% if form.errors %}
+            <script>
+              document.addEventListener("DOMContentLoaded", function() {
+                const modalEl = document.getElementById("addAddressModal");
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+              });
+            </script>
+          {% endif %}
       </div>
 
       <div class="row mb-4">
@@ -69,8 +84,24 @@
         <p class="mb-1">{{ address.road }}, {{ address.number }}</p>
         <p class="mb-1">{{ address.district }} – {{ address.city }} / {{ address.state }}</p>
         <p class="mb-1">{{ address.cep }} – {{ address.country }}</p>
+        {% if address.complement %}
+          <p class="mb-1"><strong>Complemento:</strong> {{ address.complement }}</p>
+        {% endif %}
         <div class="d-flex gap-2 mt-2">
-          <a href="#" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil"></i> Editar</a>
+         <!-- Botão Editar -->
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#editAddressModal{{ address.pk }}">
+          <i class="bi bi-pencil"></i> Editar
+        </button>
+       {% include 'account/update_address.html' with address=address form=address.edit_form %}
+        {% if address.open_modal %}
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                var modal = new bootstrap.Modal(document.getElementById('editAddressModal{{ address.pk }}'));
+                modal.show();
+              });
+            </script>
+          {% endif %}
+
           <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAddressModal{{ address.pk }}">
             Excluir
           </button>
@@ -86,7 +117,7 @@
 </div>
 
 
-      {% if client.wants_to_be_artist %}
+      {% if client.wants_to_be_client %}
         <div class="alert alert-info mt-4" role="alert">
           Este usuário manifestou interesse em se tornar artista!
         </div>

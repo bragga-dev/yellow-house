@@ -262,3 +262,11 @@ class ArtistAddress(BaseAddress):
 
 
     
+class Exhibitions(models.Model):
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='exhibitions')
+    title = models.CharField(_('Título'), max_length=255)
+    description = models.TextField(_('Descrição'), blank=True, null=True)
+    date = models.DateField(_('Data'), null=False, blank=False)
+    location = models.CharField(_('Localização'), max_length=255, null=False, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
