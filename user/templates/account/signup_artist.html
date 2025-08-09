@@ -10,7 +10,7 @@
 
             <h2 class="text-center mb-4">{% trans "Cadastrar como Artista" %}</h2>
 
-            <form method="POST" action="{% url 'account_signup_artist' %}" autocomplete="off">
+            <form method="POST" action="{% url 'shared:account_signup_artist' %}" autocomplete="off">
               {% csrf_token %}
               {{ redirect_field }}
 

@@ -226,3 +226,46 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "samaedo666@gmail.com"
 EMAIL_HOST_PASSWORD = "ifhz zttu sxpi xvci"
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
+# Logging configuration
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple', # Ou 'verbose' para mais detalhes
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO', # Nível padrão para todos os logs não especificados
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'), # Pode ser DEBUG em desenvolvimento
+            'propagate': False,
+        },
+        # Adicione este logger específico para o seu arquivo de views onde 'delete_address' está
+        # AJUSTE O CAMINHO 'user.views.shared.add_address' para o caminho REAL do seu arquivo
+        'user.views.shared.add_address': {
+            'handlers': ['console'],
+            'level': 'DEBUG', # Este nível mostrará TUDO (INFO, WARNING, ERROR, DEBUG)
+            'propagate': False,
+        },
+    },
+}

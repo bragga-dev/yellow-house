@@ -48,9 +48,24 @@ class UserManager(BaseUserManager):
     
 
 
+import os
+
 def validate_image_file(value):
     valid_extensions = ['jpg', 'jpeg', 'png']
-    file_ext = imghdr.what(value)
+    # Tenta obter o path real do arquivo
+    try:
+        file_path = value.path
+    except ValueError:
+        # Se não tiver path (ex: arquivo em memória), pula validação aqui
+        return
+    except Exception:
+        return
+
+    # Verifica se o arquivo existe, se não, pula validação
+    if not os.path.exists(file_path):
+        return
+
+    file_ext = imghdr.what(file_path)
     if file_ext not in valid_extensions:
         raise ValidationError('Formato de arquivo inválido. Use jpg, jpeg ou png.')
 
@@ -137,16 +152,47 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class BaseAddress(models.Model):
+        class States(models.TextChoices):
+            AC = "AC", "Acre"
+            AL = "AL", "Alagoas"
+            AP = "AP", "Amapá"
+            AM = "AM", "Amazonas"
+            BA = "BA", "Bahia"
+            CE = "CE", "Ceará"
+            DF = "DF", "Distrito Federal"
+            ES = "ES", "Espírito Santo"
+            GO = "GO", "Goiás"
+            MA = "MA", "Maranhão"
+            MT = "MT", "Mato Grosso"
+            MS = "MS", "Mato Grosso do Sul"
+            MG = "MG", "Minas Gerais"
+            PA = "PA", "Pará"
+            PB = "PB", "Paraíba"
+            PR = "PR", "Paraná"
+            PE = "PE", "Pernambuco"
+            PI = "PI", "Piauí"
+            RJ = "RJ", "Rio de Janeiro"
+            RN = "RN", "Rio Grande do Norte"
+            RS = "RS", "Rio Grande do Sul"
+            RO = "RO", "Rondônia"
+            RR = "RR", "Roraima"
+            SC = "SC", "Santa Catarina"
+            SP = "SP", "São Paulo"
+            SE = "SE", "Sergipe"
+            TO = "TO", "Tocantins"
+
+
         id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
         cep = models.CharField(_('CEP'), max_length=9, null=False)  
         road = models.CharField(_('Rua'), max_length=255, null=False, blank=False)
         number = models.CharField(_('N°'), max_length=10, null=False, blank=False)
         district = models.CharField(_('Bairro'), max_length=100, null=False, blank=False)
         city = models.CharField(_('Cidade'), max_length=100, null=False, blank=False)
-        state = models.CharField(_('Estado'), max_length=2, null=False, blank=False)  
+        state = models.CharField(_('Estado'),  max_length=2, choices=States.choices, null=False,  blank=False)
         country = models.CharField(_('País'), max_length=100, default="Brasil")
-        principal = models.BooleanField(_('Endereço Padrão?'), default=False)
+        principal = models.BooleanField(_('Endereço Padrão?'), default=True, help_text=_('Define este endereço como o principal para entregas.'))
         slug = models.SlugField(max_length=255, unique=True, editable=False)
+        complement = models.CharField(_('Complemento'), max_length=255, null=True, blank=True)
         created_at = models.DateTimeField(auto_now_add=True)
         updated_at = models.DateTimeField(auto_now=True)
 
@@ -166,7 +212,7 @@ class BaseAddress(models.Model):
                 base_slug = slugify(f"{self.road}-{self.number}-{self.district}-{self.city}-{self.state}-{self.country}")
                 unique_slug = base_slug
                 num = 1
-                while BaseAddress.objects.filter(slug=unique_slug).exists():
+                while self.__class__.objects.filter(slug=unique_slug).exists():
                     unique_slug = f'{base_slug}-{num}'
                     num += 1
                 self.slug = unique_slug
@@ -185,10 +231,20 @@ class Client(models.Model):
 class ClientAddress(BaseAddress):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='addresses')
 
+    def save(self, *args, **kwargs):
+        # Se o endereço atual for definido como principal
+        if self.principal:
+            # Define todos os outros como não principais
+            ClientAddress.objects.filter(client=self.client, principal=True).exclude(pk=self.pk).update(principal=False)
+        super().save(*args, **kwargs)
+    
+
 
 class Artist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="artist")
     is_verified = models.BooleanField(_('Autorizado?'), default=False, help_text="Indica se o artista foi verificado pela plataforma.")
+    bio = models.TextField(_('Biografia'), blank=True, null=True, help_text=_('Conte um pouco sobre você.'))
+
 
     class Meta:
         verbose_name = "Artista"
@@ -196,3 +252,21 @@ class Artist(models.Model):
 
 class ArtistAddress(BaseAddress):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='addresses')
+
+    def save(self, *args, **kwargs):
+        # Se o endereço atual for definido como principal
+        if self.principal:
+            # Define todos os outros como não principais
+            ArtistAddress.objects.filter(artist=self.artist, principal=True).exclude(pk=self.pk).update(principal=False)
+        super().save(*args, **kwargs)
+
+
+    
+class Exhibitions(models.Model):
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='exhibitions')
+    title = models.CharField(_('Título'), max_length=255)
+    description = models.TextField(_('Descrição'), blank=True, null=True)
+    date = models.DateField(_('Data'), null=False, blank=False)
+    location = models.CharField(_('Localização'), max_length=255, null=False, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
