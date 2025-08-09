@@ -10,7 +10,7 @@ def dashboard_artist(request, slug, pk):
         return redirect('account_login')
 
     # transformar em lista para podermos adicionar atributos nos objetos
-    addresses = list(artist.addresses.all())
+    addresses = list(artist.addresses.all().order_by('id'))
 
     # formulário usado para criar novo endereço (modal de criação)
     form = AddressForm(address_type='artist')

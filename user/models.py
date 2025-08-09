@@ -190,8 +190,9 @@ class BaseAddress(models.Model):
         city = models.CharField(_('Cidade'), max_length=100, null=False, blank=False)
         state = models.CharField(_('Estado'),  max_length=2, choices=States.choices, null=False,  blank=False)
         country = models.CharField(_('País'), max_length=100, default="Brasil")
-        principal = models.BooleanField(_('Endereço Padrão?'), default=False)
+        principal = models.BooleanField(_('Endereço Padrão?'), default=True, help_text=_('Define este endereço como o principal para entregas.'))
         slug = models.SlugField(max_length=255, unique=True, editable=False)
+        complement = models.CharField(_('Complemento'), max_length=255, null=True, blank=True)
         created_at = models.DateTimeField(auto_now_add=True)
         updated_at = models.DateTimeField(auto_now=True)
 
@@ -229,6 +230,13 @@ class Client(models.Model):
 
 class ClientAddress(BaseAddress):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='addresses')
+
+    def save(self, *args, **kwargs):
+        # Se o endereço atual for definido como principal
+        if self.principal:
+            # Define todos os outros como não principais
+            ClientAddress.objects.filter(client=self.client, principal=True).exclude(pk=self.pk).update(principal=False)
+        super().save(*args, **kwargs)
     
 
 
@@ -244,4 +252,13 @@ class Artist(models.Model):
 
 class ArtistAddress(BaseAddress):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='addresses')
+
+    def save(self, *args, **kwargs):
+        # Se o endereço atual for definido como principal
+        if self.principal:
+            # Define todos os outros como não principais
+            ArtistAddress.objects.filter(artist=self.artist, principal=True).exclude(pk=self.pk).update(principal=False)
+        super().save(*args, **kwargs)
+
+
     

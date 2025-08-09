@@ -90,6 +90,15 @@
               {% endif %}
             </div>
 
+            <!-- Complemento -->
+            <div class="col-md-12">
+              <label for="{{ form.complement.id_for_label }}" class="form-label fw-semibold text-dark">Complemento (opcional)</label> 
+              <input type="text" name="{{ form.complement.html_name }}" id="{{ form.complement.id_for_label }}" class="form-control border-1 rounded-2" value="{{ form.complement.value|default_if_none:'' }}">
+              {% if form.complement.errors %}
+                <div class="text-danger small">{{ form.complement.errors.as_text|linebreaksbr }}</div>
+              {% endif %}
+            </div>
+
             <!-- Endereço principal -->
             <div class="col-12">
               <div class="form-check mt-2">

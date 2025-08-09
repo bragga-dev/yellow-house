@@ -149,7 +149,7 @@ class CustomUserChangeForm(UserChangeForm):
 class AddressForm(forms.ModelForm):
     class Meta:
         model = ClientAddress  # padrão, pode ser alterado dinamicamente
-        fields = ['cep', 'road', 'number', 'district', 'city', 'state', 'country', 'principal']
+        fields = ['cep', 'road', 'number', 'district', 'city', 'state', 'country', 'complement', 'principal']
         widgets = {
             'cep': forms.TextInput(attrs={'placeholder': 'CEP'}),
             'road': forms.TextInput(attrs={'placeholder': 'Rua'}),
@@ -158,7 +158,8 @@ class AddressForm(forms.ModelForm):
             'city': forms.TextInput(attrs={'placeholder': 'Cidade'}),
             'state': forms.Select(attrs={'class': 'form-select'}),
             'country': forms.TextInput(attrs={'placeholder': 'País'}),
-            'principal': forms.CheckboxInput(),
+            'complement': forms.TextInput(attrs={'placeholder': 'Complemento (opcional)'}),
+            'principal': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
     def __init__(self, *args, **kwargs):
