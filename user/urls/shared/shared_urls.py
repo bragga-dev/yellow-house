@@ -12,5 +12,5 @@ urlpatterns = [
     path('create_address/', create_address, name='create_address'),
     path('update_address/<uuid:pk>/', update_address, name='update_address'),
     path('delete_address/<uuid:pk>/', delete_address, name='delete_address'),
-    path('<slug:slug>/<uuid:pk>/', profile_redirect, name='profile_redirect'),  # último da lista
+    path('<slug:slug>/<uuid:pk>/', profile_redirect, name='profile_redirect'),  
 ]

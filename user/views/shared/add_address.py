@@ -72,41 +72,63 @@ def create_address(request):
 
 @login_required
 def update_address(request, pk):
-    logger.debug(f"edit_address called with pk={pk} and user={request.user}")
+    logger.debug(f"update_address called with pk={pk} and user={request.user}")
+    user = request.user
 
-    address = get_object_or_404(pk=pk)
-
-    # Verifica se o usuário é dono do endereço
-    if request.user.is_client and hasattr(request.user, 'client'):
-        if address.client != request.user.client:
-            messages.error(request, "Você não tem permissão para editar este endereço.")
-            return redirect('profile')
-        owner = request.user.client
-        address_type = 'client'
-
-    elif request.user.is_artist and hasattr(request.user, 'artist'):
-        if address.artist != request.user.artist:
-            messages.error(request, "Você não tem permissão para editar este endereço.")
-            return redirect('profile')
-        owner = request.user.artist
-        address_type = 'artist'
-
+    if getattr(user, 'is_client', False) and getattr(user, 'client', None):
+        owner = user.client
+        address = get_object_or_404(ClientAddress, pk=pk, client=owner)
+        owner_type = 'client'
+        dashboard_template = 'account/dashboard_client.html'
+        dashboard_url_name = 'client:dashboard_client'
+    elif getattr(user, 'is_artist', False) and getattr(user, 'artist', None):
+        owner = user.artist
+        address = get_object_or_404(ArtistAddress, pk=pk, artist=owner)
+        owner_type = 'artist'
+        dashboard_template = 'account/dashboard_artist.html'
+        dashboard_url_name = 'artist:dashboard_artist'
     else:
         messages.error(request, "Seu tipo de usuário não é suportado.")
-        return redirect('home')
+        return redirect('/')
 
-    # Formulário
     if request.method == 'POST':
-        form = AddressForm(request.POST, instance=address, address_type=address_type)
+        form = AddressForm(request.POST, instance=address, address_type=owner_type)
         if form.is_valid():
-            form.save(owner=owner)
-            messages.success(request, "Endereço atualizado com sucesso.")
-            return redirect('profile')
-    else:
-        form = AddressForm(instance=address, address_type=address_type)
+            try:
+                form.save(owner=owner)
+                messages.success(request, "Endereço atualizado com sucesso.")
+                return redirect(dashboard_url_name, slug=user.slug, pk=user.pk)
+            except Exception as e:
+                logger.error(f"Erro ao salvar endereço: {e}")
+                messages.error(request, f"Erro ao atualizar o endereço: {e}")
+        else:
+            # Form inválido — reconstruir dashboard e reabrir modal
+            messages.error(request, "Corrija os erros no formulário.")
 
-    return render(request, 'account/edit_address.html', {'form': form})
+            # Buscar todos os endereços
+            addresses = list(owner.addresses.all())
 
+            # Anexar o edit_form correto a cada endereço
+            for addr in addresses:
+                if addr.pk == address.pk:
+                    # O endereço com erro recebe o form com erros
+                    addr.edit_form = form
+                    addr.open_modal = True  # flag para template reabrir o modal
+                else:
+                    addr.edit_form = AddressForm(instance=addr, address_type=owner_type)
+
+            context = {
+                'user': user,
+                'addresses': addresses,
+                'form': AddressForm(address_type=owner_type),  # form de criação
+                'artist': owner if owner_type == 'artist' else getattr(user, 'artist', None),
+                'client': owner if owner_type == 'client' else getattr(user, 'client', None),
+            }
+            return render(request, dashboard_template, context)
+
+    # GET (ex: carregando modal pela primeira vez)
+    form = AddressForm(instance=address, address_type=owner_type)
+    return render(request, 'account/update_address.html', {'form': form, 'address': address})
 
 @login_required
 def delete_address(request, pk):

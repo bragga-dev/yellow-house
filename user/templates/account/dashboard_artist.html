@@ -85,7 +85,20 @@
         <p class="mb-1">{{ address.district }} – {{ address.city }} / {{ address.state }}</p>
         <p class="mb-1">{{ address.cep }} – {{ address.country }}</p>
         <div class="d-flex gap-2 mt-2">
-          <a href="#" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil"></i> Editar</a>
+         <!-- Botão Editar -->
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#editAddressModal{{ address.pk }}">
+          <i class="bi bi-pencil"></i> Editar
+        </button>
+       {% include 'account/update_address.html' with address=address form=address.edit_form %}
+        {% if address.open_modal %}
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                var modal = new bootstrap.Modal(document.getElementById('editAddressModal{{ address.pk }}'));
+                modal.show();
+              });
+            </script>
+          {% endif %}
+
           <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAddressModal{{ address.pk }}">
             Excluir
           </button>

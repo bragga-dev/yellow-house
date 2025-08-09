@@ -7,15 +7,23 @@ from user.forms import AddressForm
 def dashboard_artist(request, slug, pk):
     artist = get_object_or_404(Artist, user__slug=slug, user__pk=pk)
     if artist.user != request.user:
-        return redirect('account_login') 
-    addresses = artist.addresses.all()    
-    form = AddressForm(address_type='artist')  # instância vazia pra povoar o modal
+        return redirect('account_login')
+
+    # transformar em lista para podermos adicionar atributos nos objetos
+    addresses = list(artist.addresses.all())
+
+    # formulário usado para criar novo endereço (modal de criação)
+    form = AddressForm(address_type='artist')
+
+    # anexar um edit_form em cada endereço (instância já preenchida com instance=addr)
+    for addr in addresses:
+        addr.edit_form = AddressForm(instance=addr, address_type='artist')
 
     context = {
         'artist': artist,
         'addresses': addresses,
         'user': artist.user,
-        'form': form,  # importante: fornece o form pro include do modal
+        'form': form,
+        # não precisa mais enviar edit_forms separado
     }
     return render(request, 'account/dashboard_artist.html', context)
-
