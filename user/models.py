@@ -135,7 +135,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self.is_artist and self.is_client:
             raise ValidationError("O usuário não pode ser Cliente e Artista ao mesmo tempo")
         
-        
+        if self.date_of_birth and self.date_of_birth > timezone.localdate():
+            raise ValidationError({'date_of_birth': 'Data de nascimento não pode ser maior que a data atual.'})
+
     def save(self, *args, **kwargs):
         self.full_clean()
         if not self.slug or self._state.adding or self.has_name_changed():
