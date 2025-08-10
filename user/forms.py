@@ -73,7 +73,7 @@ class ArtistSignupForm(SignupForm):
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'cpf', 'phone', 'photo']
+        fields = ['first_name', 'last_name', 'username', 'cpf', 'phone', 'photo', 'date_of_birth']
         widgets = {
             'first_name': forms.TextInput(attrs={'placeholder': 'Digite seu nome'}),
             'last_name': forms.TextInput(attrs={'placeholder': 'Digite seu sobrenome'}),
@@ -83,6 +83,12 @@ class UserUpdateForm(forms.ModelForm):
             'phone': forms.TextInput(attrs={'placeholder': 'DDD + número'}),
             'photo': forms.ClearableFileInput(attrs={'placeholder': 'Foto de perfil'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        dob = self.instance.date_of_birth
+        if dob:
+            self.initial['date_of_birth'] = dob.strftime('%Y-%m-%d')
 
     def clean_cpf(self):
         cpf = self.cleaned_data.get('cpf')
