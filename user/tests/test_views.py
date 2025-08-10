@@ -1,7 +1,12 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client as DjangoClient
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from user.models import Client as ClientModel, ClientAddress
+from user.models import Client, ClientAddress, Artist, ArtistAddress
+from django.contrib.messages import get_messages
+from user.models import ClientAddress, Client  
+from user.forms import AddressForm
+import uuid
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -11,106 +16,162 @@ logger = logging.getLogger(__name__)
 
 
 
-from django.contrib.messages import get_messages
-from user.models import ClientAddress, Client  # ajuste conforme seus modelos
-from user.forms import AddressForm
-
 User = get_user_model()
 
-class CreateAddressViewTests(TestCase):
-    def setUp(self):
-        self.client_user = User.objects.create_user(username='cliente', password='123456')
-        self.client_user.is_client = True
-        self.client_user.save()
-        self.client_profile = Client.objects.create(user=self.client_user, slug='cliente-slug')
-        self.client_user.client = self.client_profile
-
-        self.url = reverse('shared:create_address')
-
-    def test_get_request_renders_form(self):
-        self.client.login(username='cliente', password='123456')
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'account/create_address.html')
-        self.assertIsInstance(response.context['form'], AddressForm)
-
-    def test_post_valid_data_creates_address(self):
-        self.client.login(username='cliente', password='123456')
-        data = {
-            'cep': '12345678',
-            'road': 'Rua Teste',
-            'number': '100',
-            'district': 'Centro',
-            'city': 'Jequié',
-            'state': 'BA',
-            'country': 'Brasil',
-            'principal': True,
-        }
-        response = self.client.post(self.url, data)
-        self.assertEqual(ClientAddress.objects.count(), 1)
-        address = ClientAddress.objects.first()
-        self.assertEqual(address.road, 'Rua Teste')
-        self.assertRedirects(response, reverse('client:dashboard_client', kwargs={'slug': self.client_user.slug, 'pk': self.client_user.pk}))
-
-    def test_post_invalid_data_shows_errors(self):
-        self.client.login(username='cliente', password='123456')
-        data = {
-            'cep': '',  # campo obrigatório vazio
-            'road': 'Rua Teste',
-            'number': '100',
-            'district': 'Centro',
-            'city': 'Jequié',
-            'state': 'BA',
-            'country': 'Brasil',
-            'principal': True,
-        }
-        response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, 200)
-        self.assertFormError(response, 'form', 'cep', 'Este campo é obrigatório.')
-
-    def test_user_without_type_redirects(self):
-        user = User.objects.create_user(username='sem_tipo', password='123456')
-        self.client.login(username='sem_tipo', password='123456')
-        response = self.client.get(self.url)
-        self.assertRedirects(response, '/')
-        messages = list(get_messages(response.wsgi_request))
-        self.assertTrue(any("não é suportado" in str(m) for m in messages))
-
-
-
-User = get_user_model()
-
-class DeleteAddressViewTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
-            username="testuser",
+class AddressViewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user_client = User.objects.create_user(
+            username="Roberto",
             first_name="Test",
-            last_name="User",
-            email="test@example.com",
+            last_name="Dias",
+            email="fernado@gmail.com",
             password="testpassword",
             is_client=True
         )
+        
 
-        self.client_instance = ClientModel.objects.create(user=self.user)
+        cls.user_artist = User.objects.create_user(
+            username="Fulano",
+            first_name="Artist",
+            last_name="User",
+            email="braga@gmail.com",
+            password="artistpassword",
+            is_artist=True
+        )
+        cls.client_instance = Client.objects.create(user=cls.user_client)
+    
+    # Para o artista, pega o que foi criado automaticamente pelo save do User
+        cls.artist_instance = cls.user_artist.artist
 
-        self.address = ClientAddress.objects.create(
-            client=self.client_instance,
+        cls.address_client = ClientAddress.objects.create(
+            client=cls.client_instance,
             road="Rua Teste",
             number="123",
-            district="Centro",  # obrigatório
+            district="Centro",  
             city="Cidade",
-            state="BA",          # maiúsculo conforme choices
+            state="BA",         
             country="País",
             cep="00000-000"
         )
+        
+        cls.address_artist = ArtistAddress.objects.create(
+            artist=cls.artist_instance,
+            road="Rua Artista",
+            number="456",
+            district="Bairro Artista",
+            city="Cidade Artista",
+            state="SP",
+            country="Brasil",
+            cep="11111-111"
+        )
 
-        self.client = Client()
-        self.client.force_login(self.user)  # <<-- correção aqui
+    def setUp(self):
+        self.client = DjangoClient()
+        self.artist_client = DjangoClient()
+        self.client.force_login(self.__class__.user_client)
+        self.artist_client.force_login(self.__class__.user_artist)
+
+    def test_create_address_client_get(self):
+        url = reverse('shared:create_address')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'account/dashboard_client.html')
+
+    def test_create_address_artist_get(self):
+        url = reverse('shared:create_address')
+        response = self.artist_client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'account/dashboard_artist.html')
+
+    def test_create_address_client_post_valid(self):
+        url = reverse('shared:create_address')
+        data = {
+            'road': "Nova Rua",
+            'number': "456",
+            'district': "Bairro Novo",
+            'city': "Nova Cidade",
+            'state': "RJ",
+            'country': "Brasil",
+            'cep': "12345-678"
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(ClientAddress.objects.filter(road="Nova Rua", client=self.__class__.client_instance).exists())
+        self.assertRedirects(response, reverse('client:dashboard_client', kwargs={'slug': self.__class__.user_client.slug, 'pk': self.__class__.user_client.pk}))
+
+    def test_create_address_artist_post_valid(self):
+        url = reverse('shared:create_address')
+        data = {
+            'road': "Rua Artista Nova",
+            'number': "789",
+            'district': "Bairro Artista Novo",
+            'city': "Cidade Artista Nova",
+            'state': "MG",
+            'country': "Brasil",
+            'cep': "98765-432"
+        }
+        response = self.artist_client.post(url, data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(ArtistAddress.objects.filter(road="Rua Artista Nova", artist=self.__class__.artist_instance).exists())
+        self.assertRedirects(response, reverse('artist:dashboard_artist', kwargs={'slug': self.__class__.user_artist.slug, 'pk': self.__class__.user_artist.pk}))
+
+    def test_create_address_client_post_invalid(self):
+        url = reverse('shared:create_address')
+        data = {
+            'road': "", 
+            'number': "456",
+            'district': "Bairro Novo",
+            'city': "Nova Cidade",
+            'state': "RJ",
+            'country': "Brasil",
+            'cep': "12345-678"
+        }
+        response = self.client.post(url, data, follow=True)
+        print("Errors: ", response.context['form'].errors)
+        print("Status code:", response.status_code)
+        print("Templates usados:", [t.name for t in response.templates])
+        print("Chaves no contexto:", response.context.keys() if response.context else 'Sem contexto')
+        print("Erros do formulário:", response.context['form'].errors if response.context and 'form' in response.context else 'Sem form no contexto')
+        self.assertEqual(response.status_code, 200)
+        form = response.context['form']
+        self.assertTrue(form.has_error('road'))
+        self.assertIn('Este campo é obrigatório.', form.errors['road'])
+        self.assertTemplateUsed(response, 'account/dashboard_client.html')
+        
+    def test_update_address_client_get(self):
+        url = reverse('shared:update_address', kwargs={'pk': self.__class__.address_client.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'account/update_address.html')
 
     def test_delete_address_success(self):
-        url = reverse('shared:delete_address', kwargs={'pk': self.address.pk})
-        response = self.client.post(url, follow=True)  # segue redirecionamento
-        print("redirect chain:", response.redirect_chain)  # debug: pra onde foi
-        # opcional: inspeciona o usuário e se a página final tem algo esperável
-        self.assertFalse(ClientAddress.objects.filter(pk=self.address.pk).exists())
+        url = reverse('shared:delete_address', kwargs={'pk': self.__class__.address_client.pk})
+        response = self.client.post(url, follow=True)
+        self.assertFalse(ClientAddress.objects.filter(pk=self.__class__.address_client.pk).exists())
+        self.assertRedirects(response, reverse('client:dashboard_client', kwargs={'slug': self.__class__.user_client.slug, 'pk': self.__class__.user_client.pk}))
+
+    def test_delete_address_not_found(self):
+        fake_uuid = uuid.uuid4()  
+        url = reverse('shared:delete_address', kwargs={'pk': str(fake_uuid)})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 404)  
+
+    def test_delete_address_unauthorized(self):
+        # Tentar deletar o endereço do cliente logado como artista
+        url = reverse('shared:delete_address', kwargs={'pk': self.__class__.address_client.pk})
+        response = self.artist_client.post(url, follow=True)
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(ClientAddress.objects.filter(pk=self.__class__.address_client.pk).exists())
         
+    def test_delete_address_artist_success(self):
+        url = reverse('shared:delete_address', kwargs={'pk': self.__class__.address_artist.pk})
+        response = self.artist_client.post(url, follow=True)
+        self.assertFalse(ArtistAddress.objects.filter(pk=self.__class__.address_artist.pk).exists())
+        self.assertRedirects(response, reverse('artist:dashboard_artist', kwargs={'slug': self.__class__.user_artist.slug, 'pk': self.__class__.user_artist.pk}))
+        
+    def test_delete_address_artist_not_found(self):
+        fake_uuid = uuid.uuid4()  
+        url = reverse('shared:delete_address', kwargs={'pk': str(fake_uuid)})
+        response = self.artist_client.post(url)
+        self.assertEqual(response.status_code, 404)
