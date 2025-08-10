@@ -5,19 +5,25 @@
 <section id="profile-update" class="my-5">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-md-10 col-lg-8 col-xl-6">
-        <div class="card shadow rounded-4">
+      <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+        <div class="card shadow rounded-4 border-0">
           <div class="card-body p-4">
 
-            <h2 class="text-center mb-4">Atualizar Perfil</h2>
+            <h2 class="text-center mb-4" style="font-weight:700">Atualizar Perfil</h2>
 
-          <form method="POST" enctype="multipart/form-data" action="{% url 'client:update_profile_client' slug=user_form.instance.slug pk=user_form.instance.pk %}">
+            <form id="profileForm" method="POST" enctype="multipart/form-data"
+                  action="{% url 'client:update_profile_client' slug=user_form.instance.slug pk=user_form.instance.pk %}">
               {% csrf_token %}
-              {{ user_form.non_field_errors }}
-              {{ address_form.non_field_errors }}
 
-              <!-- Campos do Perfil -->
+              {# erros não-field #}
+              {% if user_form.non_field_errors %}
+                <div class="alert alert-danger">{{ user_form.non_field_errors }}</div>
+              {% endif %}
+              {% if address_form.non_field_errors %}
+                <div class="alert alert-danger">{{ address_form.non_field_errors }}</div>
+              {% endif %}
 
+              <!-- Primeiro Nome -->
               <div class="mb-3">
                 <label for="{{ user_form.first_name.id_for_label }}" class="form-label">Primeiro nome</label>
                 {{ user_form.first_name }}
@@ -26,6 +32,7 @@
                 {% endfor %}
               </div>
 
+              <!-- Último Nome -->
               <div class="mb-3">
                 <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Último nome</label>
                 {{ user_form.last_name }}
@@ -34,6 +41,7 @@
                 {% endfor %}
               </div>
 
+              <!-- Usuário -->
               <div class="mb-3">
                 <label for="{{ user_form.username.id_for_label }}" class="form-label">Usuário</label>
                 {{ user_form.username }}
@@ -45,6 +53,7 @@
                 {% endif %}
               </div>
 
+              <!-- CPF -->
               <div class="mb-3">
                 <label for="{{ user_form.cpf.id_for_label }}" class="form-label">CPF</label>
                 {{ user_form.cpf }}
@@ -53,6 +62,7 @@
                 {% endfor %}
               </div>
 
+              <!-- Telefone -->
               <div class="mb-3">
                 <label for="{{ user_form.phone.id_for_label }}" class="form-label">Telefone</label>
                 {{ user_form.phone }}
@@ -62,15 +72,26 @@
                 <div class="form-text">Digite um número com DDD. Ex: +55 11 91234-5678</div>
               </div>
 
+              <!-- Data de Nascimento -->
               <div class="mb-3">
-                <label class="form-label">Foto atual:</label><br>
+                <label for="{{ user_form.date_of_birth.id_for_label }}" class="form-label">Data de Nascimento</label>
+                {% for error in user_form.date_of_birth.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+
+              <!-- Foto Atual -->
+              <div class="mb-3">
+                <label class="form-label">Foto atual</label><br>
                 {% if user_form.instance.photo %}
-                  <img src="{{ user_form.instance.photo.url }}" alt="Foto atual" class="img-thumbnail mb-2" style="max-width: 150px;">
+                  <img src="{{ user_form.instance.photo.url }}" alt="Foto atual"
+                       class="img-thumbnail mb-2" style="max-width:150px;">
                 {% else %}
-                  <p>Nenhuma foto enviada.</p>
+                  <p class="text-muted">Nenhuma foto enviada.</p>
                 {% endif %}
               </div>
 
+              <!-- Alterar Foto -->
               <div class="mb-3">
                 <label for="{{ user_form.photo.id_for_label }}" class="form-label">Alterar foto</label>
                 {{ user_form.photo }}
@@ -79,80 +100,12 @@
                 {% endfor %}
               </div>
 
-              <hr>
-
-              <!-- Campos do Endereço -->
-
-              <h3 class="mb-3">Endereço</h3>
-
-              <div class="mb-3">
-                <label for="{{ address_form.cep.id_for_label }}" class="form-label">CEP</label>
-                {{ address_form.cep }}
-                {% for error in address_form.cep.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
+              <!-- Ações -->
+              <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'client:dashboard_client' slug=user_form.instance.slug pk=user_form.instance.pk %}"
+                   class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
               </div>
-
-              <div class="mb-3">
-                <label for="{{ address_form.road.id_for_label }}" class="form-label">Rua</label>
-                {{ address_form.road }}
-                {% for error in address_form.road.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
-
-              <div class="mb-3">
-                <label for="{{ address_form.number.id_for_label }}" class="form-label">Número</label>
-                {{ address_form.number }}
-                {% for error in address_form.number.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
-
-              <div class="mb-3">
-                <label for="{{ address_form.district.id_for_label }}" class="form-label">Bairro</label>
-                {{ address_form.district }}
-                {% for error in address_form.district.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
-
-              <div class="mb-3">
-                <label for="{{ address_form.city.id_for_label }}" class="form-label">Cidade</label>
-                {{ address_form.city }}
-                {% for error in address_form.city.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
-
-              <div class="mb-3">
-                <label for="{{ address_form.state.id_for_label }}" class="form-label">Estado</label>
-                {{ address_form.state }}
-                {% for error in address_form.state.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
-
-              <div class="mb-3">
-                <label for="{{ address_form.country.id_for_label }}" class="form-label">País</label>
-                {{ address_form.country }}
-                {% for error in address_form.country.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
-
-              <div class="form-check mb-3">
-                {{ address_form.principal }}
-                <label for="{{ address_form.principal.id_for_label }}" class="form-check-label">Endereço Principal</label>
-                {% for error in address_form.principal.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
-
-              <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Salvar</button>
-              </div>
-
             </form>
 
           </div>
@@ -161,4 +114,31 @@
     </div>
   </div>
 </section>
+
+{# Fallback JS para aplicar classes e ajustar date input sem alterar forms.py #}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('profileForm');
+  if (!form) return;
+
+  // adiciona classe form-control para inputs, selects e textareas
+  form.querySelectorAll('input, select, textarea').forEach(el => {
+    // não altere inputs tipo file visualmente além de adicionar classe
+    if (!el.classList.contains('form-control')) {
+      el.classList.add('form-control');
+    }
+  });
+
+  // garante que date_of_birth tenha type=date, placeholder e autocomplete adequados
+  const dobFieldNames = ['date_of_birth', 'date_of_birth', 'user-date_of_birth'];
+  dobFieldNames.forEach(name => {
+    const el = form.querySelector(`[name$="${name}"]`);
+    if (el) {
+      try { el.type = 'date'; } catch(e) {}
+      el.placeholder = 'DD/MM/AAAA';
+      el.autocomplete = 'bday';
+    }
+  });
+});
+</script>
 {% endblock %}

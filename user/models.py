@@ -14,6 +14,8 @@ from django.urls import reverse
 from django.utils.text import slugify
 from validate_docbr import CPF
 from phonenumber_field.modelfields import PhoneNumberField
+from brazilcep import get_address_from_cep, WebService
+from brazilcep.exceptions import BrazilCEPException
 
 
 
@@ -150,6 +152,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self.is_artist and not hasattr(self, 'artist'):
             Artist.objects.create(user=self)
 
+def validar_cep(value):
+    cep = value.replace('-', '').strip()
+    if len(cep) != 8 or not cep.isdigit():
+        raise ValidationError('CEP inválido: formato incorreto.')
+
+    try:
+        get_address_from_cep(cep, webservice=WebService.VIACEP)
+    except BrazilCEPException:
+        raise ValidationError('CEP inválido ou não encontrado.')
+
 
 class BaseAddress(models.Model):
         class States(models.TextChoices):
@@ -183,7 +195,7 @@ class BaseAddress(models.Model):
 
 
         id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-        cep = models.CharField(_('CEP'), max_length=9, null=False)  
+        cep = models.CharField(_('CEP'), max_length=9, null=False, blank=False, validators=[validar_cep])  
         road = models.CharField(_('Rua'), max_length=255, null=False, blank=False)
         number = models.CharField(_('N°'), max_length=10, null=False, blank=False)
         district = models.CharField(_('Bairro'), max_length=100, null=False, blank=False)
@@ -198,7 +210,8 @@ class BaseAddress(models.Model):
 
         def __str__(self):
             return f"{self.road}, {self.number} - {self.city}/{self.state}"
-        
+    
+
         def get_absolute_url(self):
             return reverse('address-detail', kwargs={'uuid': str(self.id), 'slug': self.slug})
         

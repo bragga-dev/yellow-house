@@ -85,7 +85,7 @@
         <p class="mb-1">{{ address.district }} – {{ address.city }} / {{ address.state }}</p>
         <p class="mb-1">{{ address.cep }} – {{ address.country }}</p>
         {% if address.complement %}
-          <p class="mb-1"><strong>Complemento:</strong> {{ address.complement }}</p>
+          <p class="mb-1"><strong>Complemento:</strong> {{ address.complement|slice:":20" }}{% if address.complement|length > 20 %}...{% endif %}</p>
         {% endif %}
         <div class="d-flex gap-2 mt-2">
          <!-- Botão Editar -->
