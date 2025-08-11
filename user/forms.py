@@ -120,10 +120,11 @@ class ClientUpdateForm(forms.ModelForm):
 class ArtistUpdateForm(forms.ModelForm):
     class Meta:
         model = Artist
-        fields = ['is_verified', 'bio']
+        fields = ['is_verified', 'bio', 'banner']
         widgets = {
             'is_verified': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'bio': forms.Textarea(attrs={'placeholder': 'Conte um pouco sobre você.', 'rows': 4}),
+            'banner': forms.ClearableFileInput(attrs={'placeholder': 'Formato de arquivo: jpg, jpeg ou png.'}),
         }
 
     def __init__(self, *args, **kwargs):

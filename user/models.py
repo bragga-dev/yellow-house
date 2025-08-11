@@ -259,6 +259,7 @@ class Artist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="artist")
     is_verified = models.BooleanField(_('Autorizado?'), default=False, help_text="Indica se o artista foi verificado pela plataforma.")
     bio = models.TextField(_('Biografia'), blank=True, null=True, help_text=_('Conte um pouco sobre você.'))
+    banner = models.ImageField(upload_to="artist_banners/", default="artist_banners/default.jpg", blank=True, null=True, validators=[validate_image_file], help_text=_('Formato de arquivo: jpg, jpeg ou png.'))
 
 
     class Meta:

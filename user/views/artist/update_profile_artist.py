@@ -16,7 +16,7 @@ def update_profile_artist(request, slug, pk):
 
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, request.FILES, instance=user)
-        artist_form = ArtistUpdateForm(request.POST, instance=artist)
+        artist_form = ArtistUpdateForm(request.POST, request.FILES, instance=artist)
 
         if user_form.is_valid() and artist_form.is_valid():
             user_form.save()

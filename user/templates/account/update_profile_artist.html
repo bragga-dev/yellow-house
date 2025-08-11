@@ -2,120 +2,195 @@
 {% load static %}
 
 {% block content %}
-<section id="profile-update" class="my-5">
+<section class="account section">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-12 col-md-10 col-lg-8 col-xl-6">
-        <div class="card shadow rounded-4 border-0">
-          <div class="card-body p-4">
-
-            <h2 class="text-center mb-4" style="font-weight:700">Atualizar Perfil</h2>
+      <div class="col-lg-8 col-xl-6">
+        <div class="card bg-surface rounded-4 shadow-sm border-0 overflow-hidden">
+          <div class="card-body p-4 p-lg-5">
+            
+            <!-- Card Header with Decorative Accent -->
+            <div class="text-center mb-4 pb-2 border-bottom">
+              <h2 class="heading-color mb-0" style="font-weight:700">Atualizar Perfil</h2>
+              <div class="accent-line mx-auto mt-3"></div>
+            </div>
 
             <form id="profileForm" method="POST" enctype="multipart/form-data"
-                  action="{% url 'artist:update_profile_artist' slug=user_form.instance.slug pk=user_form.instance.pk %}">
+                  action="{% url 'artist:update_profile_artist' slug=user_form.instance.slug pk=user_form.instance.pk %}"
+                  class="needs-validation" novalidate>
               {% csrf_token %}
 
-              {# erros não-field #}
+              <!-- Non-field Errors -->
               {% if user_form.non_field_errors %}
-                <div class="alert alert-danger">{{ user_form.non_field_errors }}</div>
+                <div class="alert alert-danger mb-4">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  {{ user_form.non_field_errors }}
+                </div>
               {% endif %}
               {% if address_form.non_field_errors %}
-                <div class="alert alert-danger">{{ address_form.non_field_errors }}</div>
+                <div class="alert alert-danger mb-4">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  {{ address_form.non_field_errors }}
+                </div>
               {% endif %}
 
-              <!-- Primeiro Nome -->
-              <div class="mb-3">
-                <label for="{{ user_form.first_name.id_for_label }}" class="form-label">Primeiro nome</label>
-                {{ user_form.first_name }}
-                {% for error in user_form.first_name.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
+              <!-- Two Column Layout for Name Fields -->
+              <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                  <label for="{{ user_form.first_name.id_for_label }}" class="form-label">Primeiro nome</label>
+                  {{ user_form.first_name }}
+                  {% for error in user_form.first_name.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Último nome</label>
+                  {{ user_form.last_name }}
+                  {% for error in user_form.last_name.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
               </div>
 
-              <!-- Último Nome -->
-              <div class="mb-3">
-                <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Último nome</label>
-                {{ user_form.last_name }}
-                {% for error in user_form.last_name.errors %}
-                  <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-              </div>
-
-              <!-- Usuário -->
-              <div class="mb-3">
+              <!-- Username Field -->
+              <div class="mb-4">
                 <label for="{{ user_form.username.id_for_label }}" class="form-label">Usuário</label>
-                {{ user_form.username }}
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-person"></i></span>
+                  {{ user_form.username }}
+                </div>
                 {% for error in user_form.username.errors %}
-                  <div class="text-danger small">{{ error }}</div>
+                  <div class="invalid-feedback d-block">{{ error }}</div>
                 {% endfor %}
                 {% if user_form.username.help_text %}
-                  <div class="form-text">{{ user_form.username.help_text }}</div>
+                  <div class="form-text text-muted">{{ user_form.username.help_text }}</div>
                 {% endif %}
               </div>
 
-              <!-- CPF -->
-              <div class="mb-3">
+              <!-- CPF Field -->
+              <div class="mb-4">
                 <label for="{{ user_form.cpf.id_for_label }}" class="form-label">CPF</label>
-                {{ user_form.cpf }}
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
+                  {{ user_form.cpf }}
+                </div>
                 {% for error in user_form.cpf.errors %}
-                  <div class="text-danger small">{{ error }}</div>
+                  <div class="invalid-feedback d-block">{{ error }}</div>
                 {% endfor %}
               </div>
 
-              <!-- Telefone -->
-              <div class="mb-3">
+              <!-- Phone Field -->
+              <div class="mb-4">
                 <label for="{{ user_form.phone.id_for_label }}" class="form-label">Telefone</label>
-                {{ user_form.phone }}
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                  {{ user_form.phone }}
+                </div>
                 {% for error in user_form.phone.errors %}
-                  <div class="text-danger small">{{ error }}</div>
+                  <div class="invalid-feedback d-block">{{ error }}</div>
                 {% endfor %}
-                <div class="form-text">Digite um número com DDD. Ex: +55 11 91234-5678</div>
+                <div class="form-text text-muted">
+                  <i class="bi bi-info-circle me-1"></i> Digite um número com DDD. Ex: +55 11 91234-5678
+                </div>
               </div>
 
-              <!-- Data de Nascimento -->
-              <div class="mb-3">
+              <!-- Date of Birth Field -->
+              <div class="mb-4">
                 <label for="{{ user_form.date_of_birth.id_for_label }}" class="form-label">Data de Nascimento</label>
-                {{ user_form.date_of_birth }}
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                  {{ user_form.date_of_birth }}
+                </div>
                 {% for error in user_form.date_of_birth.errors %}
-                  <div class="text-danger small">{{ error }}</div>
+                  <div class="invalid-feedback d-block">{{ error }}</div>
                 {% endfor %}
               </div>
 
-              <!-- Foto Atual -->
-              <div class="mb-3">
-                <label class="form-label">Foto atual</label><br>
-                {% if user_form.instance.photo %}
-                  <img src="{{ user_form.instance.photo.url }}" alt="Foto atual"
-                       class="img-thumbnail mb-2" style="max-width:150px;">
-                {% else %}
-                  <p class="text-muted">Nenhuma foto enviada.</p>
-                {% endif %}
+              <!-- Current Photo -->
+              <div class="mb-4">
+                <label class="form-label">Foto atual</label>
+                <div class="d-flex align-items-center gap-3">
+                  {% if user_form.instance.photo %}
+                    <img src="{{ user_form.instance.photo.url }}" alt="Foto atual"
+                         class="img-thumbnail rounded-circle" style="width:80px; height:80px; object-fit:cover;">
+                  {% else %}
+                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" 
+                         style="width:80px; height:80px;">
+                      <i class="bi bi-person text-muted" style="font-size:2rem;"></i>
+                    </div>
+                  {% endif %}
+                  <div class="flex-grow-1">
+                    <div class="form-text text-muted">
+                      {% if user_form.instance.photo %}
+                        Foto atual do perfil
+                      {% else %}
+                        Nenhuma foto enviada
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <!-- Alterar Foto -->
-              <div class="mb-3">
+              <!-- Photo Upload -->
+              <div class="mb-4">
                 <label for="{{ user_form.photo.id_for_label }}" class="form-label">Alterar foto</label>
-                {{ user_form.photo }}
+                <div class="file-input-group">
+                  {{ user_form.photo }}
+                  <label for="{{ user_form.photo.id_for_label }}" class="file-input-label">
+                    <span class="file-input-button btn btn-outline-accent">
+                      <i class="bi bi-upload me-2"></i>Selecionar arquivo
+                    </span>
+                    <span class="file-input-text text-muted ms-2">Nenhum arquivo selecionado</span>
+                  </label>
+                </div>
                 {% for error in user_form.photo.errors %}
-                  <div class="text-danger small">{{ error }}</div>
+                  <div class="invalid-feedback d-block">{{ error }}</div>
                 {% endfor %}
               </div>
 
-              <!-- Bio -->
-              <div class="mb-3">
+              <!-- Banner Upload -->
+              <div class="mb-4">
+                <label for="{{ artist_form.banner.id_for_label }}" class="form-label">Banner do Artista</label>
+                <div class="file-input-group">
+                  {{ artist_form.banner }}
+                  <label for="{{ artist_form.banner.id_for_label }}" class="file-input-label">
+                    <span class="file-input-button btn btn-outline-accent">
+                      <i class="bi bi-upload me-2"></i>Selecionar arquivo
+                    </span>
+                    <span class="file-input-text text-muted ms-2">Nenhum arquivo selecionado</span>
+                  </label>
+                </div>
+                {% for error in artist_form.banner.errors %}
+                  <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+                <div class="form-text text-muted">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Formato de arquivo: jpg, jpeg ou png.
+                </div>
+              </div>
+
+              <!-- Bio Field -->
+              <div class="mb-4">
                 <label for="{{ user_form.bio.id_for_label }}" class="form-label">Biografia</label>
                 {{ artist_form.bio }}
                 {% for error in user_form.bio.errors %}
-                  <div class="text-danger small">{{ error }}</div>
+                  <div class="invalid-feedback d-block">{{ error }}</div>
                 {% endfor %}
-                <div class="form-text">Conte-nos mais sobre você. Máximo 500 caracteres.</div>
+                <div class="form-text text-muted">
+                  <i class="bi bi-info-circle me-1"></i> Conte-nos mais sobre você.
+                </div>
               </div>
 
-              <!-- Ações -->
-              <div class="d-flex justify-content-between mt-4">
+              <!-- Form Actions -->
+              <div class="d-flex justify-content-between mt-5 pt-3 border-top">
                 <a href="{% url 'artist:dashboard_artist' slug=user_form.instance.slug pk=user_form.instance.pk %}"
-                   class="btn btn-outline-secondary">Cancelar</a>
-                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                   class="btn btn-outline-secondary px-4">
+                  <i class="bi bi-arrow-left me-2"></i>Cancelar
+                </a>
+                <button type="submit" class="btn btn-accent px-4">
+                  <i class="bi bi-check-circle me-2"></i>Salvar Alterações
+                </button>
               </div>
             </form>
 
@@ -126,23 +201,67 @@
   </div>
 </section>
 
-{# Fallback JS para aplicar classes e ajustar date input sem alterar forms.py #}
+<!-- Custom Styles for this Template -->
+<style>
+  .accent-line {
+    width: 60px;
+    height: 3px;
+    background-color: var(--accent-color);
+    border-radius: 3px;
+  }
+  
+  .file-input-group {
+    position: relative;
+  }
+  
+  .file-input-group input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 0.1px;
+    height: 0.1px;
+  }
+  
+  .file-input-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .file-input-text {
+    font-size: 0.9rem;
+  }
+</style>
+
+<!-- Form Enhancement Script -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('profileForm');
   if (!form) return;
 
-  // adiciona classe form-control para inputs, selects e textareas
-  form.querySelectorAll('input, select, textarea').forEach(el => {
-    // não altere inputs tipo file visualmente além de adicionar classe
-    if (!el.classList.contains('form-control')) {
-      el.classList.add('form-control');
-    }
+  // Add form-control class to all inputs, selects, textareas
+  form.querySelectorAll('input:not([type="file"]), select, textarea').forEach(el => {
+    el.classList.add('form-control');
   });
 
-  // garante que date_of_birth tenha type=date, placeholder e autocomplete adequados
-  const dobFieldNames = ['date_of_birth', 'date_of_birth', 'user-date_of_birth'];
-  dobFieldNames.forEach(name => {
+ // Enhance file input display for all file inputs
+form.querySelectorAll('input[type="file"]').forEach(input => {
+  const group = input.closest('.file-input-group');
+  if (group) {
+    const fileNameDisplay = group.querySelector('.file-input-text');
+    input.addEventListener('change', function () {
+      if (this.files.length > 0) {
+        fileNameDisplay.textContent = this.files[0].name;
+      } else {
+        fileNameDisplay.textContent = 'Nenhum arquivo selecionado';
+      }
+    });
+  }
+});
+
+
+  // Date field enhancement
+  const dobFields = ['date_of_birth', 'user-date_of_birth'];
+  dobFields.forEach(name => {
     const el = form.querySelector(`[name$="${name}"]`);
     if (el) {
       try { el.type = 'date'; } catch(e) {}
@@ -150,6 +269,15 @@ document.addEventListener('DOMContentLoaded', function () {
       el.autocomplete = 'bday';
     }
   });
+  
+  // Form validation
+  form.addEventListener('submit', function(event) {
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    form.classList.add('was-validated');
+  }, false);
 });
 </script>
 {% endblock %}
