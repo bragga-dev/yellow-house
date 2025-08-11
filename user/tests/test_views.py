@@ -52,7 +52,7 @@ class AddressViewTests(TestCase):
             city="Cidade",
             state="BA",         
             country="País",
-            cep="00000-000"
+            cep="45201-347"
         )
         
         cls.address_artist = ArtistAddress.objects.create(
@@ -63,7 +63,7 @@ class AddressViewTests(TestCase):
             city="Cidade Artista",
             state="SP",
             country="Brasil",
-            cep="11111-111"
+            cep="45201-347"
         )
 
     def setUp(self):
@@ -93,7 +93,7 @@ class AddressViewTests(TestCase):
             'city': "Nova Cidade",
             'state': "RJ",
             'country': "Brasil",
-            'cep': "12345-678"
+            'cep': "45201-347"
         }
         response = self.client.post(url, data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -109,7 +109,7 @@ class AddressViewTests(TestCase):
             'city': "Cidade Artista Nova",
             'state': "MG",
             'country': "Brasil",
-            'cep': "98765-432"
+            'cep': "45201-347"
         }
         response = self.artist_client.post(url, data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -125,7 +125,7 @@ class AddressViewTests(TestCase):
             'city': "Nova Cidade",
             'state': "RJ",
             'country': "Brasil",
-            'cep': "12345-678"
+            'cep': "45201-347"
         }
         response = self.client.post(url, data, follow=True)
         print("Errors: ", response.context['form'].errors)

@@ -135,7 +135,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self.is_artist and self.is_client:
             raise ValidationError("O usuário não pode ser Cliente e Artista ao mesmo tempo")
         
-        
+        if self.date_of_birth and self.date_of_birth > timezone.localdate():
+            raise ValidationError({'date_of_birth': 'Data de nascimento não pode ser maior que a data atual.'})
+
     def save(self, *args, **kwargs):
         self.full_clean()
         if not self.slug or self._state.adding or self.has_name_changed():
@@ -257,6 +259,7 @@ class Artist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="artist")
     is_verified = models.BooleanField(_('Autorizado?'), default=False, help_text="Indica se o artista foi verificado pela plataforma.")
     bio = models.TextField(_('Biografia'), blank=True, null=True, help_text=_('Conte um pouco sobre você.'))
+    banner = models.ImageField(upload_to="artist_banners/", default="artist_banners/default.jpg", blank=True, null=True, validators=[validate_image_file], help_text=_('Formato de arquivo: jpg, jpeg ou png.'))
 
 
     class Meta:
