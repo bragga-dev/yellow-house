@@ -48,10 +48,8 @@
             <a href="#" class="badge bg-success text-contrast ms-2" data-bs-toggle="tooltip" title="Artista Verificado">
               <i class="bi bi-check-circle"></i> Verificado
             </a>
-            {% else %}
-            <a href="#" class="badge bg-danger text-contrast ms-2" data-bs-toggle="tooltip" title="Artista Não Verificado">
-              <i class="bi bi-x-circle"></i> Não Verificado
-            </a>
+            {% else %}            
+              <span class="badge bg-danger ms-2">Não Verificado</span>
             {% endif %} 
           </div>
         </div>
@@ -171,7 +169,7 @@
             <h4 class="heading-color mb-3">Biografia</h4>
             {% if artist.bio %}
               <div class="bg-surface rounded p-3">
-                <p class="mb-0 text-justify">{{ artist.bio|linebreaks }}</p>
+                {{ artist.bio|safe }}
               </div>
               <div class="text-end mt-2">
                 <a href="{% url 'artist:update_profile_artist' slug=user.slug pk=user.pk %}" class="btn btn-outline-secondary btn-sm">

@@ -170,18 +170,26 @@
                 </div>
               </div>
 
-              <!-- Bio Field -->
+             <!-- Bio Field -->
               <div class="mb-4">
-                <label for="{{ user_form.bio.id_for_label }}" class="form-label">Biografia</label>
-                {{ artist_form.bio }}
-                {% for error in user_form.bio.errors %}
+                <label for="quill-editor" class="form-label">Biografia</label>
+
+                <!-- Editor visual -->
+                <div id="quill-editor" style="min-height: 150px;">
+                  {{ artist_form.bio.value|safe }}
+                </div>
+
+                <!-- Campo escondido que será enviado no form -->
+                <input type="hidden" name="bio" id="id_bio">
+
+                {% for error in artist_form.bio.errors %}
                   <div class="invalid-feedback d-block">{{ error }}</div>
                 {% endfor %}
+
                 <div class="form-text text-muted">
                   <i class="bi bi-info-circle me-1"></i> Conte-nos mais sobre você.
                 </div>
               </div>
-
               <!-- Form Actions -->
               <div class="d-flex justify-content-between mt-5 pt-3 border-top">
                 <a href="{% url 'artist:dashboard_artist' slug=user_form.instance.slug pk=user_form.instance.pk %}"
@@ -230,6 +238,11 @@
   .file-input-text {
     font-size: 0.9rem;
   }
+  #quill-editor .ql-editor {
+  max-height: 250px;   /* altura máxima */
+  overflow-y: auto;    /* ativa barra de rolagem vertical */
+}
+
 </style>
 
 <!-- Form Enhancement Script -->
@@ -279,5 +292,43 @@ form.querySelectorAll('input[type="file"]').forEach(input => {
     form.classList.add('was-validated');
   }, false);
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+  var quill = new Quill('#quill-editor', {
+    theme: 'snow',
+    modules: {
+      toolbar: [  
+        ['bold', 'italic', 'underline'],              // estilos básicos
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }], // listas
+        ['link', 'image', 'video'],                   // links e imagens
+        ['clean'],                                    // limpar formatação
+        [{ 'align': [] }],                            // alinhamento
+        [{ 'header': [1, 2, 3, false] }],             // headers
+        ['blockquote'],                               // citação
+        [{ 'color': [] }, { 'background': [] }], // <-- cores da fonte e do fundo
+        ['code-block'],                               // bloco de código
+        [{ 'direction': 'rtl' }, { 'indent': '-1'}, { 'indent': '+1' }], // direção e indent
+        ['emoji']                                     // botão de emoji (vem do plugin quill-emoji)
+      ],
+      "emoji-toolbar": true,      // habilita o botão de emoji na toolbar
+      "emoji-textarea": false,    // desativa painel separado
+      "emoji-shortname": true ,    // permite usar :smile: etc.
+    }
+  });
+
+  // Inicializar campo escondido com conteúdo existente
+  var hiddenInput = document.getElementById('id_bio');
+  if (hiddenInput.value) {
+    quill.root.innerHTML = hiddenInput.value;
+  }
+
+  // Ao enviar formulário, atualizar campo escondido
+  document.getElementById('profileForm').addEventListener('submit', function() {
+    hiddenInput.value = quill.root.innerHTML;
+  });
+});
+
+
 </script>
+
 {% endblock %}

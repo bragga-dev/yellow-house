@@ -12288,3 +12288,20 @@ section,
   color: #004d40 !important;
   text-decoration: underline;
 }
+
+.ql-align-center {
+  text-align: center;
+}
+.ql-align-right {
+  text-align: right;
+}
+.ql-align-justify {
+  text-align: justify;
+}
+.bg-surface img, #quill-editor img {
+    max-width: 100%;   /* não ultrapassa a largura do container */
+    height: auto;      /* mantém proporção */
+    display: block;    /* remove espaçamento extra */
+    margin: 0.5rem 0;  /* espaçamento acima/abaixo */
+}
+

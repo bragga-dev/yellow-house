@@ -269,3 +269,7 @@ LOGGING = {
         },
     },
 }
+
+
+# Valor em bytes. Exemplo: 20 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
