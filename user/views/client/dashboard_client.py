@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from user.models import Client
-from user.forms import AddressForm
+from user.forms import AddressForm, PromoteToArtistForm
 
 @login_required
 def dashboard_client(request, slug, pk):
@@ -18,12 +18,13 @@ def dashboard_client(request, slug, pk):
     # anexar um edit_form em cada endereço (instância já preenchida com instance=addr)
     for addr in addresses:
         addr.edit_form = AddressForm(instance=addr, address_type='client')
+    promote_form = PromoteToArtistForm()
 
     context = {
         'client': client,
         'addresses': addresses,
         'user': client.user,
         'form': form,
-        # não precisa mais enviar edit_forms separado
+        'promote_form': promote_form,
     }
     return render(request, 'account/dashboard_client.html', context)

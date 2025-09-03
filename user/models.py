@@ -9,13 +9,17 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
-import imghdr
 from django.urls import reverse
 from django.utils.text import slugify
 from validate_docbr import CPF
 from phonenumber_field.modelfields import PhoneNumberField
 from brazilcep import get_address_from_cep, WebService
 from brazilcep.exceptions import BrazilCEPException
+from PIL import Image
+from django.db import transaction
+from PIL import Image
+from django.core.exceptions import ValidationError
+
 
 
 
@@ -49,31 +53,44 @@ class UserManager(BaseUserManager):
         return user
     
 
-
-import os
-
 def validate_image_file(value):
-    valid_extensions = ['jpg', 'jpeg', 'png']
-    # Tenta obter o path real do arquivo
+    if not value:
+        return
+    valid_formats = ["JPEG", "JPG", "PNG"]
+    max_size_mb = 5
+    max_width = 4000
+    max_height = 4000
+
     try:
-        file_path = value.path
-    except ValueError:
-        # Se não tiver path (ex: arquivo em memória), pula validação aqui
-        return
+        # Abre a imagem diretamente do arquivo
+        img = Image.open(value)
+        img.verify()  # verifica se é imagem válida
     except Exception:
-        return
+        raise ValidationError("Arquivo inválido ou corrompido.")
 
-    # Verifica se o arquivo existe, se não, pula validação
-    if not os.path.exists(file_path):
-        return
+    # Reabre para acessar propriedades
+    value.seek(0)
+    img = Image.open(value)
 
-    file_ext = imghdr.what(file_path)
-    if file_ext not in valid_extensions:
-        raise ValidationError('Formato de arquivo inválido. Use jpg, jpeg ou png.')
+    # Verifica formato
+    if img.format.upper() not in valid_formats:
+        raise ValidationError("Formato inválido. Use JPG, JPEG, PNG.")
+
+    # Verifica tamanho
+    if value.size > max_size_mb * 1024 * 1024:
+        raise ValidationError(f"O arquivo não pode ultrapassar {max_size_mb}MB.")
+
+    # Verifica resolução
+    width, height = img.size
+    if width > max_width or height > max_height:
+        raise ValidationError(
+            f"A imagem não pode ultrapassar {max_width}x{max_height} pixels."
+        )
+
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  #
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  
     username = models.CharField( _('username'), max_length=15, unique=True,
         help_text=_('Required. 15 characters or fewer. Letters, numbers and @/./+/-/_ characters'),
         validators=[validators.RegexValidator(re.compile(r'^[\w.@+-]+$'), _('Enter a valid username.'), _('invalid'))])
@@ -137,6 +154,25 @@ class User(AbstractBaseUser, PermissionsMixin):
         
         if self.date_of_birth and self.date_of_birth > timezone.localdate():
             raise ValidationError({'date_of_birth': 'Data de nascimento não pode ser maior que a data atual.'})
+        
+    def promote_to_artist(self):
+        from .models import Artist, Client
+        with transaction.atomic():
+            self.is_artist = True
+            self.is_client = False
+            self.save(update_fields=['is_artist', 'is_client'])
+            Client.objects.filter(user=self).delete()
+            Artist.objects.get_or_create(user=self)
+
+    def demote_to_client(self):   
+        from .models import Artist, Client
+        with transaction.atomic():
+            self.is_artist = False
+            self.is_client = True
+            self.save(update_fields=['is_artist', 'is_client'])
+            Artist.objects.filter(user=self).delete()
+            Client.objects.get_or_create(user=self)
+
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -247,9 +283,7 @@ class ClientAddress(BaseAddress):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='addresses')
 
     def save(self, *args, **kwargs):
-        # Se o endereço atual for definido como principal
         if self.principal:
-            # Define todos os outros como não principais
             ClientAddress.objects.filter(client=self.client, principal=True).exclude(pk=self.pk).update(principal=False)
         super().save(*args, **kwargs)
     
@@ -260,11 +294,17 @@ class Artist(models.Model):
     is_verified = models.BooleanField(_('Autorizado?'), default=False, help_text="Indica se o artista foi verificado pela plataforma.")
     bio = models.TextField(_('Biografia'), blank=True, null=True, help_text=_('Conte um pouco sobre você.'))
     banner = models.ImageField(upload_to="artist_banners/", default="artist_banners/default.jpg", blank=True, null=True, validators=[validate_image_file], help_text=_('Formato de arquivo: jpg, jpeg ou png.'))
-
+    instagram = models.URLField(_('Instagram'), max_length=255, blank=True, null=True, help_text=_('Link do seu perfil no Instagram.'))
+    facebook = models.URLField(_('Facebook'), max_length=255, blank=True, null=True, help_text=_('Link do seu perfil no Facebook.'))
+    twitter = models.URLField(_('Twitter'), max_length=255, blank=True, null=True, help_text=_('Link do seu perfil no Twitter.'))
+    tiktok = models.URLField(_('TikTok'), max_length=255, blank=True, null=True, help_text=_('Link do seu perfil no TikTok.'))
 
     class Meta:
         verbose_name = "Artista"
         verbose_name_plural = "Artistas"
+
+    def __str__(self):
+        return self.user.get_full_name()
 
 class ArtistAddress(BaseAddress):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='addresses')

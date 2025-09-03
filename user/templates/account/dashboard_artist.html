@@ -43,6 +43,20 @@
               <i class="bi bi-box-arrow-right me-1"></i> Sair
             </a>
           </div>
+
+
+          <!--Rebaixar para cliente-->
+
+          <div class="text-center mt-3">
+            <form action="{% url 'artist:demote_to_client' slug=artist.user.slug pk=artist.user.pk %}" method="post" 
+                  onsubmit="return confirm('Tem certeza que deseja voltar a ser cliente?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-warning btn-sm">
+                <i class="bi bi-arrow-down-circle me-1"></i> Voltar a ser Cliente
+              </button>
+            </form>
+          </div>
+
           <div class="text-center mt-4">
            {% if artist.is_verified %}
             <a href="#" class="badge bg-success text-contrast ms-2" data-bs-toggle="tooltip" title="Artista Verificado">

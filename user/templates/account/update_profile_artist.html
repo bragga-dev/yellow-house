@@ -170,6 +170,53 @@
                 </div>
               </div>
 
+             <!-- Redes Sociais -->
+              <div class="mb-4">
+                <label class="form-label">Redes Sociais</label>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="{{ artist_form.instagram.id_for_label }}" class="form-label">Instagram</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-instagram"></i></span>
+                      {{ artist_form.instagram }}
+                    </div>
+                    {% for error in artist_form.instagram.errors %}
+                      <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                  <div class="col-md-6">
+                    <label for="{{ artist_form.facebook.id_for_label }}" class="form-label">Facebook</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-facebook"></i></span>
+                      {{ artist_form.facebook }}
+                    </div>
+                    {% for error in artist_form.facebook.errors %}
+                      <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                  <div class="col-md-6">
+                    <label for="{{ artist_form.twitter.id_for_label }}" class="form-label">Twitter</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-twitter"></i></span>
+                      {{ artist_form.twitter }}
+                    </div>
+                    {% for error in artist_form.twitter.errors %}
+                      <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                  <div class="col-md-6">
+                    <label for="{{ artist_form.tiktok.id_for_label }}" class="form-label">TikTok</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-tiktok"></i></span>
+                      {{ artist_form.tiktok }}
+                    </div>
+                    {% for error in artist_form.tiktok.errors %}
+                      <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>  
+              
              <!-- Bio Field -->
               <div class="mb-4">
                 <label for="quill-editor" class="form-label">Biografia</label>

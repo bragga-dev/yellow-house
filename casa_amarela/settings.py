@@ -217,6 +217,7 @@ ACCOUNT_LOGIN_BY_CODE_REQUIRED = False
 ACCOUNT_LOGIN_TOKEN_ENABLED = False
 ACCOUNT_LOGIN_BY_CODE_ENABLED = False
 
+
 # Envio de E-mail:
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

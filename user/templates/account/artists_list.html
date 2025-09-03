@@ -1,0 +1,69 @@
+{% extends "vitrine/base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Artistas</h2>
+      <p>Conheça os artistas da nossa plataforma</p>
+    </div>
+
+    <div class="row">
+      {% for artist in artists %}
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm category-card">
+            
+            <!-- Banner do artista -->
+           <!-- Banner substituído pela foto do artista -->
+            <div class="category-image">
+            {% if artist.user.photo %}
+                <img src="{{ artist.user.photo.url }}" class="card-img-top img-fluid" alt="Foto de {{ artist.user.get_full_name }}">
+            {% else %}
+                <img src="{% static 'img/default-profile.jpg' %}" class="card-img-top img-fluid" alt="Foto padrão">
+            {% endif %}
+            </div>
+
+            <div class="card-body text-center">
+            <!-- Nome -->
+            <h5 class="card-title">{{ artist.user.get_full_name }}</h5>
+            <!-- Botão de detalhes -->
+            <a href="{% url 'artist:artist_detail' slug=artist.user.slug  pk=artist.user.pk %}" class="btn btn-sm btn-primary mt-3">
+                Ver perfil
+            </a>
+            </div>
+
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-center">Nenhum artista encontrado.</p>
+      {% endfor %}
+    </div>
+
+    <!-- Paginação -->
+    <div class="d-flex justify-content-center mt-4">
+      <nav>
+        <ul class="pagination">
+          {% if artists.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ artists.previous_page_number }}">Anterior</a>
+            </li>
+          {% endif %}
+          
+          <li class="page-item active">
+            <span class="page-link">
+              Página {{ artists.number }} de {{ artists.paginator.num_pages }}
+            </span>
+          </li>
+          
+          {% if artists.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ artists.next_page_number }}">Próxima</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -25,7 +25,20 @@
           <i class="bi bi-box-arrow-right"></i> Sair
         </a>
       </div>
+         <!--Virar Artista-->
+
+          <div class="text-center mt-3">
+            <form action="{% url 'client:promote_to_artist' slug=client.user.slug pk=client.user.pk %}" method="post" 
+                  onsubmit="return confirm('Tem certeza que deseja voltar a ser cliente?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-warning btn-sm">
+                <i class="bi bi-arrow-down-circle me-1"></i> Quero ser Artista
+              </button>
+            </form>
+          </div>
     </div>
+
+  
 
     <!-- Conteúdo principal -->
     <div class="col-md-8 bg-white rounded-end shadow-sm py-4 px-5">
