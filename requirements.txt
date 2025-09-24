@@ -3,6 +3,8 @@ aiohttp==3.12.15
 aiosignal==1.4.0
 asgiref==3.8.1
 attrs==25.3.0
+boto3==1.40.34
+botocore==1.40.34
 brazilcep==7.0.0
 certifi==2025.4.26
 cffi==1.17.1
@@ -15,9 +17,11 @@ django-extensions==4.1
 django-filter==25.1
 django-phonenumber-field==8.1.0
 django-ratelimit==4.1.0
+django-storages==1.14.6
 django-widget-tweaks==1.5.0
 frozenlist==1.7.0
 idna==3.10
+jmespath==1.0.1
 multidict==6.6.3
 phonenumbers==9.0.5
 pillow==11.2.1
@@ -26,9 +30,12 @@ psycopg2-binary==2.9.10
 pycep-correios==5.2.0
 pycparser==2.22
 PyJWT==2.10.1
+python-dateutil==2.9.0.post0
 python-decouple==3.8
 python-dotenv==1.1.1
 requests==2.32.3
+s3transfer==0.14.0
+six==1.17.0
 sqlparse==0.5.3
 typing_extensions==4.14.1
 urllib3==2.4.0

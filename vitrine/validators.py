@@ -37,3 +37,4 @@ def validate_image_file(value):
         raise ValidationError(
             f"A imagem não pode ultrapassar {max_width}x{max_height} pixels."
         )
+    

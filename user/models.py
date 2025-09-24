@@ -19,7 +19,7 @@ from PIL import Image
 from django.db import transaction
 from PIL import Image
 from django.core.exceptions import ValidationError
-from vitrine.models import validate_image_file
+from vitrine.validators import validate_image_file
 
 
 
