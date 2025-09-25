@@ -43,15 +43,54 @@
               <i class="bi bi-box-arrow-right me-1"></i> Sair
             </a>
           </div>
+
+
+         <!-- Botão que abre o modal -->
+<div class="text-center mt-3">
+  <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#demoteModal">
+    <i class="bi bi-arrow-down-double me-1"></i> Alterar para Cliente
+  </button>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="demoteModal" tabindex="-1" aria-labelledby="demoteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <!-- Cabeçalho -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="demoteModalLabel">Confirmar Ação</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+
+      <!-- Corpo -->
+      <div class="modal-body text-center">
+        Tem certeza que deseja alterar sua conta para Cliente?
+      </div>
+
+      <!-- Rodapé -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        
+        <!-- Formulário dentro do modal -->
+        <form action="{% url 'artist:demote_to_client' slug=artist.user.slug pk=artist.user.pk %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-warning">Confirmar</button>
+        </form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
           <div class="text-center mt-4">
            {% if artist.is_verified %}
             <a href="#" class="badge bg-success text-contrast ms-2" data-bs-toggle="tooltip" title="Artista Verificado">
               <i class="bi bi-check-circle"></i> Verificado
             </a>
-            {% else %}
-            <a href="#" class="badge bg-danger text-contrast ms-2" data-bs-toggle="tooltip" title="Artista Não Verificado">
-              <i class="bi bi-x-circle"></i> Não Verificado
-            </a>
+            {% else %}            
+              <span class="badge bg-danger ms-2">Não Verificado</span>
             {% endif %} 
           </div>
         </div>
@@ -169,9 +208,9 @@
           <!-- Seção de Biografia -->
           <div class="mt-4 pt-4 border-top">
             <h4 class="heading-color mb-3">Biografia</h4>
-            {% if artist.bio %}
+            {% if artist.bio  and artist.bio == "" and artist.bio != None %}
               <div class="bg-surface rounded p-3">
-                <p class="mb-0 text-justify">{{ artist.bio|linebreaks }}</p>
+                {{ artist.bio|safe }}
               </div>
               <div class="text-end mt-2">
                 <a href="{% url 'artist:update_profile_artist' slug=user.slug pk=user.pk %}" class="btn btn-outline-secondary btn-sm">

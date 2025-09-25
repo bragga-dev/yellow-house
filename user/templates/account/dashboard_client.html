@@ -25,7 +25,46 @@
           <i class="bi bi-box-arrow-right"></i> Sair
         </a>
       </div>
+        <!-- Botão que abre o modal -->
+      <div class="text-center mt-3">
+        <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#promoteModal">
+          <i class="bi bi-arrow-down-double me-1"></i> Quero ser Artista
+        </button>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="promoteModal" tabindex="-1" aria-labelledby="promoteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+
+            <!-- Cabeçalho -->
+            <div class="modal-header">
+              <h5 class="modal-title" id="promoteModalLabel">Confirmar Ação</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <!-- Corpo -->
+            <div class="modal-body text-center">
+              Tem certeza que deseja se tornar um artista?
+            </div>
+
+            <!-- Rodapé -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              
+              <!-- Formulário dentro do modal -->
+              <form action="{% url 'client:promote_to_artist' slug=client.user.slug pk=client.user.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Confirmar</button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
     </div>
+
+  
 
     <!-- Conteúdo principal -->
     <div class="col-md-8 bg-white rounded-end shadow-sm py-4 px-5">

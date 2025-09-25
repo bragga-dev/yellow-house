@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from user.models import Artist
-from user.forms import AddressForm
+from user.forms import AddressForm, DemoteToClientForm
 
 @login_required
 def dashboard_artist(request, slug, pk):
@@ -18,12 +18,13 @@ def dashboard_artist(request, slug, pk):
     # anexar um edit_form em cada endereço (instância já preenchida com instance=addr)
     for addr in addresses:
         addr.edit_form = AddressForm(instance=addr, address_type='artist')
+    demote_form = DemoteToClientForm()
 
     context = {
         'artist': artist,
         'addresses': addresses,
         'user': artist.user,
         'form': form,
-        # não precisa mais enviar edit_forms separado
+        'demote_form': demote_form,
     }
     return render(request, 'account/dashboard_artist.html', context)

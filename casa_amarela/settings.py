@@ -19,18 +19,6 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-p*3az3)%_w0&#v@-03f#4120s63+8hzhs7kyj^=^5(fihf$k2c'
-
-# SECURITY WARNING: don't ru,n with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -48,7 +36,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.google',
-    'django_extensions'
+    'django_extensions',
+    'storages'
 ]
     
 
@@ -113,17 +102,30 @@ DATABASES = {
     }
 }
 
-# Armazenamento com MinIO (como se fosse S3)
 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
-AWS_S3_ENDPOINT_URL = config("AWS_S3_ENDPOINT_URL")
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = None
-AWS_S3_VERIFY = False
+# Arquivos estáticos (sempre locais)
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
+# Arquivos de mídia (via MinIO)
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID", default="minio")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY", default="minio123")
+AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME", default="media")
+AWS_S3_ENDPOINT_URL = config("AWS_S3_ENDPOINT_URL", default="http://minio:9000")  # interno
+MINIO_ACCESS_URL = config("MINIO_ACCESS_URL", default="http://localhost:9000")   # público
+
+# URL pública de mídia
+MEDIA_URL = f"{MINIO_ACCESS_URL}/{AWS_STORAGE_BUCKET_NAME}/"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "vitrine.storage.S3MediaStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 
 # Password validation
@@ -156,20 +158,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-STATIC_URL = '/static/'
-
-MEDIA_URL = "/media/"
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 # Configurações Django-Allauth
 
@@ -217,6 +205,7 @@ ACCOUNT_LOGIN_BY_CODE_REQUIRED = False
 ACCOUNT_LOGIN_TOKEN_ENABLED = False
 ACCOUNT_LOGIN_BY_CODE_ENABLED = False
 
+
 # Envio de E-mail:
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -247,25 +236,42 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'simple', # Ou 'verbose' para mais detalhes
+            'formatter': 'simple',
         },
     },
     'root': {
         'handlers': ['console'],
-        'level': 'INFO', # Nível padrão para todos os logs não especificados
+        'level': 'INFO',
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'), # Pode ser DEBUG em desenvolvimento
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
-        # Adicione este logger específico para o seu arquivo de views onde 'delete_address' está
-        # AJUSTE O CAMINHO 'user.views.shared.add_address' para o caminho REAL do seu arquivo
         'user.views.shared.add_address': {
             'handlers': ['console'],
-            'level': 'DEBUG', # Este nível mostrará TUDO (INFO, WARNING, ERROR, DEBUG)
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'boto3': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'botocore': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'storages': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
             'propagate': False,
         },
     },
 }
+
+
+# Valor em bytes. Exemplo: 20 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024

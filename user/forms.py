@@ -1,6 +1,6 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from .models import Client, Artist
+from .models import Client, Artist, Exhibitions
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
 from .models import User
@@ -120,11 +120,15 @@ class ClientUpdateForm(forms.ModelForm):
 class ArtistUpdateForm(forms.ModelForm):
     class Meta:
         model = Artist
-        fields = ['is_verified', 'bio', 'banner']
+        fields = ['is_verified', 'bio', 'banner', 'instagram', 'facebook', 'twitter', 'tiktok']
         widgets = {
             'is_verified': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'bio': forms.Textarea(attrs={'placeholder': 'Conte um pouco sobre você.', 'rows': 4}),
             'banner': forms.ClearableFileInput(attrs={'placeholder': 'Formato de arquivo: jpg, jpeg ou png.'}),
+            'instagram': forms.URLInput(attrs={'placeholder': 'Link do seu perfil no Instagram.'}),
+            'facebook': forms.URLInput(attrs={'placeholder': 'Link do seu perfil no Facebook.'}),
+            'twitter': forms.URLInput(attrs={'placeholder': 'Link do seu perfil no Twitter.'}),
+            'tiktok': forms.URLInput(attrs={'placeholder': 'Link do seu perfil no TikTok.'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -188,4 +192,23 @@ class AddressForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+class ExhibitionForm(forms.ModelForm):
+    class Meta:
+        model = Exhibitions
+        fields = ['artist', 'title', 'description', 'date', 'location']
+        widgets = {
+            'artist': forms.Select(attrs={'class': 'form-select'}),
+            'title': forms.TextInput(attrs={'placeholder': 'Título da exposição'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Descrição da exposição', 'rows': 4}),
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'location': forms.TextInput(attrs={'placeholder': 'Local da exposição'}),   
+        }
+
+class PromoteToArtistForm(forms.Form):
+    confirm = forms.BooleanField(label="Desejo me tornar um artista", required=True)
+
+class DemoteToClientForm(forms.Form):
+    confirm = forms.BooleanField(label="Desejo voltar a ser um cliente", required=True)
+
 
