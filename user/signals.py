@@ -1,6 +1,7 @@
 from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from django.apps import apps
+from django.db import models
 
 
 Client = apps.get_model('user', 'Client')
@@ -42,34 +43,54 @@ def unset_user_is_artist(sender, instance, **kwargs):
 # -------------------------------
 # Limpeza de arquivos de mídia
 # -------------------------------
-
-def _delete_files(instance):
-    """Remove arquivos de todos os campos ImageField do objeto."""
-    for field in instance._meta.get_fields():
-        if field.get_internal_type() == "ImageField":
-            file = getattr(instance, field.name)
-            if file and file.storage.exists(file.name):
-                file.delete(save=False)
+from django.db.models.signals import pre_save, post_delete
+from django.dispatch import receiver
+from user.models import User, Artist
 
 
-@receiver(post_delete, sender=Client)
-@receiver(post_delete, sender=Artist)
-def delete_files_on_delete(sender, instance, **kwargs):
-    _delete_files(instance)
 
+def is_default_file(file_field):
+    """Retorna True se o arquivo estiver na pasta default/"""
+    if not file_field:
+        return False
+    return file_field.name.startswith("default/")  # ignora qualquer arquivo dentro da pasta default
 
-@receiver(pre_save, sender=Client)
-@receiver(pre_save, sender=Artist)
-def delete_old_files_on_change(sender, instance, **kwargs):
+# --- User ---
+@receiver(post_delete, sender=User)
+def delete_user_photo_on_delete(sender, instance, **kwargs):
+    if instance.photo and not is_default_file(instance.photo):
+        instance.photo.delete(save=False)
+
+@receiver(pre_save, sender=User)
+def delete_user_photo_on_change(sender, instance, **kwargs):
     if not instance.pk:
-        return
+        return False
+
     try:
-        old_instance = sender.objects.get(pk=instance.pk)
+        old_file = sender.objects.get(pk=instance.pk).photo
     except sender.DoesNotExist:
-        return
-    for field in instance._meta.get_fields():
-        if field.get_internal_type() == "ImageField":
-            old_file = getattr(old_instance, field.name)
-            new_file = getattr(instance, field.name)
-            if old_file and old_file != new_file and old_file.storage.exists(old_file.name):
-                old_file.delete(save=False)
+        return False
+
+    new_file = instance.photo
+    if old_file and old_file != new_file and not is_default_file(old_file):
+        old_file.delete(save=False)
+
+# --- Artist ---
+@receiver(post_delete, sender=Artist)
+def delete_artist_banner_on_delete(sender, instance, **kwargs):
+    if instance.banner and not is_default_file(instance.banner):
+        instance.banner.delete(save=False)
+
+@receiver(pre_save, sender=Artist)
+def delete_artist_banner_on_change(sender, instance, **kwargs):
+    if not instance.pk:
+        return False
+
+    try:
+        old_file = sender.objects.get(pk=instance.pk).banner
+    except sender.DoesNotExist:
+        return False
+
+    new_file = instance.banner
+    if old_file and old_file != new_file and not is_default_file(old_file):
+        old_file.delete(save=False)

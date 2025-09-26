@@ -62,11 +62,16 @@ class ArtistAdmin(admin.ModelAdmin):
     list_filter = ('is_verified',)
     inlines = [ArtistAddressInline]
 
-    # Para garantir que apenas staff pode alterar is_verified via admin
+    
     def get_readonly_fields(self, request, obj=None):
         if not request.user.is_staff:
             return ('is_verified',)
         return ()
+    
+    # Filtrar apenas artistas válidos (user.is_artist=True)
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(user__is_artist=True)
 
 # Registrar endereços separadamente, se quiser:
 @admin.register(ClientAddress)

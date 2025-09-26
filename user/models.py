@@ -1,6 +1,5 @@
 import re
 import uuid
-from django.conf import settings
 from django.db import models
 from django.core import validators
 from django.utils import timezone
@@ -15,9 +14,7 @@ from validate_docbr import CPF
 from phonenumber_field.modelfields import PhoneNumberField
 from brazilcep import get_address_from_cep, WebService
 from brazilcep.exceptions import BrazilCEPException
-from PIL import Image
 from django.db import transaction
-from PIL import Image
 from django.core.exceptions import ValidationError
 from vitrine.validators import validate_image_file
 
@@ -62,7 +59,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(_('last name'), max_length=30)
     email = models.EmailField(_('email address'), max_length=255, unique=True)
     date_of_birth = models.DateField(_('date of birth'), null=True, blank=True, help_text=_('Formato: DD/MM/AAAA.'))
-    photo = models.ImageField(upload_to="photos/", default="photos/default.jpg", blank=True, null=True, validators=[validate_image_file], help_text=_('Formato de arquivo: jpg, jpeg ou png.'))
+    photo = models.ImageField(upload_to="photos/", default="default/user_img.jpg", blank=True, null=True, validators=[validate_image_file], help_text=_('Formato de arquivo: jpg, jpeg ou png.'))
     cpf = models.CharField(max_length=14, unique=True, null=True, blank=True)    
     phone = PhoneNumberField(region="BR", unique=True, null=True, blank=True, help_text='Digite um número com DDD. Ex: +55 11 91234-5678')
     slug = models.SlugField(max_length=255, unique=True, editable=False)
@@ -99,7 +96,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     
     def has_name_changed(self):
-        """Verifica se o nome do usuário mudou"""
         if not self.id:
             return False
             
@@ -118,6 +114,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         
         if self.date_of_birth and self.date_of_birth > timezone.localdate():
             raise ValidationError({'date_of_birth': 'Data de nascimento não pode ser maior que a data atual.'})
+        
+        
         
     def promote_to_artist(self):
         from .models import Artist, Client
@@ -148,9 +146,12 @@ class User(AbstractBaseUser, PermissionsMixin):
                 unique_slug = f'{base_slug}-{num}'
                 num += 1
             self.slug = unique_slug
+        if not self.photo:
+            self.photo.name = self._meta.get_field("photo").default
+
         super().save(*args, **kwargs)
 
-        # Cria perfil de artista automaticamente se marcado
+       
         if self.is_artist and not hasattr(self, 'artist'):
             Artist.objects.create(user=self)
 
@@ -257,7 +258,7 @@ class Artist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="artist")
     is_verified = models.BooleanField(_('Autorizado?'), default=False, help_text="Indica se o artista foi verificado pela plataforma.")
     bio = models.TextField(_('Biografia'), blank=True, null=True, help_text=_('Conte um pouco sobre você.'))
-    banner = models.ImageField(upload_to="artist_banners/", default="artist_banners/default.jpg", blank=True, null=True, validators=[validate_image_file], help_text=_('Formato de arquivo: jpg, jpeg ou png.'))
+    banner = models.ImageField(upload_to="artist_banners/", default="default/banner.jpg", blank=True, null=True, validators=[validate_image_file], help_text=_('Formato de arquivo: jpg, jpeg ou png.'))
     instagram = models.URLField(_('Instagram'), max_length=255, blank=True, null=True, help_text=_('Link do seu perfil no Instagram.'))
     facebook = models.URLField(_('Facebook'), max_length=255, blank=True, null=True, help_text=_('Link do seu perfil no Facebook.'))
     twitter = models.URLField(_('Twitter'), max_length=255, blank=True, null=True, help_text=_('Link do seu perfil no Twitter.'))
@@ -269,18 +270,18 @@ class Artist(models.Model):
 
     def __str__(self):
         return self.user.get_full_name()
-
-class ArtistAddress(BaseAddress):
-    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='addresses')
-
-    def save(self, *args, **kwargs):
-        # Se o endereço atual for definido como principal
-        if self.principal:
-            # Define todos os outros como não principais
-            ArtistAddress.objects.filter(artist=self.artist, principal=True).exclude(pk=self.pk).update(principal=False)
+    def save(self, *args, **kwargs):      
+        if not self.banner:
+                self.banner.name = self._meta.get_field("banner").default
         super().save(*args, **kwargs)
 
 
+class ArtistAddress(BaseAddress):
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='addresses')
+    def save(self, *args, **kwargs):
+        if self.principal:
+            ArtistAddress.objects.filter(artist=self.artist, principal=True).exclude(pk=self.pk).update(principal=False)
+        super().save(*args, **kwargs)
     
 class Exhibitions(models.Model):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='exhibitions')
