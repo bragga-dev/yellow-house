@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+
 <!-- Banner de Capa -->
 <div class="banner-container" style="width: 100%; height: 300px; overflow: hidden; background-color: #f0f0f0;">
   {% if artist.banner %}
@@ -85,7 +86,7 @@
           </div>
           <div class="text-center mt-4">
            {% if artist.is_verified %}
-            <a href="{% url 'artist:collection' slug=artist.user.slug pk=artist.user.pk %}" class="badge bg-success text-contrast ms-2" data-bs-toggle="tooltip" title="Artista Verificado">
+            <a href="#" class="badge bg-success text-contrast ms-2" data-bs-toggle="tooltip" title="Artista Verificado">
               <i class="bi bi-check-circle"></i> Criar Acervo
             </a>
             {% else %}            
@@ -99,7 +100,7 @@
       <div class="col-lg-8">
         <div class="bg-surface rounded shadow-sm p-4">
           <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="heading-color mb-0">Informações do Artista</h3>
+            <h3 class="heading-color mb-0">Acervo</h3>
             <div class="d-flex gap-2">
               <a href="{% url 'artist:update_profile_artist' slug=user.slug pk=user.pk %}" class="btn btn-outline-secondary btn-sm">
                 <i class="bi bi-pencil me-1"></i> Editar
@@ -121,24 +122,7 @@
             </script>
           {% endif %}
 
-          <div class="row mb-4">
-            <div class="col-md-6 mb-3">
-              <p class="mb-1"><strong>Nome completo:</strong></p>
-              <p class="text-muted">{{ user.get_full_name }}</p>
-            </div>
-            <div class="col-md-6 mb-3">
-              <p class="mb-1"><strong>Email:</strong></p>
-              <p class="text-muted">{{ user.email }}</p>
-            </div>
-            <div class="col-md-6 mb-3">
-              <p class="mb-1"><strong>Data de nascimento:</strong></p>
-              <p class="text-muted">{{ user.date_of_birth|date:"d/m/Y"|default:"Não informado" }}</p>
-            </div>
-            <div class="col-md-6 mb-3">
-              <p class="mb-1"><strong>Telefone:</strong></p>
-              <p class="text-muted">{{ user.phone|default:"Não informado" }}</p>
-            </div>
-          </div>
+          
 
           <h4 class="heading-color mb-3">Endereços</h4>
           <div class="row">

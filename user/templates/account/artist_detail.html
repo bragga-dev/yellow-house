@@ -97,6 +97,55 @@
         {% endfor %}
       </div>
     </div>
+    <hr>
+<div class="mt-5">
+
+
+  <h4>Artistas Relacionados</h4>
+  {% if artists %}
+  <div id="relatedArtistsCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      {% for related_artist in artists %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+          <div class="d-flex justify-content-center">
+            <div class="text-center">
+              <a href="{% url 'artist:artist_detail' slug=related_artist.user.slug pk=related_artist.user.pk %}">
+                {% if related_artist.user.photo %}
+                  <img src="{{ related_artist.user.photo.url }}" 
+                       class="rounded-circle shadow-sm" 
+                       style="width: 120px; height: 120px; object-fit: cover;" 
+                       alt="Foto de {{ related_artist.user.get_full_name }}">
+                {% else %}
+                  <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" 
+                       style="width: 120px; height: 120px;">
+                    <span class="text-white">Sem foto</span>
+                  </div>
+                {% endif %}
+              </a>
+              <p class="mt-2 fw-semibold">{{ related_artist.user.get_full_name }}</p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+   <!-- Controles -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#relatedArtistsCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"
+            style="background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 15px;"></span>
+      <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#relatedArtistsCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"
+            style="background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 15px;"></span>
+      <span class="visually-hidden">Próximo</span>
+    </button>
+
+      </div>
+      {% else %}
+        <p class="text-muted">Nenhum artista relacionado encontrado.</p>
+      {% endif %}
+    </div>
+    </div>
   </div>
 </section>
 {% endblock %}

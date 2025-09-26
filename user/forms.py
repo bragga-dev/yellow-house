@@ -1,11 +1,9 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from .models import Client, Artist, Exhibitions
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
-from .models import User
 from validate_docbr import CPF
-from .models import ClientAddress, ArtistAddress
+from user.models import ClientAddress, ArtistAddress, Exhibitions, User, Client, Artist
 from phonenumber_field.formfields import PhoneNumberField
 
 
@@ -196,13 +194,14 @@ class AddressForm(forms.ModelForm):
 class ExhibitionForm(forms.ModelForm):
     class Meta:
         model = Exhibitions
-        fields = ['artist', 'title', 'description', 'date', 'location']
+        fields = ['artist', 'title', 'description', 'date', 'location', "exhibition_banner"]
         widgets = {
             'artist': forms.Select(attrs={'class': 'form-select'}),
             'title': forms.TextInput(attrs={'placeholder': 'Título da exposição'}),
             'description': forms.Textarea(attrs={'placeholder': 'Descrição da exposição', 'rows': 4}),
             'date': forms.DateInput(attrs={'type': 'date'}),
             'location': forms.TextInput(attrs={'placeholder': 'Local da exposição'}),   
+            'exhibition_banner': forms.ClearableFileInput(attrs={'placeholder': 'Formato de arquivo: jpg, jpeg ou png.'}),
         }
 
 class PromoteToArtistForm(forms.Form):

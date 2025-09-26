@@ -58,7 +58,7 @@ class ClientAdmin(admin.ModelAdmin):
 # Admin para Artist com endereço inline e controle de is_verified
 @admin.register(Artist)
 class ArtistAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_verified')
+    list_display = ('user', 'is_verified', 'bio', 'instagram', 'facebook', 'twitter', 'tiktok')
     list_filter = ('is_verified',)
     inlines = [ArtistAddressInline]
 

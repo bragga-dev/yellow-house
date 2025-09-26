@@ -12,10 +12,10 @@ def create_exhibitions(request):
         form = ExhibitionForm(request.POST, request.FILES)
         if form.is_valid():
             exhibition = form.save(commit=False)
-            exhibition.artist = request.user.artist  # Assuming the user is logged in and is an artist
+            exhibition.artist = request.user.artist  
             exhibition.save()
             messages.success(request, 'Exhibition created successfully!')
-            return redirect('artist:dashboard_artist')  # Redirect to the artist's dashboard or another appropriate page
+            return redirect('artist:dashboard_artist')  
     else:
         form = ExhibitionForm()
     

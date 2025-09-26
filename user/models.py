@@ -289,5 +289,16 @@ class Exhibitions(models.Model):
     description = models.TextField(_('Descrição'), blank=True, null=True)
     date = models.DateField(_('Data'), null=False, blank=False)
     location = models.CharField(_('Localização'), max_length=255, null=False, blank=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    exhibition_banner = models.ImageField(upload_to="exhibition_banners/", default="default/exhibitions_banner.jpg"  ,blank=False, null=False, validators=[validate_image_file], help_text=_('Formato de arquivo: jpg, jpeg ou png.'))
+
+    class Meta:
+        verbose_name = "Exposição"
+        verbose_name_plural = "Exposição"
+        ordering = ['-date']
+    def __str__(self):
+        return f"{self.title} - {self.artist.user.get_full_name()}" 
+    
+    def save(self, *args, **kwargs):
+        if not self.exhibition_banner:
+            self.exhibition_banner.name = self._meta.get_field("exhibition_banner").default
+        super().save(*args, **kwargs)
