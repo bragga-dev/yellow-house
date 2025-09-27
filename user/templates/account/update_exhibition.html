@@ -1,0 +1,101 @@
+<!-- Modal: Editar Exposição -->
+<div class="modal fade" id="editExhibitionModal{{ exhibition.pk }}" tabindex="-1" aria-labelledby="editExhibitionModalLabel{{ exhibition.pk }}" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow-sm border-0">
+      <div class="modal-header bg-light border-bottom-0">
+        <h5 class="modal-title d-flex align-items-center" id="editExhibitionModalLabel{{ exhibition.pk }}">
+          <i class="bi bi-easel2-fill text-primary me-2"></i> Editar Exposição
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+
+      <form method="POST" action="{% url 'artist:update_exhibition' exhibition.id %}" enctype="multipart/form-data" novalidate class="px-4 pb-3">
+        {% csrf_token %}
+        <div class="modal-body px-0">
+
+          {% if exhibition.edit_form.non_field_errors %}
+            <div class="alert alert-danger rounded-3 py-2 px-3">
+              {{ exhibition.edit_form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          <div class="row g-3">
+            <!-- Título -->
+            <div class="col-md-8">
+              <label for="{{ exhibition.edit_form.title.id_for_label }}" class="form-label fw-semibold text-dark">Título da Exposição</label>
+              <input type="text" name="{{ exhibition.edit_form.title.html_name }}" id="{{ exhibition.edit_form.title.id_for_label }}" 
+                     class="form-control border-1 rounded-2" 
+                     value="{{ exhibition.edit_form.title.value|default_if_none:'' }}">
+              {% if exhibition.edit_form.title.errors %}
+                <div class="text-danger small">{{ exhibition.edit_form.title.errors.as_text|linebreaksbr }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Data -->
+            <div class="col-md-4">
+              <label for="{{ exhibition.edit_form.date.id_for_label }}" class="form-label fw-semibold text-dark">Data</label>
+              <input type="date" name="{{ exhibition.edit_form.date.html_name }}" id="{{ exhibition.edit_form.date.id_for_label }}" 
+                     class="form-control border-1 rounded-2" 
+                     value="{{ exhibition.edit_form.instance.date|date:'Y-m-d' }}">
+              {% if exhibition.edit_form.date.errors %}
+                <div class="text-danger small">{{ exhibition.edit_form.date.errors.as_text|linebreaksbr }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Local -->
+            <div class="col-md-12">
+              <label for="{{ exhibition.edit_form.location.id_for_label }}" class="form-label fw-semibold text-dark">Local</label>
+              <input type="text" name="{{ exhibition.edit_form.location.html_name }}" id="{{ exhibition.edit_form.location.id_for_label }}" 
+                     class="form-control border-1 rounded-2" 
+                     value="{{ exhibition.edit_form.location.value|default_if_none:'' }}">
+              {% if exhibition.edit_form.location.errors %}
+                <div class="text-danger small">{{ exhibition.edit_form.location.errors.as_text|linebreaksbr }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Descrição -->
+            <div class="col-12">
+              <label for="{{ exhibition.edit_form.description.id_for_label }}" class="form-label fw-semibold text-dark">Descrição</label>
+              <textarea name="{{ exhibition.edit_form.description.html_name }}" id="{{ exhibition.edit_form.description.id_for_label }}" 
+                        rows="3" class="form-control border-1 rounded-2">{{ exhibition.edit_form.description.value|default_if_none:'' }}</textarea>
+              {% if exhibition.edit_form.description.errors %}
+                <div class="text-danger small">{{ exhibition.edit_form.description.errors.as_text|linebreaksbr }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Imagem -->
+           <div class="col-12">
+              <label for="{{ exhibition.edit_form.exhibition_banner.id_for_label }}" class="form-label fw-semibold text-dark">Imagem de Capa</label>
+              <input type="file" name="{{ exhibition.edit_form.exhibition_banner.html_name }}" id="{{ exhibition.edit_form.exhibition_banner.id_for_label }}" 
+                     class="form-control border-1 rounded-2">
+              {% if exhibition.edit_form.exhibition_banner.errors %}
+                <div class="text-danger small">{{ exhibition.edit_form.exhibition_banner.errors.as_text|linebreaksbr }}</div>
+              {% endif %}
+              {% if exhibition.exhibition_banner %}
+                <small class="text-muted">Imagem atual: {{ exhibition.exhibition_banner.name }}</small>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top-0 pt-3">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-save-fill me-1"></i> Salvar Alterações
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Abrir modal automaticamente se houver erros -->
+{% if exhibition.edit_form.errors %}
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var modalEl = document.getElementById("editExhibitionModal{{ exhibition.pk }}");
+      var modal = new bootstrap.Modal(modalEl);
+      modal.show();
+    });
+  </script>
+{% endif %}

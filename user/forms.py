@@ -197,7 +197,7 @@ class ExhibitionForm(forms.ModelForm):
         fields = ['title', 'description', 'date', 'location', "exhibition_banner"]
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Título da exposição'}),
-            'description': forms.Textarea(attrs={'placeholder': 'Descrição da exposição', 'rows': 4}),
+            'description': forms.Textarea(attrs={'placeholder': 'Descrição da exposição', 'rows': 20}),
             'date': forms.DateInput(attrs={'type': 'date'}),
             'location': forms.TextInput(attrs={'placeholder': 'Local da exposição'}),   
             'exhibition_banner': forms.ClearableFileInput(attrs={'placeholder': 'Formato de arquivo: jpg, jpeg ou png.'}),

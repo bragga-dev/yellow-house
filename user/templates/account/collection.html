@@ -121,16 +121,25 @@
                     <p class="card-text"><small class="text-muted">{{ exhibition.date|date:"d/m/Y" }} – {{ exhibition.location }}</small></p>
                     <p class="card-text">{{ exhibition.description|truncatechars:100 }}</p>
                   </div>
-                  <div class="card-footer bg-transparent border-0 d-flex justify-content-end">
+                  <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
+
+                    <!-- Botão Editar -->
                     <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editExhibitionModal{{ exhibition.pk }}">
                       <i class="bi bi-pencil me-1"></i> Editar
                     </button>
+                     <!-- Botão Excluir -->
+                      <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteExhibitionModal{{ exhibition.pk }}">
+                        <i class="bi bi-trash me-1"></i> Excluir
+                      </button>
                   </div>
                 </div>
               </div>
 
               <!-- Modal de Edição de Exposição -->
-             
+            {% include 'account/update_exhibition.html' with exhibition=exhibition %}
+
+            <!-- Modal de Exclusão de Exposição -->
+            {% include 'account/confirm_delete_exhibition.html' with exhibition=exhibition %}
             {% empty %}
               <div class="col-12">
                 <div class="alert alert-info mb-0">

@@ -54,7 +54,7 @@ def create_exhibition(request):
 
 
 @login_required
-def edit_exhibition(request, exhibition_id):
+def update_exhibition(request, exhibition_id):
     exhibition = get_object_or_404(Exhibitions, id=exhibition_id)
 
     if exhibition.artist.user != request.user:
@@ -69,10 +69,34 @@ def edit_exhibition(request, exhibition_id):
             return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
         else:
             messages.error(request, 'Por favor, corrija os erros abaixo.')
-    else:
-        form = ExhibitionForm(instance=exhibition)
 
-    return render(request, 'account/edit_exhibition.html', {
-        'form': form,
-        'exhibition': exhibition,
-    })
+         
+            artist = request.user.artist
+            exhibitions = list(artist.exhibitions.all().order_by('id'))
+
+            for ex in exhibitions:
+                ex.edit_form = form if ex.id == exhibition.id else ExhibitionForm(instance=ex)
+
+            return render(request, 'account/collection.html', {
+                'artist': artist,
+                'exhibitions': exhibitions,
+                'form_exhibition': ExhibitionForm(),  # para modal de criação
+            })
+
+   
+    return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
+
+@login_required
+def delete_exhibition(request, exhibition_id):
+    exhibition = get_object_or_404(Exhibitions, id=exhibition_id)
+
+    if exhibition.artist.user != request.user:
+        messages.error(request, "Você não tem permissão para deletar esta exposição.")
+        return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
+
+    if request.method == 'POST':
+        exhibition.delete()
+        messages.success(request, 'Exposição deletada com sucesso!')
+        return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
+
+    return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)

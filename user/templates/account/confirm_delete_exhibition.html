@@ -1,0 +1,27 @@
+<!-- Modal: Deletar Exposição -->
+<div class="modal fade" id="deleteExhibitionModal{{ exhibition.id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'artist:delete_exhibition' exhibition_id=exhibition.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-trash3-fill text-danger me-2"></i> Excluir Exposição
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          Deseja realmente excluir a exposição <strong>{{ exhibition.title }}</strong>?
+          <br>
+          <small class="text-muted">Esta ação não poderá ser desfeita.</small>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash-fill me-1"></i> Excluir
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
