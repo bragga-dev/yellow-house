@@ -285,15 +285,15 @@ class ArtistAddress(BaseAddress):
     
 class Exhibitions(models.Model):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='exhibitions')
-    title = models.CharField(_('Título'), max_length=255)
-    description = models.TextField(_('Descrição'), blank=True, null=True)
+    title = models.CharField(_('Título'), max_length=255, null=False, blank=False)
+    description = models.TextField(_('Descrição'), blank=False, null=False, default="Sem descrição", help_text=_('Conte um pouco sobre a exposição.'))
     date = models.DateField(_('Data'), null=False, blank=False)
     location = models.CharField(_('Localização'), max_length=255, null=False, blank=False)
-    exhibition_banner = models.ImageField(upload_to="exhibition_banners/", default="default/exhibitions_banner.jpg"  ,blank=False, null=False, validators=[validate_image_file], help_text=_('Formato de arquivo: jpg, jpeg ou png.'))
+    exhibition_banner = models.ImageField(upload_to="exhibition_banners/", default="default/exhibitions_banner.jpg", blank=False, null=False, validators=[validate_image_file], help_text=_('Formato de arquivo: jpg, jpeg ou png.'))
 
     class Meta:
         verbose_name = "Exposição"
-        verbose_name_plural = "Exposição"
+        verbose_name_plural = "Exposições"
         ordering = ['-date']
     def __str__(self):
         return f"{self.title} - {self.artist.user.get_full_name()}" 

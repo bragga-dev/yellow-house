@@ -10,7 +10,7 @@ admin.site.index_title = "Bem-vindo ao painel de administração Casa Amarela"
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Client, Artist, ClientAddress, ArtistAddress
+from user.models import User, Client, Artist, ClientAddress, ArtistAddress, Exhibitions
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 # Inline para endereços do cliente
@@ -81,3 +81,10 @@ class ClientAddressAdmin(admin.ModelAdmin):
 @admin.register(ArtistAddress)
 class ArtistAddressAdmin(admin.ModelAdmin):
     list_display = ('artist', 'road', 'number', 'city', 'state', 'principal')
+
+
+@admin.register(Exhibitions)
+class ExhibitionsAdmin(admin.ModelAdmin):
+    list_display = ('title', 'artist', 'date', 'location')
+    list_filter = ('date', 'artist')
+    search_fields = ('title', 'artist__user__username', 'location')

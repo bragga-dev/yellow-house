@@ -1,0 +1,87 @@
+<!-- Modal: Criar Exposição -->
+<div class="modal fade" id="addExhibitionModal" tabindex="-1" aria-labelledby="addExhibitionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow-sm border-0">
+      <div class="modal-header bg-light border-bottom-0">
+        <h5 class="modal-title d-flex align-items-center" id="addExhibitionModalLabel">
+          <i class="bi bi-easel2-fill text-primary me-2"></i> Criar Exposição
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+
+      <form method="POST" action="{% url 'artist:create_exhibition' %}" enctype="multipart/form-data" novalidate class="px-4 pb-3">
+        {% csrf_token %}
+        <div class="modal-body px-0">
+
+          {% if form_exhibition.non_field_errors %}
+            <div class="alert alert-danger rounded-3 py-2 px-3">
+              {{ form_exhibition.non_field_errors }}
+            </div>
+          {% endif %}
+
+          <div class="row g-3">
+            <!-- Título da Exposição -->
+            <div class="col-md-8">
+              <label for="{{ form_exhibition.title.id_for_label }}" class="form-label fw-semibold text-dark">Título da Exposição</label>
+              <input type="text" name="{{ form_exhibition.title.html_name }}" id="{{ form_exhibition.title.id_for_label }}" 
+                     class="form-control border-1 rounded-2" 
+                     value="{{ form_exhibition.title.value|default_if_none:'' }}">
+              {% if form_exhibition.title.errors %}
+                <div class="text-danger small">{{ form_exhibition.title.errors.as_text|linebreaksbr }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Data -->
+            <div class="col-md-4">
+              <label for="{{ form_exhibition.date.id_for_label }}" class="form-label fw-semibold text-dark">Data</label>
+              <input type="date" name="{{ form_exhibition.date.html_name }}" id="{{ form_exhibition.date.id_for_label }}" 
+                     class="form-control border-1 rounded-2" 
+                     value="{{ form_exhibition.date.value|default_if_none:'' }}">
+              {% if form_exhibition.date.errors %}
+                <div class="text-danger small">{{ form_exhibition.date.errors.as_text|linebreaksbr }}</div>
+              {% endif %}
+            </div>           
+
+            <!-- Local -->
+            <div class="col-md-12">
+              <label for="{{ form_exhibition.location.id_for_label }}" class="form-label fw-semibold text-dark">Local</label>
+              <input type="text" name="{{ form_exhibition.location.html_name }}" id="{{ form_exhibition.location.id_for_label }}" 
+                     class="form-control border-1 rounded-2" 
+                     value="{{ form_exhibition.location.value|default_if_none:'' }}">
+              {% if form_exhibition.location.errors %}
+                <div class="text-danger small">{{ form_exhibition.location.errors.as_text|linebreaksbr }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Descrição -->
+            <div class="col-12">
+              <label for="{{ form_exhibition.description.id_for_label }}" class="form-label fw-semibold text-dark">Descrição</label>
+              <textarea name="{{ form_exhibition.description.html_name }}" id="{{ form_exhibition.description.id_for_label }}" 
+                        rows="3" class="form-control border-1 rounded-2">{{ form_exhibition.description.value|default_if_none:'' }}</textarea>
+              {% if form_exhibition.description.errors %}
+                <div class="text-danger small">{{ form_exhibition.description.errors.as_text|linebreaksbr }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Imagem -->
+            <div class="col-12">
+              <label for="{{ form_exhibition.exhibition_banner.id_for_label }}" class="form-label fw-semibold text-dark">Imagem de Capa</label>
+              <input type="file" name="{{ form_exhibition.exhibition_banner.html_name }}" id="{{ form_exhibition.exhibition_banner.id_for_label }}" 
+                     class="form-control border-1 rounded-2">
+              {% if form_exhibition.exhibition_banner.errors %}
+                <div class="text-danger small">{{ form_exhibition.exhibition_banner.errors.as_text|linebreaksbr }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top-0 pt-3">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-save-fill me-1"></i> Salvar Exposição
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

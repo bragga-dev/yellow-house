@@ -13,6 +13,7 @@
     </div>
   {% endif %}
 </div>
+
 <section class="account section">
   <div class="container">
     <div class="row">
@@ -30,7 +31,6 @@
             <h4 class="heading-color mb-2">{{ user.get_full_name }}</h4>
             <p class="text-muted small mb-3">{{ user.email }}</p>
             <span class="badge bg-accent text-success">{{ user.username }}</span>
-           
           </div>
 
           <ul class="list-unstyled text-center mb-4">
@@ -45,53 +45,34 @@
             </a>
           </div>
 
-
-         <!-- Botão que abre o modal -->
+          <!-- Botão para alterar para Cliente -->
           <div class="text-center mt-3">
             <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#demoteModal">
               <i class="bi bi-arrow-down-double me-1"></i> Alterar para Cliente
             </button>
           </div>
 
-          <!-- Modal -->
+          <!-- Modal de Demote -->
           <div class="modal fade" id="demoteModal" tabindex="-1" aria-labelledby="demoteModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
-                
-                <!-- Cabeçalho -->
                 <div class="modal-header">
                   <h5 class="modal-title" id="demoteModalLabel">Confirmar Ação</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
-
-                <!-- Corpo -->
                 <div class="modal-body text-center">
                   Tem certeza que deseja alterar sua conta para Cliente?
-                  Todos os seus dados de artista serão removidos, incluindo biografia, redes sociais e endereço.
+                  Todos os seus dados de artista serão removidos, incluindo biografia, redes sociais e exposições.
                 </div>
-
-                <!-- Rodapé -->
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                  
-                  <!-- Formulário dentro do modal -->
                   <form action="{% url 'artist:demote_to_client' slug=artist.user.slug pk=artist.user.pk %}" method="post">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-warning">Confirmar</button>
                   </form>
                 </div>
-                
               </div>
             </div>
-          </div>
-          <div class="text-center mt-4">
-           {% if artist.is_verified %}
-            <a href="#" class="badge bg-success text-contrast ms-2" data-bs-toggle="tooltip" title="Artista Verificado">
-              <i class="bi bi-check-circle"></i> Criar Acervo
-            </a>
-            {% else %}            
-              <span class="badge bg-danger ms-2">Aguarde Aprovação</span>
-            {% endif %} 
           </div>
         </div>
       </div>
@@ -100,118 +81,68 @@
       <div class="col-lg-8">
         <div class="bg-surface rounded shadow-sm p-4">
           <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="heading-color mb-0">Acervo</h3>
+            <h3 class="heading-color mb-0">Exposições</h3>
             <div class="d-flex gap-2">
               <a href="{% url 'artist:update_profile_artist' slug=user.slug pk=user.pk %}" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-pencil me-1"></i> Editar
+                <i class="bi bi-pencil me-1"></i> Editar Perfil
               </a>
-              <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAddressModal">
-                <i class="bi bi-house-add me-1"></i> Endereço
+              <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addExhibitionModal">
+                <i class="bi bi-palette me-1"></i> Criar Exposição
               </button>
             </div>
           </div>
 
-          {% include 'account/create_address.html' with form=form %}
-          {% if form.errors %}
+          <!-- Modal de Criação -->
+          {% include 'account/create_exhibitions.html' with form=form_exhibition %}
+          {% if form_exhibition.errors %}
             <script>
               document.addEventListener("DOMContentLoaded", function() {
-                const modalEl = document.getElementById("addAddressModal");
+                const modalEl = document.getElementById("addExhibitionModal"); 
                 const modal = new bootstrap.Modal(modalEl);
                 modal.show();
               });
             </script>
           {% endif %}
 
-          
-
-          <h4 class="heading-color mb-3">Endereços</h4>
+          <!-- Cards de Exposições -->
           <div class="row">
-            {% for address in addresses %}
+            {% for exhibition in exhibitions %}
               <div class="col-md-6 mb-3">
-                <div class="border p-3 rounded bg-surface">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h5 class="heading-color mb-0">
-                      Endereço {{ forloop.counter }}             
-                      {% if address.principal %}
-                        <span class="badge bg-success ms-2">Padrão</span>
-                      {% endif %}      
-                      {% if address.principal %}
-                        <span class="badge bg-accent text-contrast ms-2">Padrão</span>
-                      {% endif %}
-                    </h5>
+                <div class="card h-100 shadow-sm border-0">
+                  {% if exhibition.exhibition_banner %}
+                    <img src="{{ exhibition.exhibition_banner.url }}" class="card-img-top" alt="{{ exhibition.title }}" style="height:200px; object-fit:cover;">
+                  {% else %}
+                    <div class="card-img-top d-flex align-items-center justify-content-center" style="height:200px; background-color:#f0f0f0;">
+                      <span class="text-muted">Sem imagem</span>
+                    </div>
+                  {% endif %}
+                  <div class="card-body">
+                    <h5 class="card-title">{{ exhibition.title }}</h5>
+                    <p class="card-text"><small class="text-muted">{{ exhibition.date|date:"d/m/Y" }} – {{ exhibition.location }}</small></p>
+                    <p class="card-text">{{ exhibition.description|truncatechars:100 }}</p>
                   </div>
-                  <div class="text-muted">
-                    <p class="mb-1">{{ address.road }}, {{ address.number }}</p>
-                    <p class="mb-1">{{ address.district }} – {{ address.city }} / {{ address.state }}</p>
-                    <p class="mb-1">{{ address.cep }} – {{ address.country }}</p>
-                    {% if address.complement %}
-                      <p class="mb-1"><strong>Complemento:</strong> {{ address.complement|slice:":20" }}{% if address.complement|length > 20 %}...{% endif %}</p>
-                    {% endif %}
-                  </div>
-                  
-                  <!-- Action Buttons -->
-                  <div class="d-flex gap-2 mt-3">
-                    <button type="button" 
-                            class="btn btn-outline-secondary btn-sm flex-grow-1" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#editAddressModal{{ address.pk }}">
-                      <i class="bi bi-pencil  me-1"></i> Editar
-                    </button>
-                    
-                    <button type="button" 
-                            class="btn btn-outline-danger btn-sm flex-grow-1" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#deleteAddressModal{{ address.pk }}">
-                      <i class="bi bi-trash me-1"></i> Excluir
+                  <div class="card-footer bg-transparent border-0 d-flex justify-content-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editExhibitionModal{{ exhibition.pk }}">
+                      <i class="bi bi-pencil me-1"></i> Editar
                     </button>
                   </div>
                 </div>
               </div>
-              
-              
-              {% include 'account/update_address.html' with address=address form=address.edit_form %}
-              {% include 'account/confirm_delete_address.html' with address=address %}
-              
-              {% if address.open_modal %}
-                <script>
-                  document.addEventListener('DOMContentLoaded', function () {
-                    var modal = new bootstrap.Modal(document.getElementById('editAddressModal{{ address.pk }}'));
-                    modal.show();
-                  });
-                </script>
-              {% endif %}
+
+              <!-- Modal de Edição de Exposição -->
+             
             {% empty %}
               <div class="col-12">
                 <div class="alert alert-info mb-0">
-                  <i class="bi bi-info-circle me-2"></i> Nenhum endereço cadastrado.
+                  <i class="bi bi-info-circle me-2"></i> Nenhuma exposição cadastrada.
                 </div>
               </div>
             {% endfor %}
-          </div>
-          <!-- Seção de Biografia -->
-          <div class="mt-4 pt-4 border-top">
-            <h4 class="heading-color mb-3">Biografia</h4>
-            {% if artist.bio  and artist.bio == "" and artist.bio != None %}
-              <div class="bg-surface rounded p-3">
-                {{ artist.bio|safe }}
-              </div>
-              <div class="text-end mt-2">
-                <a href="{% url 'artist:update_profile_artist' slug=user.slug pk=user.pk %}" class="btn btn-outline-secondary btn-sm">
-                  <i class="bi bi-pencil me-1"></i> Editar biografia
-                </a>
-              </div>
-            {% else %}
-              <div class="alert alert-info">
-                <i class="bi bi-info-circle me-2"></i> Nenhuma biografia cadastrada.
-                <a href="{% url 'artist:update_profile_artist' slug=user.slug pk=user.pk %}" class="btn btn-outline-primary btn-sm ms-2">
-                  <i class="bi bi-plus-circle me-1"></i> Adicionar biografia
-                </a>
-              </div>
-            {% endif %}
           </div>
         </div>
       </div>
     </div>
   </div>
 </section>
+
 {% endblock %}

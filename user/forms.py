@@ -194,9 +194,8 @@ class AddressForm(forms.ModelForm):
 class ExhibitionForm(forms.ModelForm):
     class Meta:
         model = Exhibitions
-        fields = ['artist', 'title', 'description', 'date', 'location', "exhibition_banner"]
+        fields = ['title', 'description', 'date', 'location', "exhibition_banner"]
         widgets = {
-            'artist': forms.Select(attrs={'class': 'form-select'}),
             'title': forms.TextInput(attrs={'placeholder': 'Título da exposição'}),
             'description': forms.Textarea(attrs={'placeholder': 'Descrição da exposição', 'rows': 4}),
             'date': forms.DateInput(attrs={'type': 'date'}),

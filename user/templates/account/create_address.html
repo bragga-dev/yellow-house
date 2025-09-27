@@ -69,12 +69,12 @@
             <div class="col-md-6">
               <label for="{{ form.state.id_for_label }}" class="form-label fw-semibold text-dark">Estado</label>
              <select name="{{ form.state.html_name }}" id="{{ form.state.id_for_label }}" class="form-select border-1 rounded-2">
-  {% for option in form.state.field.choices %}
-    <option value="{{ option.0 }}" {% if option.0 == form.state.value %}selected{% endif %}>
-      {{ option.1 }}
-    </option>
-  {% endfor %}
-</select>
+              {% for option in form.state.field.choices %}
+                <option value="{{ option.0 }}" {% if option.0 == form.state.value %}selected{% endif %}>
+                  {{ option.1 }}
+                </option>
+              {% endfor %}
+            </select>
 
               {% if form.state.errors %}
                 <div class="text-danger small">{{ form.state.errors.as_text|linebreaksbr }}</div>

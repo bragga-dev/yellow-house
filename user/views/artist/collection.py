@@ -1,18 +1,78 @@
-from user.forms import ExhibitionForm
-from user.models import Exhibitions, Artist
+# collection.py
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-
-
+from django.contrib import messages
+from user.forms import ExhibitionForm
+from user.models import Exhibitions, Artist
 
 
 @login_required
 def collection(request, slug, pk):
     artist = get_object_or_404(Artist, user__slug=slug, user__pk=pk)
-   
-    
+    if artist.user != request.user:
+        return redirect('account_login')
+
+    exhibitions = list(artist.exhibitions.all().order_by('id'))
+    form_exhibition = ExhibitionForm()
+    for exhibition in exhibitions:
+        exhibition.edit_form = ExhibitionForm(instance=exhibition)
+
     context = {
-        'artist': artist
+        'artist': artist,
+        'exhibitions': exhibitions,
+        'form_exhibition': form_exhibition,
     }
-        
     return render(request, 'account/collection.html', context)
+
+
+@login_required
+def create_exhibition(request):
+    if not getattr(request.user, 'is_artist', False) or not hasattr(request.user, 'artist'):
+        messages.error(request, "Somente artistas podem criar exposições.")
+        return redirect('account_login')
+
+    if request.method == 'POST':
+        form_exhibition = ExhibitionForm(request.POST, request.FILES)
+        if form_exhibition.is_valid():
+            exhibition = form_exhibition.save(commit=False)
+            exhibition.artist = request.user.artist  
+            exhibition.save()
+            messages.success(request, 'Exposição criada com sucesso!')
+            return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
+        artist = request.user.artist
+        exhibitions = list(artist.exhibitions.all().order_by('id'))
+        for exhibition in exhibitions:
+            exhibition.edit_form = ExhibitionForm(instance=exhibition)
+
+        return render(request, 'account/collection.html', {
+            'artist': artist,
+            'exhibitions': exhibitions,
+            'form_exhibition': form_exhibition,  
+        })
+
+    return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
+
+
+@login_required
+def edit_exhibition(request, exhibition_id):
+    exhibition = get_object_or_404(Exhibitions, id=exhibition_id)
+
+    if exhibition.artist.user != request.user:
+        messages.error(request, "Você não tem permissão para editar esta exposição.")
+        return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
+
+    if request.method == 'POST':
+        form = ExhibitionForm(request.POST, request.FILES, instance=exhibition)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Exposição atualizada com sucesso!')
+            return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
+        else:
+            messages.error(request, 'Por favor, corrija os erros abaixo.')
+    else:
+        form = ExhibitionForm(instance=exhibition)
+
+    return render(request, 'account/edit_exhibition.html', {
+        'form': form,
+        'exhibition': exhibition,
+    })
