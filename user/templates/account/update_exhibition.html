@@ -9,7 +9,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
       </div>
 
-      <form method="POST" action="{% url 'artist:update_exhibition' exhibition.id %}" enctype="multipart/form-data" novalidate class="px-4 pb-3">
+      <form method="POST" action="{% url 'artist:update_exhibition' slug=exhibition.slug exhibition_id=exhibition.pk %}" enctype="multipart/form-data" novalidate class="px-4 pb-3">
         {% csrf_token %}
         <div class="modal-body px-0">
 

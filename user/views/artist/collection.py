@@ -54,8 +54,8 @@ def create_exhibition(request):
 
 
 @login_required
-def update_exhibition(request, exhibition_id):
-    exhibition = get_object_or_404(Exhibitions, id=exhibition_id)
+def update_exhibition(request, slug, exhibition_id):
+    exhibition = get_object_or_404(Exhibitions, slug=slug, id=exhibition_id)
 
     if exhibition.artist.user != request.user:
         messages.error(request, "Você não tem permissão para editar esta exposição.")
@@ -87,8 +87,8 @@ def update_exhibition(request, exhibition_id):
     return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
 
 @login_required
-def delete_exhibition(request, exhibition_id):
-    exhibition = get_object_or_404(Exhibitions, id=exhibition_id)
+def delete_exhibition(request, slug, exhibition_id):
+    exhibition = get_object_or_404(Exhibitions, slug=slug, id=exhibition_id)
 
     if exhibition.artist.user != request.user:
         messages.error(request, "Você não tem permissão para deletar esta exposição.")
@@ -100,3 +100,13 @@ def delete_exhibition(request, exhibition_id):
         return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
 
     return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
+
+
+
+
+def exhibition_detail(request, slug, exhibition_id):
+    exhibition = get_object_or_404(Exhibitions, slug=slug, id=exhibition_id)
+    return render(request, 'account/exhibition_detail.html', {'exhibition': exhibition})    
+
+
+

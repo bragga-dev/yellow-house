@@ -166,9 +166,8 @@ class SouvenirImage(models.Model):
         ordering = ['-is_primary', 'id']
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # Salva primeiro para garantir que self.pk exista
+        super().save(*args, **kwargs)  
         if self.is_primary:
-            # Desmarca as outras imagens primárias do mesmo souvenir
             SouvenirImage.objects.filter(souvenir=self.souvenir, is_primary=True).exclude(pk=self.pk).update(is_primary=False)
 
 

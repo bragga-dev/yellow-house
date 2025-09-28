@@ -2,7 +2,7 @@
 <div class="modal fade" id="deleteExhibitionModal{{ exhibition.id }}" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form method="post" action="{% url 'artist:delete_exhibition' exhibition_id=exhibition.id %}">
+      <form method="post" action="{% url 'artist:delete_exhibition' slug=exhibition.slug exhibition_id=exhibition.id %}">
         {% csrf_token %}
         <div class="modal-header">
           <h5 class="modal-title">

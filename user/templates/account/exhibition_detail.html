@@ -1,0 +1,58 @@
+{% extends "vitrine/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+  <!-- Cabeçalho -->
+  <div class="text-center mb-4">
+    <h2>{{ exhibition.title }}</h2>
+    <p class="text-muted">
+      <strong>Local:</strong> {{ exhibition.location }} <br>
+      <strong>Data:</strong> {{ exhibition.date|date:"d/m/Y" }}
+    </p>
+  </div>
+
+  <!-- Banner -->
+  <div class="text-center mb-4">
+    {% if exhibition.exhibition_banner %}
+      <img src="{{ exhibition.exhibition_banner.url }}" class="img-fluid rounded shadow" style="max-height: 400px; object-fit: cover;" alt="{{ exhibition.title }}">
+    {% else %}
+      <img src="{% static 'img/default-banner.jpg' %}" class="img-fluid rounded shadow" alt="Exposição">
+    {% endif %}
+  </div>
+
+  <!-- Descrição -->
+  <div class="mb-4">
+    <h4>Sobre a Exposição</h4>
+    <p>{{ exhibition.description|linebreaks }}</p>
+  </div>
+
+  <!-- Obras relacionadas (opcional) -->
+  {% if exhibition.artworks.exists %}
+    <div class="mb-4">
+      <h4>Obras em Exposição</h4>
+      <div class="row">
+        {% for artwork in exhibition.artworks.all %}
+          <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+              <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}">
+              <div class="card-body">
+                <h5 class="card-title">{{ artwork.title }}</h5>
+                <p class="text-muted">{{ artwork.artist.user.username }}</p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Botão voltar -->
+  <div class="text-center mt-4">
+   <a href="{% url 'artist:artist_detail' slug=exhibition.artist.user.slug pk=exhibition.artist.user.pk %}" class="btn btn-outline-primary">
+  ← Voltar ao perfil do artista
+</a>
+
+  </div>
+</div>
+{% endblock %}

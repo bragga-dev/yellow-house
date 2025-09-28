@@ -284,13 +284,14 @@ class ArtistAddress(BaseAddress):
         super().save(*args, **kwargs)
     
 class Exhibitions(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, related_name='exhibitions')
     title = models.CharField(_('Título'), max_length=255, null=False, blank=False)
     description = models.TextField(_('Descrição'), blank=False, null=False, default="Sem descrição", help_text=_('Conte um pouco sobre a exposição.'))
     date = models.DateField(_('Data'), null=False, blank=False)
     location = models.CharField(_('Localização'), max_length=255, null=False, blank=False)
     exhibition_banner = models.ImageField(upload_to="exhibition_banners/", default="default/exhibitions_banner.jpg", blank=False, null=False, validators=[validate_image_file], help_text=_('Formato de arquivo: jpg, jpeg ou png.'))
-    
+    slug = models.SlugField(max_length=255, unique=True, editable=False)
     class Meta:
         verbose_name = "Exposição"
         verbose_name_plural = "Exposições"
@@ -306,4 +307,13 @@ class Exhibitions(models.Model):
     def save(self, *args, **kwargs):
         if not self.exhibition_banner:
             self.exhibition_banner.name = self._meta.get_field("exhibition_banner").default
+        
+        if not self.slug:
+                base_slug = slugify(f"{self.title}")
+                unique_slug = base_slug
+                num = 1
+                while self.__class__.objects.filter(slug=unique_slug).exists():
+                    unique_slug = f'{base_slug}-{num}'
+                    num += 1
+                self.slug = unique_slug
         super().save(*args, **kwargs)

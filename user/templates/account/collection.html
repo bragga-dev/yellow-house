@@ -83,9 +83,6 @@
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="heading-color mb-0">Exposições</h3>
             <div class="d-flex gap-2">
-              <a href="{% url 'artist:update_profile_artist' slug=user.slug pk=user.pk %}" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-pencil me-1"></i> Editar Perfil
-              </a>
               <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addExhibitionModal">
                 <i class="bi bi-palette me-1"></i> Criar Exposição
               </button>
@@ -110,7 +107,9 @@
               <div class="col-md-6 mb-3">
                 <div class="card h-100 shadow-sm border-0">
                   {% if exhibition.exhibition_banner %}
+                  <a href="{% url 'artist:exhibition_detail' slug=exhibition.slug exhibition_id=exhibition.pk %}">
                     <img src="{{ exhibition.exhibition_banner.url }}" class="card-img-top" alt="{{ exhibition.title }}" style="height:200px; object-fit:cover;">
+                  </a>
                   {% else %}
                     <div class="card-img-top d-flex align-items-center justify-content-center" style="height:200px; background-color:#f0f0f0;">
                       <span class="text-muted">Sem imagem</span>
