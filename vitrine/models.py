@@ -3,9 +3,10 @@ from vitrine.validators import validate_image_file
 from user.models import Artist
 from django.core.exceptions import ValidationError
 import uuid
-from django.utils.text import slugify   
+from vitrine.utils import generate_unique_slug
 from django.utils.translation import gettext_lazy as _  
 from django.core.validators import MinValueValidator
+from django.urls import reverse
 
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
@@ -35,14 +36,9 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(f"{self.name}-{self.id}")
-            unique_slug = base_slug
-            num = 1
-            while self.__class__.objects.filter(slug=unique_slug).exists():
-                unique_slug = f'{base_slug}-{num}'
-                num += 1
-            self.slug = unique_slug
+            self.slug = generate_unique_slug(self, self.name, self.id)
         super().save(*args, **kwargs)
+
    
 class ArtworkCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -50,22 +46,28 @@ class ArtworkCategory(models.Model):
     description = models.TextField(_('Descrição'), null=True, blank=True)
     slug = models.SlugField(max_length=255, unique=True, editable=False)
     image = models.ImageField(_('Imagem'), upload_to='artwork_categories/', validators=[validate_image_file], null=False, blank=False)
+      
+    class Meta:
+        verbose_name = "Artwork Category"
+        verbose_name_plural = "Artwork Categories"
+        ordering = ['name']
     
     def __str__(self):
         return self.name
+    
+    def get_absolute_url(self):
+        return reverse("artwork_category_detail",  kwargs={"slug": self.slug, "pk": self.id})
+
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.name)
-            unique_slug = base_slug
-            num = 1
-            while ArtworkCategory.objects.filter(slug=unique_slug).exists():
-                unique_slug = f'{base_slug}-{num}'
-                num += 1
-            self.slug = unique_slug
+            self.slug = generate_unique_slug(self, self.name, self.id)
         super().save(*args, **kwargs)
 
+    
+
 class ArtWork(Product):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     artist = models.ForeignKey(Artist, on_delete=models.PROTECT, related_name='artworks')
     art_work_category = models.ForeignKey(ArtworkCategory, on_delete=models.PROTECT, related_name='artworks')
     width = models.FloatField(_('Largura (cm)'), null=False, blank=False)
@@ -73,18 +75,28 @@ class ArtWork(Product):
     technique = models.CharField(_('Técnica'), max_length=100, null=True, blank=True)
     year_created = models.DateField(_('Ano de criação'), null=True, blank=True)    
     style = models.CharField(_('Estilo'), max_length=100, null=True, blank=True)
+    slug = models.SlugField(max_length=255, unique=True, editable=False)
 
     def __str__(self):
-        return self.name    
+        return self.name
+    
+    def get_absolute_url(self):
+        return reverse("artwork_detail", kwargs={"slug": self.slug, "pk": self.id})
+
     
     class Meta:
         verbose_name = "Artwork"
         verbose_name_plural = "Artworks"
         ordering = ['name']
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_unique_slug(self, self.name, self.id)
+        super().save(*args, **kwargs)
 
 
 class SouvenirCategory(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_('Nome'), max_length=100, unique=True)
     description = models.TextField(_('Descrição'), null=True, blank=True)
     slug = models.SlugField(max_length=255, unique=True, editable=False)
@@ -92,17 +104,20 @@ class SouvenirCategory(models.Model):
     
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = "Souvenir Category"
+        verbose_name_plural = "Souvenir Categories"
+        ordering = ['name']
+
+    def get_absolute_url(self):
+        return reverse("souvenir_category_detail",  kwargs={"slug": self.slug, "pk": self.id})
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.name)
-            unique_slug = base_slug
-            num = 1
-            while SouvenirCategory.objects.filter(slug=unique_slug).exists():
-                unique_slug = f'{base_slug}-{num}'
-                num += 1
-            self.slug = unique_slug
+            self.slug = generate_unique_slug(self, self.name, self.id)
         super().save(*args, **kwargs)
+
         
 class Souvenir(Product):
     SIZE_CHOICES = [
@@ -123,7 +138,9 @@ class Souvenir(Product):
         verbose_name = "Souvenir"
         verbose_name_plural = "Souvenirs"
         ordering = ['name']
-        
+    
+    def get_absolute_url(self):
+        return reverse("souvenir_detail",  kwargs={"slug": self.slug, "pk": self.id})
     
 class ArtworkImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
