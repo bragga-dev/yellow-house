@@ -4,6 +4,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from user.forms import ExhibitionForm
 from user.models import Exhibitions, Artist
+from vitrine.models import ArtWork
+from vitrine.forms import ArtWorkForm
 
 
 @login_required
@@ -13,7 +15,15 @@ def collection(request, slug, pk):
         return redirect('account_login')
 
     exhibitions = list(artist.exhibitions.all().order_by('id'))
+    artworks = list(artist.artworks.all().order_by('id'))
+
     form_exhibition = ExhibitionForm()
+    form_artwork = ArtWorkForm()
+
+
+    for artwork in artworks:
+        artwork.edit_form = ArtWorkForm(instance=artwork)
+
     for exhibition in exhibitions:
         exhibition.edit_form = ExhibitionForm(instance=exhibition)
 
@@ -21,6 +31,7 @@ def collection(request, slug, pk):
         'artist': artist,
         'exhibitions': exhibitions,
         'form_exhibition': form_exhibition,
+        'artworks': artworks,
     }
     return render(request, 'account/collection.html', context)
 

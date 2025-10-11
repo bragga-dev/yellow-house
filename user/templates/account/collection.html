@@ -17,6 +17,7 @@
 <section class="account section">
   <div class="container">
     <div class="row">
+
       <!-- Profile Menu Column -->
       <div class="col-lg-4 mb-4">
         <div class="profile-menu">
@@ -74,22 +75,23 @@
               </div>
             </div>
           </div>
+
         </div>
       </div>
 
       <!-- Main Content Column -->
       <div class="col-lg-8">
-        <div class="bg-surface rounded shadow-sm p-4">
+
+        <!-- Exposições -->
+        <div class="bg-surface rounded shadow-sm p-4 mb-4">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="heading-color mb-0">Exposições</h3>
-            <div class="d-flex gap-2">
-              <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addExhibitionModal">
-                <i class="bi bi-palette me-1"></i> Criar Exposição
-              </button>
-            </div>
+            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addExhibitionModal">
+              <i class="bi bi-palette me-1"></i> Criar Exposição
+            </button>
           </div>
 
-          <!-- Modal de Criação -->
+          <!-- Modal de Criação de Exposição -->
           {% include 'account/create_exhibitions.html' with form=form_exhibition %}
           {% if form_exhibition.errors %}
             <script>
@@ -121,24 +123,18 @@
                     <p class="card-text">{{ exhibition.description|truncatechars:100 }}</p>
                   </div>
                   <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
-
-                    <!-- Botão Editar -->
                     <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editExhibitionModal{{ exhibition.pk }}">
                       <i class="bi bi-pencil me-1"></i> Editar
                     </button>
-                     <!-- Botão Excluir -->
-                      <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteExhibitionModal{{ exhibition.pk }}">
-                        <i class="bi bi-trash me-1"></i> Excluir
-                      </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteExhibitionModal{{ exhibition.pk }}">
+                      <i class="bi bi-trash me-1"></i> Excluir
+                    </button>
                   </div>
                 </div>
               </div>
 
-              <!-- Modal de Edição de Exposição -->
-            {% include 'account/update_exhibition.html' with exhibition=exhibition %}
-
-            <!-- Modal de Exclusão de Exposição -->
-            {% include 'account/confirm_delete_exhibition.html' with exhibition=exhibition %}
+              {% include 'account/update_exhibition.html' with exhibition=exhibition %}
+              {% include 'account/confirm_delete_exhibition.html' with exhibition=exhibition %}
             {% empty %}
               <div class="col-12">
                 <div class="alert alert-info mb-0">
@@ -148,6 +144,58 @@
             {% endfor %}
           </div>
         </div>
+
+        <!-- Obras -->
+        <div class="bg-surface rounded shadow-sm p-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="heading-color mb-0">Obras</h3>
+            <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#addArtworkModal">
+              <i class="bi bi-plus-circle me-1"></i> Adicionar Obra
+            </button>
+          </div>
+
+          <!-- Modal de Criação de Obra -->
+          {% include 'vitrine/create-artwork.html' with form_artwork=form_artwork %}
+
+          <!-- Cards de Obras -->
+          <div class="row">
+            {% for artwork in artworks %}
+              <div class="col-md-6 mb-3">
+                <div class="card h-100 shadow-sm border-0">
+                  {% if artwork.images.all %}
+                  <a href="">
+                    <img src="{{ artwork.images.first.image.url }}" class="card-img-top" alt="{{ artwork.name }}" style="height:200px; object-fit:cover;">
+                  </a>
+                  {% else %}
+                    <div class="card-img-top d-flex align-items-center justify-content-center" style="height:200px; background-color:#f0f0f0;">
+                      <span class="text-muted">Sem imagem</span>
+                    </div>
+                  {% endif %}
+                  <div class="card-body">
+                    <h5 class="card-title">{{ artwork.name }}</h5>
+                    <p class="card-text"><small class="text-muted">{{ artwork.art_work_category.name }}</small></p>
+                    <p class="card-text">R$ {{ artwork.price }}</p>
+                  </div>
+                  <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
+                    <a href="" class="btn btn-outline-secondary btn-sm">
+                      <i class="bi bi-pencil me-1"></i> Editar
+                    </a>
+                    <a href="" class="btn btn-outline-danger btn-sm">
+                      <i class="bi bi-trash me-1"></i> Excluir
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="col-12">
+                <div class="alert alert-info mb-0">
+                  <i class="bi bi-info-circle me-2"></i> Nenhuma obra cadastrada.
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
