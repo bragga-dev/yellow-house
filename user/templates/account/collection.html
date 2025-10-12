@@ -156,46 +156,77 @@
 
           <!-- Modal de Criação de Obra -->
           {% include 'vitrine/create-artwork.html' with form_artwork=form_artwork %}
+          
 
-          <!-- Cards de Obras -->
-          <div class="row">
-            {% for artwork in artworks %}
-              <div class="col-md-6 mb-3">
-                <div class="card h-100 shadow-sm border-0">
-                  {% if artwork.images.all %}
+         <!-- Cards de Obras -->
+        <div class="row">
+          {% for artwork in artworks %}
+            <div class="col-md-6 mb-3">
+              <div class="card h-100 shadow-sm border-0">
+                {% if artwork.images.all %}
                   <a href="">
                     <img src="{{ artwork.images.first.image.url }}" class="card-img-top" alt="{{ artwork.name }}" style="height:200px; object-fit:cover;">
                   </a>
-                  {% else %}
-                    <div class="card-img-top d-flex align-items-center justify-content-center" style="height:200px; background-color:#f0f0f0;">
-                      <span class="text-muted">Sem imagem</span>
-                    </div>
-                  {% endif %}
-                  <div class="card-body">
-                    <h5 class="card-title">{{ artwork.name }}</h5>
-                    <p class="card-text"><small class="text-muted">{{ artwork.art_work_category.name }}</small></p>
-                    <p class="card-text">R$ {{ artwork.price }}</p>
+                {% else %}
+                  <div class="card-img-top d-flex align-items-center justify-content-center" style="height:200px; background-color:#f0f0f0;">
+                    <span class="text-muted">Sem imagem</span>
                   </div>
-                  <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
-                    <a href="" class="btn btn-outline-secondary btn-sm">
-                      <i class="bi bi-pencil me-1"></i> Editar
-                    </a>
-                    <a href="" class="btn btn-outline-danger btn-sm">
-                      <i class="bi bi-trash me-1"></i> Excluir
-                    </a>
-                  </div>
-                </div>
-              </div>
-            {% empty %}
-              <div class="col-12">
-                <div class="alert alert-info mb-0">
-                  <i class="bi bi-info-circle me-2"></i> Nenhuma obra cadastrada.
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        </div>
+                {% endif %}
 
+                <div class="card-body">
+                  <h5 class="card-title">{{ artwork.name }}</h5>
+                  <p class="card-text"><small class="text-muted">{{ artwork.art_work_category.name }}</small></p>
+                  <p class="card-text">R$ {{ artwork.price }}</p>
+                </div>
+
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
+                 <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#updateArtworkModal{{ artwork.id }}">
+                  <i class="bi bi-pencil"></i> Editar
+                </button>
+
+
+                  <!-- Botão que abre o modal de exclusão -->
+                  <button type="button"
+                          class="btn btn-outline-danger btn-sm"
+                          data-bs-toggle="modal"
+                          data-bs-target="#deleteArtworkModal{{ artwork.id }}">
+                    <i class="bi bi-trash me-1"></i> Excluir
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modal de exclusão da obra -->
+            <div class="modal fade" id="deleteArtworkModal{{ artwork.id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form method="post" action="{% url 'vitrine:delete_artwork' slug=artwork.slug artwork_id=artwork.id %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                      <h5 class="modal-title">Excluir Obra</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                      Deseja realmente excluir a obra <strong>{{ artwork.name }}</strong>?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <button type="submit" class="btn btn-danger">Excluir</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% include 'vitrine/update_artwork.html' with artwork=artwork %}
+
+          {% empty %}
+            <div class="col-12">
+              <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle me-2"></i> Nenhuma obra cadastrada.
+              </div>
+            </div>
+          {% endfor %}
+        </div>
       </div>
     </div>
   </div>

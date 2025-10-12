@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f6f9fc;
+      color: #333;
+      margin: 0;
+      padding: 30px;
+    }
+    .container {
+      max-width: 480px;
+      margin: auto;
+      background: #fff;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .logo {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .code {
+      display: inline-block;
+      background-color: #edf2ff;
+      color: #364fc7;
+      font-weight: bold;
+      padding: 12px 24px;
+      font-size: 22px;
+      border-radius: 6px;
+      letter-spacing: 2px;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      🔐 {{ current_site.name }}
+    </div>
+
+    <p>Olá {{ user_display|default:"" }},</p>
+
+    <p>Seu código de acesso é:</p>
+    <div style="text-align:center; margin: 20px 0;">
+      <span class="code">{{ code }}</span>
+    </div>
+
+    <p>Digite este código na janela do navegador para continuar o login.</p>
+
+    <p>Se você não solicitou este acesso, pode ignorar este e-mail.</p>
+
+    <div class="footer">
+      Obrigado por usar {{ current_site.domain }}
+    </div>
+  </div>
+</body>
+</html>

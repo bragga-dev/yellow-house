@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from user.forms import ExhibitionForm
 from user.models import Exhibitions, Artist
-from vitrine.models import ArtWork
+from vitrine.models import ArtWork, ArtworkCategory
 from vitrine.forms import ArtWorkForm
 
 
@@ -20,6 +20,8 @@ def collection(request, slug, pk):
     form_exhibition = ExhibitionForm()
     form_artwork = ArtWorkForm()
 
+    form_artwork.fields['art_work_category'].queryset = ArtworkCategory.objects.all()
+
 
     for artwork in artworks:
         artwork.edit_form = ArtWorkForm(instance=artwork)
@@ -32,6 +34,7 @@ def collection(request, slug, pk):
         'exhibitions': exhibitions,
         'form_exhibition': form_exhibition,
         'artworks': artworks,
+        'form_artwork': form_artwork,
     }
     return render(request, 'account/collection.html', context)
 
@@ -91,7 +94,7 @@ def update_exhibition(request, slug, exhibition_id):
             return render(request, 'account/collection.html', {
                 'artist': artist,
                 'exhibitions': exhibitions,
-                'form_exhibition': ExhibitionForm(),  # para modal de criação
+                'form_exhibition': ExhibitionForm(),  
             })
 
    

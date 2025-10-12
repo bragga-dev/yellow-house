@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.google',
     'django_extensions',
-    'storages'
+    'storages',
+    'widget_tweaks',
 ]
     
 
