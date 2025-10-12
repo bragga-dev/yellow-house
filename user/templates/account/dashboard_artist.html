@@ -46,51 +46,50 @@
 
 
          <!-- Botão que abre o modal -->
-<div class="text-center mt-3">
-  <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#demoteModal">
-    <i class="bi bi-arrow-down-double me-1"></i> Alterar para Cliente
-  </button>
-</div>
+          <div class="text-center mt-3">
+            <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#demoteModal">
+              <i class="bi bi-arrow-down-double me-1"></i> Alterar para Cliente
+            </button>
+          </div>
 
-<!-- Modal -->
-<div class="modal fade" id="demoteModal" tabindex="-1" aria-labelledby="demoteModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      
-      <!-- Cabeçalho -->
-      <div class="modal-header">
-        <h5 class="modal-title" id="demoteModalLabel">Confirmar Ação</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-      </div>
+          <!-- Modal -->
+          <div class="modal fade" id="demoteModal" tabindex="-1" aria-labelledby="demoteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                
+                <!-- Cabeçalho -->
+                <div class="modal-header">
+                  <h5 class="modal-title" id="demoteModalLabel">Confirmar Ação</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
 
-      <!-- Corpo -->
-      <div class="modal-body text-center">
-        Tem certeza que deseja alterar sua conta para Cliente?
-      </div>
+                <!-- Corpo -->
+                <div class="modal-body text-center">
+                  Tem certeza que deseja alterar sua conta para Cliente?
+                  Todos os seus dados de artista serão removidos, incluindo biografia, redes sociais e endereço.
+                </div>
 
-      <!-- Rodapé -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        
-        <!-- Formulário dentro do modal -->
-        <form action="{% url 'artist:demote_to_client' slug=artist.user.slug pk=artist.user.pk %}" method="post">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-warning">Confirmar</button>
-        </form>
-      </div>
-      
-    </div>
-  </div>
-</div>
-
-
+                <!-- Rodapé -->
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  
+                  <!-- Formulário dentro do modal -->
+                  <form action="{% url 'artist:demote_to_client' slug=artist.user.slug pk=artist.user.pk %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning">Confirmar</button>
+                  </form>
+                </div>
+                
+              </div>
+            </div>
+          </div>
           <div class="text-center mt-4">
            {% if artist.is_verified %}
-            <a href="#" class="badge bg-success text-contrast ms-2" data-bs-toggle="tooltip" title="Artista Verificado">
-              <i class="bi bi-check-circle"></i> Verificado
+            <a href="{% url 'artist:collection' slug=artist.user.slug pk=artist.user.pk %}" class="badge bg-success text-contrast ms-2" data-bs-toggle="tooltip" title="Artista Verificado">
+              <i class="bi bi-check-circle"></i> Criar Acervo
             </a>
             {% else %}            
-              <span class="badge bg-danger ms-2">Não Verificado</span>
+              <span class="badge bg-danger ms-2">Aguarde Aprovação</span>
             {% endif %} 
           </div>
         </div>

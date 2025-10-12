@@ -10,7 +10,7 @@ admin.site.index_title = "Bem-vindo ao painel de administração Casa Amarela"
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Client, Artist, ClientAddress, ArtistAddress
+from user.models import User, Client, Artist, ClientAddress, ArtistAddress, Exhibitions
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 # Inline para endereços do cliente
@@ -58,15 +58,20 @@ class ClientAdmin(admin.ModelAdmin):
 # Admin para Artist com endereço inline e controle de is_verified
 @admin.register(Artist)
 class ArtistAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_verified')
+    list_display = ('user', 'is_verified', 'bio', 'instagram', 'facebook', 'twitter', 'tiktok')
     list_filter = ('is_verified',)
     inlines = [ArtistAddressInline]
 
-    # Para garantir que apenas staff pode alterar is_verified via admin
+    
     def get_readonly_fields(self, request, obj=None):
         if not request.user.is_staff:
             return ('is_verified',)
         return ()
+    
+    # Filtrar apenas artistas válidos (user.is_artist=True)
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(user__is_artist=True)
 
 # Registrar endereços separadamente, se quiser:
 @admin.register(ClientAddress)
@@ -76,3 +81,10 @@ class ClientAddressAdmin(admin.ModelAdmin):
 @admin.register(ArtistAddress)
 class ArtistAddressAdmin(admin.ModelAdmin):
     list_display = ('artist', 'road', 'number', 'city', 'state', 'principal')
+
+
+@admin.register(Exhibitions)
+class ExhibitionsAdmin(admin.ModelAdmin):
+    list_display = ('title', 'artist', 'date', 'location')
+    list_filter = ('date', 'artist')
+    search_fields = ('title', 'artist__user__username', 'location')
