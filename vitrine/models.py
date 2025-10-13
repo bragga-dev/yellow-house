@@ -48,8 +48,8 @@ class ArtworkCategory(models.Model):
     image = models.ImageField(_('Imagem'), upload_to='artwork_categories/', validators=[validate_image_file], null=False, blank=False)
       
     class Meta:
-        verbose_name = "Artwork Category"
-        verbose_name_plural = "Artwork Categories"
+        verbose_name = "Categoria de obras"
+        verbose_name_plural = "Categorias de obras"
         ordering = ['name']
     
     def __str__(self):
@@ -85,8 +85,8 @@ class ArtWork(Product):
 
     
     class Meta:
-        verbose_name = "Artwork"
-        verbose_name_plural = "Artworks"
+        verbose_name = "Obra"
+        verbose_name_plural = "Obras"
         ordering = ['name']
 
     def save(self, *args, **kwargs):
@@ -140,7 +140,7 @@ class Souvenir(Product):
         ordering = ['name']
     
     def get_absolute_url(self):
-        return reverse("souvenir_detail",  kwargs={"slug": self.slug, "pk": self.id})
+        return reverse("vitrine:souvenir_detail",  kwargs={"slug": self.slug, "souvenir_id": self.id})
     
 class ArtworkImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -190,6 +190,7 @@ class SouvenirImage(models.Model):
 
 class BannerGroup(models.Model):
     name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
     
 
     def __str__(self):

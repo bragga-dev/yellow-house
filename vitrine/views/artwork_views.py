@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from vitrine.forms import ArtWorkForm
 from vitrine.models import ArtWork, ArtworkImage, ArtworkCategory
-from django.core.exceptions import PermissionDenied
+from vitrine.filters import ArtWorkFilter
+
 
 @login_required
 def create_artwork(request):
@@ -18,7 +19,7 @@ def create_artwork(request):
         form_artwork.fields['art_work_category'].queryset = ArtworkCategory.objects.all()
 
         images = request.FILES.getlist("images")
-        primary_index = int(request.POST.get("is_primary", 0))  # Índice da imagem principal
+        primary_index = int(request.POST.get("is_primary", 0))  
 
         if form_artwork.is_valid():
             artwork = form_artwork.save(commit=False)
@@ -36,7 +37,7 @@ def create_artwork(request):
             messages.success(request, 'Obra criada com sucesso!')
             return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
 
-        # Formulário inválido → renderiza collection com erros
+        
         artworks = list(artist.artworks.all().order_by('id'))
         for artwork_obj in artworks:
             artwork_obj.edit_form = ArtWorkForm(instance=artwork_obj)
@@ -52,7 +53,7 @@ def create_artwork(request):
 
 @login_required
 def update_artwork(request, slug, artwork_id):
-    # Busca a obra do usuário logado
+    
     artwork = get_object_or_404(ArtWork, slug=slug, id=artwork_id, artist__user=request.user)
     artist = request.user.artist
 
@@ -68,9 +69,9 @@ def update_artwork(request, slug, artwork_id):
             updated_artwork.artist = artist
             updated_artwork.save()
 
-            # Atualiza imagens se houver novas
+           
             if images:
-    # Remove imagens antigas (ou você pode apenas adicionar novas, dependendo da regra)
+    
                 artwork.images.all().delete()
 
                 for i, image_file in enumerate(images):
@@ -81,7 +82,7 @@ def update_artwork(request, slug, artwork_id):
                         is_primary=is_primary
                     )
             else:
-                # Apenas atualizar a imagem principal entre as existentes
+               
                 selected_primary_index = int(request.POST.get("is_primary", 0))
                 images_qs = artwork.images.all().order_by('id')  # garantir a ordem correta
                 for i, img in enumerate(images_qs):
@@ -92,7 +93,7 @@ def update_artwork(request, slug, artwork_id):
             messages.success(request, 'Obra atualizada com sucesso!')
             return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
 
-        # Formulário inválido → renderiza collection com erros
+        
         messages.error(request, 'Por favor, corrija os erros abaixo.')
 
         artworks = list(artist.artworks.all().order_by('id'))
@@ -102,7 +103,7 @@ def update_artwork(request, slug, artwork_id):
         return render(request, 'account/collection.html', {
             'artist': artist,
             'artworks': artworks,
-            'form_artwork': ArtWorkForm(),  # formulário de criação
+            'form_artwork': ArtWorkForm(), 
         })
 
     return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
@@ -118,3 +119,26 @@ def delete_artwork(request, slug, artwork_id):
 
     return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
 
+
+
+def list_artworks_by_artist(request, slug, pk):
+    artworks = ArtWork.objects.filter(artist__user__slug=slug, artist__user__pk=pk).all().order_by('-created_at')
+    return render(request, 'vitrine/artist_detail.html', {'artworks': artworks})
+
+
+def detail_artwork(request, slug, artwork_id):
+    artwork = get_object_or_404(ArtWork, slug=slug, id=artwork_id)
+    return render(request, 'vitrine/artwork_detail.html', {'artwork': artwork})
+
+
+def list_artworks(request):
+    artworks = ArtWork.objects.all().order_by('-created_at')
+    artwork_filter = ArtWorkFilter(request.GET, queryset=artworks)
+    
+    
+    return render(request, 'vitrine/list_artworks.html', {
+        'filter': artwork_filter,
+        'artworks': artwork_filter.qs,
+        'art_work_categories': ArtworkCategory.objects.all(),  
+        'styles': ArtWork.objects.values_list('style', flat=True).distinct().exclude(style__isnull=True).exclude(style=''),  
+    })

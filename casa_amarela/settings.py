@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'storages',
     'widget_tweaks',
+    'django_filters',
 ]
     
 

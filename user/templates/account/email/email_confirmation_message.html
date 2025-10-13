@@ -1,0 +1,121 @@
+{% load account %}
+{% load i18n %}
+{% autoescape off %}
+{% user_display user as user_display %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirmação de E-mail - Casa Amarela</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #f7f9fc;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .header {
+      background-color: #ffd600;
+      text-align: center;
+      padding: 25px;
+    }
+    .header h1 {
+      margin: 0;
+      color: #222;
+      font-size: 26px;
+      letter-spacing: 1px;
+    }
+    .body {
+      padding: 40px 30px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .body p {
+      margin-bottom: 15px;
+    }
+    .code {
+      display: inline-block;
+      background: #ffd600;
+      color: #000;
+      font-size: 24px;
+      font-weight: bold;
+      padding: 12px 24px;
+      border-radius: 6px;
+      margin: 25px 0;
+      letter-spacing: 2px;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #ffd600;
+      color: #000;
+      padding: 14px 28px;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 8px;
+      margin-top: 30px;
+    }
+    .btn:hover {
+      background-color: #e5c200;
+    }
+    .footer {
+      background-color: #f0f0f0;
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      color: #777;
+    }
+    a {
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>Casa Amarela 🌻</h1>
+    </div>
+
+    <div class="body">
+      <p>Olá, <strong>{{ user_display }}</strong>!</p>
+
+      <p>Você está recebendo este e-mail porque utilizou este endereço para registrar uma conta em <strong>{{ current_site.name }}</strong>.</p>
+
+      {% if code %}
+        <p>Seu código de verificação é:</p>
+        <div style="text-align:center;">
+          <span class="code">{{ code }}</span>
+        </div>
+        <p>Digite este código na janela do navegador para confirmar seu e-mail.</p>
+      {% else %}
+        <p>Para confirmar seu endereço de e-mail, clique no botão abaixo:</p>
+        <div style="text-align:center;">
+          <a href="{{ activate_url }}" class="btn">Confirmar e-mail</a>
+        </div>
+      {% endif %}
+
+      <p>Se você não realizou este cadastro, ignore esta mensagem.</p>
+      <p>Com gratidão,<br><strong>Equipe Casa Amarela</strong> 🌻</p>
+    </div>
+
+    <div class="footer">
+      &copy; {{ current_site.name }} — Todos os direitos reservados.<br>
+      <a href="https://{{ current_site.domain }}">{{ current_site.domain }}</a>
+    </div>
+  </div>
+
+</body>
+</html>
+
+{% endautoescape %}

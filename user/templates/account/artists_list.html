@@ -2,68 +2,244 @@
 {% load static %}
 
 {% block content %}
-<section class="section">
+<section class="section py-5">
   <div class="container">
-    <div class="section-title">
-      <h2>Artistas</h2>
-      <p>Conheça os artistas da nossa plataforma</p>
+    <!-- Cabeçalho da Página -->
+    <div class="page-header text-center mb-5">
+      <h1 class="display-5 fw-bold text-primary mb-3">Artistas</h1>
+      <p class="lead text-muted">Conheça os talentosos artistas da nossa plataforma</p>
     </div>
 
-    <div class="row">
+    <!-- Grid de Artistas -->
+    <div class="row g-4">
       {% for artist in artists %}
-        <div class="col-md-4 mb-4">
-          <div class="card h-100 shadow-sm category-card">
-            
-            <!-- Banner do artista -->
-           <!-- Banner substituído pela foto do artista -->
-            <div class="category-image">
-            {% if artist.user.photo %}
-                <img src="{{ artist.user.photo.url }}" class="card-img-top img-fluid" alt="Foto de {{ artist.user.get_full_name }}">
-            {% else %}
-                <img src="{% static 'img/default-profile.jpg' %}" class="card-img-top img-fluid" alt="Foto padrão">
-            {% endif %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+          <div class="card artist-card h-100 shadow-sm border-0">
+            <!-- Foto do Artista -->
+            <div class="artist-image-container position-relative">
+              {% if artist.user.photo %}
+                <img src="{{ artist.user.photo.url }}" 
+                     class="card-img-top artist-profile-img" 
+                     alt="Foto de {{ artist.user.get_full_name }}"
+                     style="height: 250px; object-fit: cover;">
+              {% else %}
+                <div class="default-artist-image d-flex align-items-center justify-content-center bg-light"
+                     style="height: 250px;">
+                  <div class="text-center text-muted">
+                    <i class="bi bi-person display-4 mb-2"></i>
+                    <p class="mb-0 small">Sem foto</p>
+                  </div>
+                </div>
+              {% endif %}
+              
+              <!-- Badge de Verificação -->
+              {% if artist.is_verified %}
+                <div class="position-absolute top-0 end-0 m-3">
+                  <span class="badge bg-success px-2 py-1 verified-badge">
+                    <i class="bi bi-patch-check-fill me-1"></i>Verificado
+                  </span>
+                </div>
+              {% endif %}
             </div>
 
-            <div class="card-body text-center">
-            <!-- Nome -->
-            <h5 class="card-title">{{ artist.user.get_full_name }}</h5>
-            <!-- Botão de detalhes -->
-            <a href="{% url 'artist:artist_detail' slug=artist.user.slug  pk=artist.user.pk %}" class="btn btn-sm btn-primary mt-3">
-                Ver perfil
-            </a>
-            </div>
+            <div class="card-body text-center d-flex flex-column">
+              <!-- Nome do Artista -->
+              <h5 class="card-title fw-bold text-dark mb-2">{{ artist.user.get_full_name }}</h5>
+              <p class="text-muted small mb-3">@{{ artist.user.username }}</p>
+              
+              <!-- Informações Adicionais -->
+              <div class="artist-stats mb-3">
+                <div class="row text-center">
+                  <div class="col-6">
+                    <small class="text-muted d-block">Obras</small>
+                    <span class="fw-bold text-primary">{{ artist.artworks.count }}</span>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted d-block">Exposições</small>
+                    <span class="fw-bold text-primary">{{ artist.exhibitions.count }}</span>
+                  </div>
+                </div>
+              </div>
 
+              <!-- Botão de Ação -->
+              <div class="mt-auto">
+                <a href="{% url 'artist:artist_detail' slug=artist.user.slug pk=artist.user.pk %}" 
+                   class="btn btn-primary w-100 btn-view-profile">
+                  <i class="bi bi-eye me-2"></i>Ver Perfil
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       {% empty %}
-        <p class="text-center">Nenhum artista encontrado.</p>
+        <!-- Estado Vazio -->
+        <div class="col-12">
+          <div class="empty-state text-center py-5">
+            <div class="empty-state-icon mb-4">
+              <i class="bi bi-people display-1 text-muted"></i>
+            </div>
+            <h3 class="h4 text-muted mb-3">Nenhum artista encontrado</h3>
+            <p class="text-muted mb-4">Não há artistas cadastrados na plataforma no momento.</p>
+            <a href="{% url 'vitrine:home' %}" class="btn btn-outline-primary">
+              <i class="bi bi-arrow-left me-2"></i>Voltar para Home
+            </a>
+          </div>
+        </div>
       {% endfor %}
     </div>
 
     <!-- Paginação -->
-    <div class="d-flex justify-content-center mt-4">
-      <nav>
-        <ul class="pagination">
-          {% if artists.has_previous %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{ artists.previous_page_number }}">Anterior</a>
-            </li>
-          {% endif %}
-          
-          <li class="page-item active">
-            <span class="page-link">
-              Página {{ artists.number }} de {{ artists.paginator.num_pages }}
-            </span>
-          </li>
-          
-          {% if artists.has_next %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{ artists.next_page_number }}">Próxima</a>
-            </li>
-          {% endif %}
-        </ul>
-      </nav>
-    </div>
+    {% if artists.paginator.num_pages > 1 %}
+      <div class="d-flex justify-content-center mt-5">
+        <nav aria-label="Navegação de páginas">
+          <ul class="pagination">
+            {% if artists.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ artists.previous_page_number }}" aria-label="Anterior">
+                  <i class="bi bi-chevron-left"></i>
+                </a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+              </li>
+            {% endif %}
+
+            <!-- Páginas Numeradas -->
+            {% for num in artists.paginator.page_range %}
+              {% if artists.number == num %}
+                <li class="page-item active" aria-current="page">
+                  <span class="page-link">{{ num }}</span>
+                </li>
+              {% elif num > artists.number|add:'-3' and num < artists.number|add:'3' %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% if artists.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ artists.next_page_number }}" aria-label="Próxima">
+                  <i class="bi bi-chevron-right"></i>
+                </a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Informação da Página Atual -->
+      <div class="text-center mt-3">
+        <p class="text-muted small">
+          Mostrando página {{ artists.number }} de {{ artists.paginator.num_pages }} 
+          - {{ artists.paginator.count }} artista{{ artists.paginator.count|pluralize }} no total
+        </p>
+      </div>
+    {% endif %}
   </div>
 </section>
+
+<style>
+.artist-card {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.artist-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.artist-image-container {
+  overflow: hidden;
+}
+
+.artist-profile-img {
+  transition: transform 0.3s ease-in-out;
+}
+
+.artist-card:hover .artist-profile-img {
+  transform: scale(1.05);
+}
+
+.default-artist-image {
+  border-radius: 12px 12px 0 0;
+}
+
+.verified-badge {
+  font-size: 0.7rem;
+  backdrop-filter: blur(10px);
+  background-color: rgba(25, 135, 84, 0.95) !important;
+}
+
+.btn-view-profile {
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-view-profile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+.empty-state {
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 3rem !important;
+}
+
+.page-link {
+  border-radius: 8px;
+  margin: 0 2px;
+  border: 1px solid #dee2e6;
+}
+
+.page-item.active .page-link {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.artist-stats {
+  border-top: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+  padding: 0.75rem 0;
+}
+
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  .artist-card {
+    margin-bottom: 1.5rem;
+  }
+  
+  .empty-state {
+    padding: 2rem !important;
+  }
+}
+
+/* Efeito de loading suave para as imagens */
+.artist-profile-img {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+</style>
 {% endblock %}

@@ -1,5 +1,6 @@
 from django.contrib import admin
-from vitrine.models import ArtWork, ArtworkImage, ArtworkCategory, Souvenir, SouvenirCategory, SouvenirImage
+from vitrine.models import ArtWork, ArtworkImage, ArtworkCategory, Souvenir, SouvenirCategory, SouvenirImage, BannerGroup, BannerImage
+
 
 # ---------- Inline para imagens de Artwork ----------
 class ArtworkImageInline(admin.TabularInline):
@@ -78,3 +79,29 @@ class SouvenirCategoryAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     ordering = ('name',)
     readonly_fields = ('slug',)
+
+
+class BannerImageInline(admin.TabularInline):
+    model = BannerImage
+    extra = 1  # Quantas imagens extras mostrar para adicionar
+    fields = ('image', 'is_primary')  # Campos a exibir
+    readonly_fields = ()
+    show_change_link = True  # Mostra link para editar imagem separadamente
+    max_num = 10  # Limita a quantidade máxima de imagens
+
+@admin.register(BannerGroup)
+class BannerGroupAdmin(admin.ModelAdmin):
+    list_display = ('name', 'total_images',)
+    inlines = [BannerImageInline]
+    search_fields = ('name',)
+
+    def total_images(self, obj):
+        return obj.images.count()
+    total_images.short_description = "Quantidade de imagens"
+
+# Caso queira registrar BannerImage separadamente também
+@admin.register(BannerImage)
+class BannerImageAdmin(admin.ModelAdmin):
+    list_display = ('group', 'is_primary', 'image')
+    list_filter = ('group', 'is_primary')
+    search_fields = ('group__name',)

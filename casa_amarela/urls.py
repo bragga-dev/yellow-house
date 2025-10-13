@@ -14,3 +14,7 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=os.path.join(BASE_DIR, 'media'))
+
+
+handler404 = 'vitrine.views.error_views.custom_404'
+handler500 = 'vitrine.views.error_views.custom_500'

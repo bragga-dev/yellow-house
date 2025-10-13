@@ -1,0 +1,147 @@
+{% extends 'vitrine/base.html' %}
+
+{% block title %}Obras de Arte{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <!-- Cabeçalho -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="fw-bold text-primary mb-2">Nossas Obras</h1>
+      <p class="text-muted">Encontre a obra perfeita para sua coleção</p>
+    </div>
+  </div>
+
+  <!-- Filtros na parte superior -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-light py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">Filtrar Obras</h5>
+            <span class="badge bg-primary">{{ artworks.count }} obra{{ artworks.count|pluralize }} encontrada{{ artworks.count|pluralize:"s" }}</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <form method="get" class="row g-3">
+            <!-- Categoria -->
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Categoria</label>
+              <select name="art_work_category" class="form-select">
+                <option value="">Todas as categorias</option>
+                {% for category in art_work_categories %}
+                  <option value="{{ category.id }}" 
+                    {% if request.GET.art_work_category == category.id|stringformat:"s" %}selected{% endif %}>
+                    {{ category.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Preço -->
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Faixa de preço</label>
+              <div class="input-group">
+                <span class="input-group-text">R$</span>
+                <input type="number" name="price_min" class="form-control" placeholder="Mínimo" 
+                       value="{{ request.GET.price_min }}">
+                <span class="input-group-text">-</span>
+                <input type="number" name="price_max" class="form-control" placeholder="Máximo" 
+                       value="{{ request.GET.price_max }}">
+              </div>
+            </div>
+
+            <!-- Estilo -->
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Estilo</label>
+              <select name="style" class="form-select">
+                <option value="">Todos os estilos</option>
+                {% for style in styles %}
+                  <option value="{{ style }}" 
+                    {% if request.GET.style == style %}selected{% endif %}>
+                    {{ style }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Botões -->
+            <div class="col-md-3 d-flex align-items-end gap-2">
+              <button type="submit" class="btn btn-primary flex-fill">
+                <i class="bi bi-funnel"></i> Aplicar
+              </button>
+              <a href="{% url 'vitrine:list_artworks' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-clockwise"></i>
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid de obras -->
+  <div class="row">
+    {% if artworks %}
+      <div class="row g-4">
+        {% for artwork in artworks %}
+          <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="card h-100 shadow-sm border-0 artwork-card">
+              <div class="position-relative">
+                <img src="{{ artwork.images.first.image.url }}" class="card-img-top" alt="{{ artwork.title }}"
+                     style="height: 250px; object-fit: cover;">
+                {% if artwork.art_work_category %}
+                  <span class="position-absolute top-0 start-0 m-2 badge bg-primary bg-opacity-90">
+                    {{ artwork.art_work_category.name }}
+                  </span>
+                {% endif %}
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title fw-bold">{{ artwork.name }}</h5>
+                <p class="fw-bold text-success fs-5 mb-2">R$ Preço: {{ artwork.price }}</p>
+                <p class="card-text text-muted">Tamanho: {{ artwork.width }} cm x {{ artwork.height }} cm</p>
+                <div class="mt-auto">
+                  <a href="{% url 'vitrine:detail_artwork' artwork.slug artwork.id %}" 
+                     class="btn btn-outline-primary w-100">
+                    <i class="bi bi-eye"></i> Ver detalhes
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="col-12">
+        <div class="text-center py-5">
+          <i class="bi bi-search display-1 text-muted"></i>
+          <h3 class="mt-3 text-muted">Nenhuma obra encontrada</h3>
+          <p class="text-muted">Tente ajustar os filtros para ver mais resultados.</p>
+          <a href="{% url 'vitrine:list_artworks' %}" class="btn btn-primary mt-2">
+            Limpar filtros
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.artwork-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.artwork-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.card-img-top {
+  transition: transform 0.3s ease;
+}
+
+.artwork-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+</style>
+{% endblock %}
