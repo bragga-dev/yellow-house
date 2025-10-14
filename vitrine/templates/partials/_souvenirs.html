@@ -1,0 +1,82 @@
+
+
+  <!-- Container principal para HTMX -->
+  <div id="souvenirs-container">
+    <div class="row g-3">
+      {% for souvenir in souvenirs %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+          <div class="card h-100 shadow-sm border-0 artwork-card">
+            {% if souvenir.images.first %}
+              <img src="{{ souvenir.images.first.image.url }}" class="card-img-top" alt="{{ souvenir.name }}" style="height: 200px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">{{ souvenir.name|truncatewords:8 }}</h5>
+              <p class="text-success fw-bold">R$ {{ souvenir.price }}</p>
+              {% if souvenir.size %}
+                <p class="card-text text-muted mb-1"><strong>Tamanho:</strong> {{ souvenir.size }}</p>
+              {% endif %}
+              {% if souvenir.material %}
+                <p class="card-text text-muted mb-1"><strong>Material:</strong> {{ souvenir.material }}</p>
+              {% endif %}
+              <p class="card-text text-muted mb-3">Estoque: {{ souvenir.stock }}</p>
+              <div class="mt-auto">
+                <a href="{{ souvenir.get_absolute_url }}" 
+                   class="btn btn-outline-primary w-100">
+                  Ver detalhes
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12 text-center py-4">
+          <h5 class="text-muted">Nenhum souvenir encontrado</h5>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if souvenirs.has_other_pages %}
+    <nav class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if souvenirs.has_previous %}
+          <li class="page-item">
+            <a hx-get="{% url 'vitrine:souvenirs_partial' %}?page={{ souvenirs.previous_page_number }}"
+               hx-target="#souvenirs-container" hx-swap="outerHTML" class="page-link">&laquo;</a>
+          </li>
+        {% endif %}
+        {% for i in souvenirs.paginator.page_range %}
+          <li class="page-item {% if souvenirs.number == i %}active{% endif %}">
+            <a hx-get="{% url 'vitrine:souvenirs_partial' %}?page={{ i }}"
+               hx-target="#souvenirs-container" hx-swap="outerHTML" class="page-link">{{ i }}</a>
+          </li>
+        {% endfor %}
+        {% if souvenirs.has_next %}
+          <li class="page-item">
+            <a hx-get="{% url 'vitrine:souvenirs_partial' %}?page={{ souvenirs.next_page_number }}"
+               hx-target="#souvenirs-container" hx-swap="outerHTML" class="page-link">&raquo;</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.artwork-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.artwork-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.card-img-top {
+  transition: transform 0.3s ease;
+}
+
+.artwork-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+</style>

@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from vitrine.validators import validate_image_file
 from user.models import Artist
 from django.core.exceptions import ValidationError
@@ -150,8 +150,10 @@ class ArtworkImage(models.Model):
 
     def clean(self):
         max_images = 5
+        if not self.artwork_id:
+            return
         if self.artwork.images.exclude(pk=self.pk).count() >= max_images:
-            raise ValidationError(f"Um produto não pode ter mais que {max_images} imagens.")    
+            raise ValidationError(f"Um produto não pode ter mais que {max_images} imagens.")
 
     def __str__(self):
         return f"Image for {self.artwork.name}"
@@ -171,8 +173,10 @@ class SouvenirImage(models.Model):
 
     def clean(self):
         max_images = 5
+        if not self.souvenir_id:
+            return  
         if self.souvenir.images.exclude(pk=self.pk).count() >= max_images:
-            raise ValidationError(f"Um produto não pode ter mais que {max_images} imagens.")  
+            raise ValidationError(f"Um produto não pode ter mais que {max_images} imagens.")
 
     def __str__(self):
         return f"Image for {self.souvenir.name}"
@@ -190,11 +194,22 @@ class SouvenirImage(models.Model):
 
 class BannerGroup(models.Model):
     name = models.CharField(max_length=100)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = "Banner Group"
+        verbose_name_plural = "Banner Groups"
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():  # garante que tudo aconteça como uma transação
+            super().save(*args, **kwargs)
+            if self.is_active:
+                BannerGroup.objects.filter(is_active=True).exclude(pk=self.pk).update(is_active=False)
+
 
 class BannerImage(models.Model):
     group = models.ForeignKey(BannerGroup, on_delete=models.CASCADE, related_name='images')
@@ -211,5 +226,6 @@ class BannerImage(models.Model):
     
     def clean(self):
         max_images = 10
-        if self.group.images.exclude(pk=self.pk).count() >= max_images:
-            raise ValidationError(f"Um grupo de banners não pode ter mais que {max_images} imagens.")
+        if self.group_id:  
+            if self.group.images.exclude(pk=self.pk).count() >= max_images:
+                raise ValidationError(f"Um grupo de banners não pode ter mais que {max_images} imagens.")

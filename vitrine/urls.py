@@ -1,5 +1,5 @@
 from django.urls import path
-from vitrine.views.index_views import index
+from vitrine.views.index_views import index, artworks_partial, souvenirs_partial
 from vitrine.views.artwork_views import create_artwork, update_artwork, delete_artwork, detail_artwork, list_artworks_by_artist, list_artworks
 from vitrine.views.souvenir_views import list_souvenirs, souvenir_detail
 
@@ -8,8 +8,11 @@ from vitrine.views.souvenir_views import list_souvenirs, souvenir_detail
 app_name = 'vitrine'
 
 urlpatterns = [
+    
     # home
     path('', index, name='index'),
+    path('partials/artworks/', artworks_partial, name='artworks_partial'),
+    path('partials/souvenirs/', souvenirs_partial, name='souvenirs_partial'),
 
     # artworks
     path('create-artwork/', create_artwork, name='create_artwork'),

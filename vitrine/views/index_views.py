@@ -1,4 +1,34 @@
 from django.shortcuts import render
+from vitrine.models import BannerGroup, ArtWork, Souvenir
+from django.core.paginator import Paginator
 
 def index(request):
-    return render(request, "vitrine/index.html")
+    group = BannerGroup.objects.filter(is_active=True).first()
+    banners = group.images.all().order_by('-is_primary') if group else []
+
+    context = {
+        'group': group,
+        'banners': banners
+    }
+    return render(request, "vitrine/index.html", context)
+
+
+def artworks_partial(request):
+    page_number = request.GET.get('page', 1)
+    artworks_list = ArtWork.objects.all().order_by('-id')
+    paginator = Paginator(artworks_list, 10)
+    artworks = paginator.get_page(page_number)
+    context = {
+        'artworks': artworks
+    }
+    return render(request, "partials/_artworks.html", context)
+
+def souvenirs_partial(request):
+    page_number = request.GET.get('page', 1)
+    souvenirs_list = Souvenir.objects.all().order_by('-id')
+    paginator = Paginator(souvenirs_list, 10)
+    souvenirs = paginator.get_page(page_number)
+    context = {
+        'souvenirs': souvenirs
+    }   
+    return render(request, "partials/_souvenirs.html", context)

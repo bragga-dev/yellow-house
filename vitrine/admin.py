@@ -91,14 +91,11 @@ class BannerImageInline(admin.TabularInline):
 
 @admin.register(BannerGroup)
 class BannerGroupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'total_images',)
+    list_display = ('name', 'is_active')
     inlines = [BannerImageInline]
     search_fields = ('name',)
 
-    def total_images(self, obj):
-        return obj.images.count()
-    total_images.short_description = "Quantidade de imagens"
-
+    
 # Caso queira registrar BannerImage separadamente também
 @admin.register(BannerImage)
 class BannerImageAdmin(admin.ModelAdmin):
