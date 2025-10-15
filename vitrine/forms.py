@@ -75,3 +75,10 @@ class SouvenirImageForm(forms.ModelForm):
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'is_primary': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+
+class SearchForm(forms.Form):
+    query = forms.CharField(label='', widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Buscar obras, souvenirs ou artistas...'
+    }))

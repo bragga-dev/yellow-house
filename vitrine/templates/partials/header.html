@@ -66,9 +66,9 @@
           </a>
 
           <!-- Search -->
-          <form class="search-form desktop-search-form">
+          <form class="search-form desktop-search-form" action="{% url 'vitrine:search_results' %}" method="GET">
             <div class="input-group">
-              <input type="text" class="form-control" placeholder="">
+              <input type="text" class="form-control" placeholder="" name="query">
               <button class="btn" type="submit">
                 <i class="bi bi-search"></i>
               </button>
@@ -178,9 +178,9 @@
     <!-- Mobile Search Form -->
     <div class="collapse" id="mobileSearch">
       <div class="container">
-        <form class="search-form">
+        <form class="search-form" action="{% url 'vitrine:search_results' %}" method="GET">
           <div class="input-group">
-            <input type="text" class="form-control" placeholder="Search for products">
+            <input type="text" class="form-control" placeholder="Search for products" name="query">
             <button class="btn" type="submit">
               <i class="bi bi-search"></i>
             </button>
