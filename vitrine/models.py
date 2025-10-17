@@ -229,3 +229,31 @@ class BannerImage(models.Model):
         if self.group_id:  
             if self.group.images.exclude(pk=self.pk).count() >= max_images:
                 raise ValidationError(f"Um grupo de banners não pode ter mais que {max_images} imagens.")
+
+
+
+class Blog(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(_('Titulo'), max_length=100, brank=False, null=False)
+    text = models.TextField(_('Texto'), brank=False, null=False)
+    created_at = models.DateTimeField(_('Criado em'), auto_now_add=True)
+    updated_at = models.DateTimeField(_('Atualizado em'), auto_now=True)
+    image = models.ImageField(_('Imagem'), upload_to='blog/', validators=[validate_image_file])
+    is_published = models.BooleanField(_('Publicado?'), default=False)
+
+    def __str__(self):
+        return self.title
+    
+
+    class Meta:
+        verbose_name = "Blog"
+        verbose_name_plural = "Blogs"
+        ordering = ['-created_at']
+
+    def get_absolute_url(self):
+        return reverse("vitrine:blog_detail", kwargs={"slug": self.slug, "blog_id": self.id})
+        
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_unique_slug(self, self.title, self.id)
+        super().save(*args, **kwargs)
