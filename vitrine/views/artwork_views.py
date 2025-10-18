@@ -4,7 +4,7 @@ from django.contrib import messages
 from vitrine.forms import ArtWorkForm
 from vitrine.models import ArtWork, ArtworkImage, ArtworkCategory
 from vitrine.filters import ArtWorkFilter
-
+from django.core.paginator import Paginator
 
 @login_required
 def create_artwork(request):
@@ -123,6 +123,11 @@ def delete_artwork(request, slug, artwork_id):
 
 def list_artworks_by_artist(request, slug, pk):
     artworks = ArtWork.objects.filter(artist__user__slug=slug, artist__user__pk=pk).all().order_by('-created_at')
+
+    pagination = Paginator(artworks, 8)
+    page_number = request.GET.get('page')
+    artworks = pagination.get_page(page_number)  
+
     return render(request, 'vitrine/artist_detail.html', {'artworks': artworks})
 
 
@@ -133,6 +138,11 @@ def detail_artwork(request, slug, artwork_id):
 
 def list_artworks(request):
     artworks = ArtWork.objects.all().order_by('-created_at')
+
+    pagination = Paginator(artworks, 8)
+    page_number = request.GET.get('page')
+    artworks = pagination.get_page(page_number) 
+    
     artwork_filter = ArtWorkFilter(request.GET, queryset=artworks)
     
     
