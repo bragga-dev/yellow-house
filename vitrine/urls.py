@@ -3,7 +3,7 @@ from vitrine.views.index_views import index, artworks_partial, souvenirs_partial
 from vitrine.views.artwork_views import create_artwork, update_artwork, delete_artwork, detail_artwork, list_artworks_by_artist, list_artworks
 from vitrine.views.souvenir_views import list_souvenirs, souvenir_detail
 from vitrine.views.on_views import on_view
-from vitrine.views.blog_views import blog_list, blog_view
+from vitrine.views.blog_views import blog_list, blog_detail
 
 
 app_name = 'vitrine'
@@ -20,7 +20,7 @@ urlpatterns = [
 
     #blog
     path('blog/', blog_list, name='blog_list'),
-    path('blog/<slug:slug>/<uuid:blog_id>/', blog_view, name='blog_view'),
+    path('blog/<slug:slug>/<uuid:blog_id>/', blog_detail, name='blog_detail'),
 
     # search bar
     path('search/', search_results, name='search_results'),

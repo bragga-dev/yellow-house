@@ -153,7 +153,7 @@ class ArtworkImage(models.Model):
         if not self.artwork_id:
             return
         if self.artwork.images.exclude(pk=self.pk).count() >= max_images:
-            raise ValidationError(f"Um produto não pode ter mais que {max_images} imagens.")
+            raise ValidationError(f"Uma obra não pode ter mais que {max_images} imagens.")
 
     def __str__(self):
         return f"Image for {self.artwork.name}"
@@ -163,6 +163,15 @@ class ArtworkImage(models.Model):
         verbose_name = "Product Image Artwork"
         verbose_name_plural = "Product Images Artworks"
         ordering = ['-is_primary', 'id']
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)  
+        if self.is_primary:
+            ArtworkImage.objects.filter(artwork=self.artwork, is_primary=True).exclude(pk=self.pk).update(is_primary=False)
+
+                  
+
 
 class SouvenirImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -175,8 +184,9 @@ class SouvenirImage(models.Model):
         max_images = 5
         if not self.souvenir_id:
             return  
-        if self.souvenir.images.exclude(pk=self.pk).count() >= max_images:
-            raise ValidationError(f"Um produto não pode ter mais que {max_images} imagens.")
+        if self.artwork.images.exclude(pk=self.pk).count() >= max_images:
+            raise ValidationError({'image': f'Uma obra não pode ter mais que {max_images} imagens.'})
+
 
     def __str__(self):
         return f"Image for {self.souvenir.name}"
@@ -187,6 +197,7 @@ class SouvenirImage(models.Model):
         ordering = ['-is_primary', 'id']
 
     def save(self, *args, **kwargs):
+        self.full_clean()
         super().save(*args, **kwargs)  
         if self.is_primary:
             SouvenirImage.objects.filter(souvenir=self.souvenir, is_primary=True).exclude(pk=self.pk).update(is_primary=False)
@@ -223,21 +234,15 @@ class BannerImage(models.Model):
 
     def __str__(self):
         return f"Banner for {self.group.name}"
-    
-    def clean(self):
-        max_images = 10
-        if self.group_id:  
-            if self.group.images.exclude(pk=self.pk).count() >= max_images:
-                raise ValidationError(f"Um grupo de banners não pode ter mais que {max_images} imagens.")
-
 
 
 class Blog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    title = models.CharField(_('Titulo'), max_length=100, brank=False, null=False)
-    text = models.TextField(_('Texto'), brank=False, null=False)
+    title = models.CharField(_('Titulo'), max_length=100, blank=False, null=False)
+    text = models.TextField(_('Texto'), blank=False, null=False)
     created_at = models.DateTimeField(_('Criado em'), auto_now_add=True)
     updated_at = models.DateTimeField(_('Atualizado em'), auto_now=True)
+    slug = models.SlugField(max_length=255, unique=True, editable=False)
     image = models.ImageField(_('Imagem'), upload_to='blog/', validators=[validate_image_file])
     is_published = models.BooleanField(_('Publicado?'), default=False)
 

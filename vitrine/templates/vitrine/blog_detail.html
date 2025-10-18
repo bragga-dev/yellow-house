@@ -1,0 +1,177 @@
+{% extends "vitrine/base.html" %}
+{% load static %}
+
+{% block title %}{{ blog.title }} - Blog Casa Amarela{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'vitrine:blog_list' %}" class="text-decoration-none">Blog</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ blog.title|truncatewords:5 }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Cabeçalho do Post -->
+            <article class="blog-detail">
+                <!-- Imagem Principal -->
+                {% if blog.image %}
+                <div class="mb-4">
+                    <img src="{{ blog.image.url }}" class="img-fluid rounded shadow" alt="{{ blog.title }}" style="width: 100%; height: 400px; object-fit: cover;">
+                </div>
+                {% endif %}
+
+                <!-- Metadados -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <small class="text-muted">
+                            <i class="far fa-calendar-alt me-1"></i>
+                            Publicado em {{ blog.created_at|date:"d/m/Y" }}
+                        </small>
+                        {% if blog.updated_at != blog.created_at %}
+                        <small class="text-muted ms-3">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            Atualizado em {{ blog.updated_at|date:"d/m/Y" }}
+                        </small>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <span class="badge bg-warning text-dark">
+                            <i class="fas fa-book-open me-1"></i>
+                            Blog
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Título -->
+                <h1 class="display-5 text-dark mb-4">{{ blog.title }}</h1>
+
+                <!-- Conteúdo do Post -->
+                <div class="blog-content">
+                    {{ blog.text|linebreaks }}
+                </div>
+
+                <!-- Divisor -->
+                <hr class="my-5">
+
+                <!-- Ações -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- Botão Voltar -->
+                    <a href="{% url 'vitrine:blog_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar para o Blog
+                    </a>
+
+                    <!-- Compartilhamento -->
+                    <div class="share-buttons">
+                        <small class="text-muted me-2">Compartilhar:</small>
+                        <a href="#" class="text-decoration-none text-muted me-2" onclick="shareOnFacebook()">
+                            <i class="fab fa-facebook fa-lg"></i>
+                        </a>
+                        <a href="#" class="text-decoration-none text-muted me-2" onclick="shareOnTwitter()">
+                            <i class="fab fa-twitter fa-lg"></i>
+                        </a>
+                        <a href="#" class="text-decoration-none text-muted" onclick="shareOnLinkedIn()">
+                            <i class="fab fa-linkedin fa-lg"></i>
+                        </a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <!-- Posts Relacionados -->
+    {% if related_posts %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="text-dark mb-4">Posts Relacionados</h3>
+            <div class="row">
+                {% for related in related_posts %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        {% if related.image %}
+                        <img src="{{ related.image.url }}" class="card-img-top" alt="{{ related.title }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <img src="{% static 'images/blog-placeholder.jpg' %}" class="card-img-top" alt="Imagem padrão" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title h6">{{ related.title }}</h5>
+                            <p class="card-text text-muted small">
+                                {{ related.text|truncatewords:20 }}
+                            </p>
+                            <a href="{{ related.get_absolute_url }}" class="btn btn-warning btn-sm">
+                                Ler Mais
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- JavaScript para Compartilhamento -->
+<script>
+function shareOnFacebook() {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent("{{ blog.title }}");
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${title}`, '_blank');
+}
+
+function shareOnTwitter() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent("{{ blog.title }}");
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+}
+
+function shareOnLinkedIn() {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent("{{ blog.title }}");
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+}
+</script>
+
+<!-- Estilos Customizados -->
+<style>
+    .blog-content {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #495057;
+    }
+    
+    .blog-content p {
+        margin-bottom: 1.5rem;
+    }
+    
+    .share-buttons a:hover {
+        color: #ffc107 !important;
+        transform: scale(1.1);
+        transition: all 0.3s ease;
+    }
+    
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+    }
+    
+    .breadcrumb-item a {
+        color: #6c757d;
+    }
+    
+    .breadcrumb-item a:hover {
+        color: #ffc107;
+    }
+    
+    .blog-detail {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}

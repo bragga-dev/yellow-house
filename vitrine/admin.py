@@ -1,5 +1,6 @@
 from django.contrib import admin
-from vitrine.models import ArtWork, ArtworkImage, ArtworkCategory, Souvenir, SouvenirCategory, SouvenirImage, BannerGroup, BannerImage
+from vitrine.models import ArtWork, ArtworkImage, \
+ArtworkCategory, Souvenir, SouvenirCategory, SouvenirImage, BannerGroup, BannerImage, Blog
 
 
 # ---------- Inline para imagens de Artwork ----------
@@ -102,3 +103,13 @@ class BannerImageAdmin(admin.ModelAdmin):
     list_display = ('group', 'is_primary', 'image')
     list_filter = ('group', 'is_primary')
     search_fields = ('group__name',)
+
+
+
+@admin.register(Blog)
+class BlogAdmin(admin.ModelAdmin):
+    list_display = ('title', 'is_published', 'created_at', 'updated_at')
+    list_filter = ('is_published', 'created_at')
+    search_fields = ('title', 'text')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('-created_at',)
