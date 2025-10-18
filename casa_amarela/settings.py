@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'user',
     'vitrine',
+    'checkout',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

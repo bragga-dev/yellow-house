@@ -19,7 +19,7 @@ def index(request):
 def artworks_partial(request):
     page_number = request.GET.get('page', 1)
     artworks_list = ArtWork.objects.all().order_by('-id')
-    paginator = Paginator(artworks_list, 10)
+    paginator = Paginator(artworks_list, 16)
     artworks = paginator.get_page(page_number)
     context = {
         'artworks': artworks
@@ -29,7 +29,7 @@ def artworks_partial(request):
 def souvenirs_partial(request):
     page_number = request.GET.get('page', 1)
     souvenirs_list = Souvenir.objects.all().order_by('-id')
-    paginator = Paginator(souvenirs_list, 10)
+    paginator = Paginator(souvenirs_list, 16)
     souvenirs = paginator.get_page(page_number)
     context = {
         'souvenirs': souvenirs
