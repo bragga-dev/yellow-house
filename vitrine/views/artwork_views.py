@@ -122,7 +122,7 @@ def delete_artwork(request, slug, artwork_id):
 
 
 def list_artworks_by_artist(request, slug, pk):
-    artworks = ArtWork.objects.filter(artist__user__slug=slug, artist__user__pk=pk).all().order_by('-created_at')
+    artworks = ArtWork.objects.filter(artist__user__slug=slug, artist__user__pk=pk, stock__gt=0).all().order_by('-created_at')
 
     pagination = Paginator(artworks, 8)
     page_number = request.GET.get('page')
@@ -137,18 +137,20 @@ def detail_artwork(request, slug, artwork_id):
 
 
 def list_artworks(request):
-    artworks = ArtWork.objects.all().order_by('-created_at')
-
-    pagination = Paginator(artworks, 8)
-    page_number = request.GET.get('page')
-    artworks = pagination.get_page(page_number) 
-    
+    artworks = ArtWork.objects.filter(stock__gt=0).order_by('-created_at')
     artwork_filter = ArtWorkFilter(request.GET, queryset=artworks)
+    filtered_qs = artwork_filter.qs  
     
-    
+    pagination = Paginator(filtered_qs, 8)
+    page_number = request.GET.get('page')
+    artworks_page = pagination.get_page(page_number)
+
     return render(request, 'vitrine/list_artworks.html', {
         'filter': artwork_filter,
-        'artworks': artwork_filter.qs,
-        'art_work_categories': ArtworkCategory.objects.all(),  
-        'styles': ArtWork.objects.values_list('style', flat=True).distinct().exclude(style__isnull=True).exclude(style=''),  
+        'artworks': artworks_page,  
+        'art_work_categories': ArtworkCategory.objects.all(),
+        'styles': ArtWork.objects.values_list('style', flat=True)
+                                 .distinct()
+                                 .exclude(style__isnull=True)
+                                 .exclude(style=''),
     })
