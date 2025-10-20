@@ -6,10 +6,13 @@ from casa_amarela.settings import BASE_DIR
 import os
 
 urlpatterns = [
+    path('', include('vitrine.urls')),
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('user/', include('user.urls')),
-    path('', include('vitrine.urls')),
+    path('checkout/', include('checkout.urls')),
+   
+    
 ]
 
 if settings.DEBUG:
