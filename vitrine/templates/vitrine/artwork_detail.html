@@ -69,9 +69,10 @@
         </div>
 
         <div class="product-actions">
-          <button class="btn btn-primary w-100 py-3 mb-2">
-            <i class="bi bi-cart-plus me-2"></i>Adicionar ao Carrinho
-          </button>
+        <a href="{% url 'checkout:add_item_in_cart' slug=artwork.slug item_id=artwork.id %}" class="btn btn-primary w-100 py-3 mb-2">
+          <i class="bi bi-cart-plus me-2"></i>Adicionar ao Carrinho
+        </a>
+
           <button class="btn btn-outline-primary w-100 py-3 mb-2">
             <i class="bi bi-bag-check me-2"></i>Comprar Agora
           </button>

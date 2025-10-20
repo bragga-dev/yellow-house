@@ -43,10 +43,7 @@ class Product(models.Model):
 class ArtworkCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_('Nome'), max_length=100, unique=True)
-    description = models.TextField(_('Descrição'), null=True, blank=True)
-    slug = models.SlugField(max_length=255, unique=True, editable=False)
-    image = models.ImageField(_('Imagem'), upload_to='artwork_categories/', validators=[validate_image_file], null=False, blank=False)
-      
+   
     class Meta:
         verbose_name = "Categoria de obras"
         verbose_name_plural = "Categorias de obras"
@@ -54,16 +51,6 @@ class ArtworkCategory(models.Model):
     
     def __str__(self):
         return self.name
-    
-    def get_absolute_url(self):
-        return reverse("artwork_category_detail",  kwargs={"slug": self.slug, "pk": self.id})
-
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = generate_unique_slug(self, self.name, self.id)
-        super().save(*args, **kwargs)
-
     
 
 class ArtWork(Product):
@@ -76,7 +63,7 @@ class ArtWork(Product):
     year_created = models.DateField(_('Ano de criação'), null=True, blank=True)    
     style = models.CharField(_('Estilo'), max_length=100, null=True, blank=True)
     slug = models.SlugField(max_length=255, unique=True, editable=False)
-
+    
     def __str__(self):
         return self.name
     
@@ -98,9 +85,6 @@ class ArtWork(Product):
 class SouvenirCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_('Nome'), max_length=100, unique=True)
-    description = models.TextField(_('Descrição'), null=True, blank=True)
-    slug = models.SlugField(max_length=255, unique=True, editable=False)
-    image = models.ImageField(_('Imagem'), upload_to='souvenir_categories/', validators=[validate_image_file], null=False, blank=False)
     
     def __str__(self):
         return self.name
@@ -110,14 +94,8 @@ class SouvenirCategory(models.Model):
         verbose_name_plural = "Souvenir Categories"
         ordering = ['name']
 
-    def get_absolute_url(self):
-        return reverse("souvenir_category_detail",  kwargs={"slug": self.slug, "pk": self.id})
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = generate_unique_slug(self, self.name, self.id)
-        super().save(*args, **kwargs)
-
+   
+   
         
 class Souvenir(Product):
     SIZE_CHOICES = [
@@ -130,7 +108,7 @@ class Souvenir(Product):
     souvenir_category = models.ForeignKey(SouvenirCategory, on_delete=models.PROTECT, related_name='souvenirs')
     material = models.CharField(_('Material'), max_length=100, null=True, blank=True)
     size = models.CharField(_('Tamanho'), max_length=20, choices=SIZE_CHOICES, null=True, blank=True)
-
+    
     def __str__(self):
         return self.name
     

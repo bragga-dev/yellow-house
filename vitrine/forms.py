@@ -7,21 +7,19 @@ from vitrine.models import  ArtworkCategory, SouvenirCategory, ArtWork, Souvenir
 class ArtworkCategoryForm(forms.ModelForm):
     class Meta:
         model = ArtworkCategory
-        fields = ['name', 'description', 'image']   
+        fields = ['name']   
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome da categoria'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descrição da categoria', 'rows': 3}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+
         }
 
 class SouvenirCategoryForm(forms.ModelForm):
     class Meta:
         model = SouvenirCategory
-        fields = ['name', 'description', 'image']   
+        fields = ['name']   
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome da categoria'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descrição da categoria', 'rows': 3}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            
         }   
 
 class ArtWorkForm(forms.ModelForm):

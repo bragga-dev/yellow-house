@@ -37,10 +37,10 @@ class ArtworkImageAdmin(admin.ModelAdmin):
 # ---------- Admin de ArtworkCategory ----------
 @admin.register(ArtworkCategory)
 class ArtworkCategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'image')
+    list_display = ('name', )
     search_fields = ('name',)
     ordering = ('name',)
-    readonly_fields = ('slug',)
+   
 
 
 # ---------- Inline para imagens de Souvenir ----------
@@ -76,10 +76,10 @@ class SouvenirImageAdmin(admin.ModelAdmin):
 # ---------- Admin de SouvenirCategory ----------
 @admin.register(SouvenirCategory)
 class SouvenirCategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'image')
+    list_display = ('name', )
     search_fields = ('name',)
     ordering = ('name',)
-    readonly_fields = ('slug',)
+  
 
 
 class BannerImageInline(admin.TabularInline):
