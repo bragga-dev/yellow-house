@@ -1,0 +1,289 @@
+{% extends "vitrine/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Título e Breadcrumb -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="">Home</a></li>
+                    <li class="breadcrumb-item active">Carrinho de Compras</li>
+                </ol>
+            </nav>
+            <h1 class="h2">Carrinho de Compras</h1>
+        </div>
+    </div>
+
+    <!-- Mensagens -->
+    {% if messages %}
+    <div class="row mb-4">
+        <div class="col-12">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if cart.items.all %}
+    <div class="row">
+        <!-- Lista de Itens -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-cart3 me-2"></i>
+                        Itens no Carrinho ({{ cart.items.count }})
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% for item in cart.items.all %}
+                    <div class="p-3 border-bottom">
+                        <div class="row align-items-center">
+                            <!-- Imagem do Produto -->
+                            <div class="col-md-2 col-3">
+                                {% if item.artwork and item.artwork.image %}
+                                <img src="{{ item.artwork.image.url }}" alt="{{ item.artwork.name }}" 
+                                     class="img-fluid rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                                {% elif item.souvenir and item.souvenir.image %}
+                                <img src="{{ item.souvenir.image.url }}" alt="{{ item.souvenir.name }}" 
+                                     class="img-fluid rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                     style="width: 80px; height: 80px;">
+                                    <i class="bi bi-image text-muted fs-4"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Informações do Produto -->
+                            <div class="col-md-4 col-9">
+                                <h6 class="mb-1 fw-bold">
+                                    {% if item.artwork %}
+                                        {{ item.artwork.name }}
+                                    {% elif item.souvenir %}
+                                        {{ item.souvenir.name }}
+                                    {% endif %}
+                                </h6>
+                                <p class="text-muted small mb-1">
+                                    {% if item.artwork %}
+                                        <i class="bi bi-palette me-1"></i>Obra de Arte
+                                    {% elif item.souvenir %}
+                                        <i class="bi bi-gift me-1"></i>Souvenir
+                                    {% endif %}
+                                </p>
+                                <p class="text-primary fw-bold mb-0">R$ {{ item.unit_price }}</p>
+                            </div>
+
+                            <!-- Controle de Quantidade -->
+                            <div class="col-md-3 col-6">
+                                <form method="post" action="{% url 'checkout:update_item_quantity' item.id %}" 
+                                      class="d-flex align-items-center">
+                                    {% csrf_token %}
+                                    <div class="input-group input-group-sm" style="width: 120px;">
+                                        <button type="button" class="btn btn-outline-secondary" 
+                                                onclick="decrementQuantity('quantity-{{ item.id }}')"
+                                                style="width: 35px;">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <input type="number" 
+                                               name="quantity" 
+                                               id="quantity-{{ item.id }}"
+                                               value="{{ item.quantity }}" 
+                                               min="1" 
+                                               class="form-control text-center"
+                                               onchange="this.form.submit()"
+                                               style="border-left: 0; border-right: 0;">
+                                        <button type="button" class="btn btn-outline-secondary" 
+                                                onclick="incrementQuantity('quantity-{{ item.id }}')"
+                                                style="width: 35px;">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Subtotal e Ações -->
+                            <div class="col-md-3 col-6 text-end">
+                                <p class="fw-bold h6 mb-2">R$ {{ item.subtotal }}</p>
+                                <form method="post" action="{% url 'checkout:remove_item_from_cart' item.id %}" 
+                                      class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash"></i> Remover
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumo do Pedido -->
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-receipt me-2"></i>
+                        Resumo do Pedido
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Subtotal:</span>
+                        <span class="fw-semibold">R$ {{ cart.total_price }}</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Frete:</span>
+                        <span class="text-success fw-semibold">A calcular</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Desconto:</span>
+                        <span class="text-success fw-semibold">R$ 0,00</span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between mb-4">
+                        <strong class="fs-5">Total:</strong>
+                        <strong class="fs-4 text-primary">R$ {{ cart.total_price }}</strong>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="" class="btn btn-primary btn-lg">
+                            <i class="bi bi-credit-card me-2"></i> Finalizar Compra
+                        </a>
+                        <a href="" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i> Continuar Comprando
+                        </a>
+                    </div>
+
+                    <!-- Informações de Segurança -->
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <i class="bi bi-shield-check text-success d-block fs-4"></i>
+                                <small class="text-muted">Seguro</small>
+                            </div>
+                            <div class="col-4">
+                                <i class="bi bi-truck text-primary d-block fs-4"></i>
+                                <small class="text-muted">Entrega</small>
+                            </div>
+                            <div class="col-4">
+                                <i class="bi bi-arrow-repeat text-warning d-block fs-4"></i>
+                                <small class="text-muted">Troca</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Produtos Recomendados -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h4 class="mb-4">Você também pode gostar</h4>
+            <div class="row">
+                <!-- Aqui você pode adicionar produtos recomendados -->
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-plus-circle text-muted fs-1"></i>
+                            <p class="text-muted mt-2">Mais produtos</p>
+                            <a href="" class="btn btn-outline-primary btn-sm">
+                                Ver mais
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Carrinho Vazio -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-cart-x text-muted" style="font-size: 4rem;"></i>
+                    <h3 class="text-muted mt-3">Seu carrinho está vazio</h3>
+                    <p class="text-muted mb-4">Adicione alguns itens incríveis ao seu carrinho!</p>
+                    <a href="" class="btn btn-primary btn-lg">
+                        <i class="bi bi-arrow-left me-2"></i> Continuar Comprando
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Funções para incrementar/decrementar quantidade
+    function incrementQuantity(inputId) {
+        const input = document.getElementById(inputId);
+        input.value = parseInt(input.value) + 1;
+        input.form.submit();
+    }
+
+    function decrementQuantity(inputId) {
+        const input = document.getElementById(inputId);
+        if (parseInt(input.value) > 1) {
+            input.value = parseInt(input.value) - 1;
+            input.form.submit();
+        }
+    }
+
+    // Atualizar quantidade quando o usuário digitar manualmente
+    document.addEventListener('DOMContentLoaded', function() {
+        const quantityInputs = document.querySelectorAll('input[name="quantity"]');
+        quantityInputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.value < 1) {
+                    this.value = 1;
+                }
+            });
+        });
+    });
+
+    // Confirmar remoção de item
+    document.addEventListener('DOMContentLoaded', function() {
+        const removeButtons = document.querySelectorAll('form[action*="remove_item"]');
+        removeButtons.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                if (!confirm('Tem certeza que deseja remover este item do carrinho?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    .quantity-input-group {
+        max-width: 120px;
+    }
+    
+    .btn-quantity {
+        width: 35px;
+    }
+    
+    .product-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
