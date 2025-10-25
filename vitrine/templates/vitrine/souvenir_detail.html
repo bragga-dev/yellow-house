@@ -1,4 +1,5 @@
 {% extends "vitrine/base.html" %}
+{% load range_tags %}
 {% block title %}{{ souvenir.name }} - Detalhes do Souvenir{% endblock %}
 
 {% block content %}
@@ -65,12 +66,24 @@
               </div>
             </div>
           </div>
-        </div>
+        </div>       
+         <form method="POST" action="{% url 'checkout:add_item_in_cart' slug=souvenir.slug item_id=souvenir.id %}" class="mb-3">
+          {% csrf_token %}
+          
+          <div class="d-flex align-items-center mb-3">
+            <label for="quantity" class="me-2 fw-semibold">Quantidade:</label>
+            <select name="quantity" id="quantity" class="form-select w-auto">
+              {% for i in 1|to:souvenir.stock %}
+                <option value="{{ i }}">{{ i }}</option>
+              {% endfor %}
+            </select>
+            <small class="text-muted ms-2">({{ souvenir.stock }} em estoque)</small>
+          </div>
 
-        <div class="product-actions">
-          <<a href="{% url 'checkout:add_item_in_cart' slug=souvenir.slug item_id=souvenir.id %}" class="btn btn-primary w-100 py-3 mb-2">
-          <i class="bi bi-cart-plus me-2"></i>Adicionar ao Carrinho
-        </a>
+          <button type="submit" class="btn btn-primary w-100 py-3">
+            <i class="bi bi-cart-plus me-2"></i>Adicionar ao Carrinho
+          </button>
+        </form>
           <button class="btn btn-outline-primary w-100 py-3 mb-2">
             <i class="bi bi-bag-check me-2"></i>Comprar Agora
           </button>

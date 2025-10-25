@@ -1,6 +1,6 @@
 
 from django import forms
-from vitrine.models import  ArtworkCategory, SouvenirCategory, ArtWork, Souvenir, ArtworkImage, SouvenirImage
+from vitrine.models import  ArtworkCategory, SouvenirCategory, ArtWork, Souvenir, ArtworkImage, SouvenirImage, Package
 
 
 
@@ -39,6 +39,20 @@ class ArtWorkForm(forms.ModelForm):
             'stock': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Quantidade em estoque'}),
             
         }   
+
+
+
+class PackageForm(forms.ModelForm):
+    class Meta:
+        model = Package
+        fields = ['weight', 'width', 'height', 'length']
+        widgets = {
+            'weight': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Peso em kg'}),
+            'width': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Largura da embalagem (cm)'}),
+            'height': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Altura da embalagem (cm)'}),
+            'length': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Comprimento da embalagem (cm)'}),
+        }
+
 
 class SouvenirForm(forms.ModelForm):
     class Meta:
@@ -80,3 +94,6 @@ class SearchForm(forms.Form):
         'class': 'form-control',
         'placeholder': 'Buscar obras, souvenirs ou artistas...'
     }))
+
+
+

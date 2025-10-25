@@ -4,6 +4,7 @@ from vitrine.views.artwork_views import create_artwork, update_artwork, delete_a
 from vitrine.views.souvenir_views import list_souvenirs, souvenir_detail
 from vitrine.views.on_views import on_view
 from vitrine.views.blog_views import blog_list, blog_detail
+from vitrine.views.frenet_views import calcular_frete
 
 
 app_name = 'vitrine'
@@ -17,6 +18,9 @@ urlpatterns = [
 
     #sobre
     path('sobre/', on_view, name='on_view'),
+
+    #frete
+    path('frete/', calcular_frete, name='calcular_frete'),
 
     #blog
     path('blog/', blog_list, name='blog_list'),

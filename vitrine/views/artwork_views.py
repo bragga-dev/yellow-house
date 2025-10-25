@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from vitrine.forms import ArtWorkForm
+from vitrine.forms import ArtWorkForm, PackageForm
 from vitrine.models import ArtWork, ArtworkImage, ArtworkCategory
 from vitrine.filters import ArtWorkFilter
 from django.core.paginator import Paginator
@@ -16,14 +16,18 @@ def create_artwork(request):
 
     if request.method == 'POST':
         form_artwork = ArtWorkForm(request.POST, request.FILES)
+        form_package = PackageForm(request.POST)
         form_artwork.fields['art_work_category'].queryset = ArtworkCategory.objects.all()
 
         images = request.FILES.getlist("images")
         primary_index = int(request.POST.get("is_primary", 0))  
 
-        if form_artwork.is_valid():
+        if form_artwork.is_valid() and form_package.is_valid():
+            package = form_package.save()
+
             artwork = form_artwork.save(commit=False)
             artwork.artist = artist
+            artwork.package = package
             artwork.save()
 
             for i, image_file in enumerate(images):
@@ -46,6 +50,7 @@ def create_artwork(request):
             'artist': artist,
             'artworks': artworks,
             'form_artwork': form_artwork,
+            'form_package': form_package
         })
 
     return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
@@ -58,15 +63,19 @@ def update_artwork(request, slug, artwork_id):
     artist = request.user.artist
 
     if request.method == 'POST':
+        form_package = PackageForm(request.POST, instance=artwork.package)
         form_artwork = ArtWorkForm(request.POST, request.FILES, instance=artwork)
         form_artwork.fields['art_work_category'].queryset = ArtworkCategory.objects.all()
 
         images = request.FILES.getlist("images")
         primary_index = int(request.POST.get("is_primary", 0)) if request.POST.get("is_primary") else 0
 
-        if form_artwork.is_valid():
+        if form_artwork.is_valid() and form_package.is_valid():
+            packege = form_package.save()
+
             updated_artwork = form_artwork.save(commit=False)
             updated_artwork.artist = artist
+            updated_artwork.package = packege
             updated_artwork.save()
 
            
@@ -104,6 +113,7 @@ def update_artwork(request, slug, artwork_id):
             'artist': artist,
             'artworks': artworks,
             'form_artwork': ArtWorkForm(), 
+            'form_package': form_package
         })
 
     return redirect('artist:collection', slug=request.user.slug, pk=request.user.pk)
@@ -131,9 +141,61 @@ def list_artworks_by_artist(request, slug, pk):
     return render(request, 'vitrine/artist_detail.html', {'artworks': artworks})
 
 
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from vitrine.models import ArtWork
+from vitrine.services.frenet import calcular_frete
+
+from django.http import JsonResponse
+
 def detail_artwork(request, slug, artwork_id):
     artwork = get_object_or_404(ArtWork, slug=slug, id=artwork_id)
-    return render(request, 'vitrine/artwork_detail.html', {'artwork': artwork})
+    resultado_frete = None
+    resultado_frete_valido = []
+
+    if request.method == "POST" and request.headers.get("x-requested-with") == "XMLHttpRequest":
+        endereco_principal = artwork.artist.addresses.filter(principal=True).first()
+        if not endereco_principal:
+            return JsonResponse({"error": "O artista não possui um endereço principal cadastrado."})
+
+        cep_origem = endereco_principal.cep
+        cep_destino = request.POST.get("cep_destino")
+        quantidade = int(request.POST.get("quantidade", 1))
+
+        package = artwork.package
+        if not package:
+            return JsonResponse({"error": "Nenhuma embalagem cadastrada para esta obra."})
+
+        peso_total = package.weight * quantidade
+        valor_total = float(artwork.price) * quantidade
+
+        resultado_frete = calcular_frete(
+            origem_cep=cep_origem,
+            destino_cep=cep_destino,
+            peso=peso_total,
+            altura=package.height,
+            largura=package.width,
+            comprimento=package.length,
+            valor=valor_total
+        )
+
+        resultado_frete_valido = [
+            s for s in resultado_frete.get("ShippingSevicesArray", [])
+            if not s.get("Error", True)
+        ]
+
+        return JsonResponse({"fretes": resultado_frete_valido})
+
+    context = {
+        "artwork": artwork,
+    }
+    return render(request, "vitrine/artwork_detail.html", context)
+
+
+# def detail_artwork(request, slug, artwork_id):
+#     artwork = get_object_or_404(ArtWork, slug=slug, id=artwork_id)
+
+#     return render(request, 'vitrine/artwork_detail.html', {'artwork': artwork})
 
 
 def list_artworks(request):

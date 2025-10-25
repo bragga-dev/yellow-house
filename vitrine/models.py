@@ -8,6 +8,43 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.urls import reverse
 
+
+
+class Package(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    weight = models.FloatField(_('Peso'), help_text="Peso total em kg", null=False, blank=False, validators=[MinValueValidator(0.00)])
+    width = models.FloatField(_('Largura'), help_text="Largura em cm", null=False, blank=False, validators=[MinValueValidator(0.00)])
+    height = models.FloatField(_('Altura'), help_text="Altura em cm", null=False, blank=False, validators=[MinValueValidator(0.00)])
+    length = models.FloatField(_('Comprimento'), help_text="Comprimento em cm", null=False, blank=False, validators=[MinValueValidator(0.00)])
+
+    def clean(self):
+        errors = {}
+
+        def safe_float(value):
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return None
+
+        weight = safe_float(self.weight)
+        width = safe_float(self.width)
+        height = safe_float(self.height)
+        length = safe_float(self.length)
+
+        if weight is not None and weight < 0:
+            errors['weight'] = 'O peso não pode ser negativo.'
+        if width is not None and width < 0:
+            errors['width'] = 'A largura não pode ser negativa.'
+        if height is not None and height < 0:
+            errors['height'] = 'A altura não pode ser negativa.'
+        if length is not None and length < 0:
+            errors['length'] = 'O comprimento não pode ser negativo.'
+
+        if errors:
+            raise ValidationError(errors)
+
+        return super().clean()
+
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
     name = models.CharField(_('Nome'), max_length=200)
@@ -55,6 +92,7 @@ class ArtworkCategory(models.Model):
 
 class ArtWork(Product):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    package = models.OneToOneField(Package, on_delete=models.CASCADE, related_name='artworks', null=True, blank=True)
     artist = models.ForeignKey(Artist, on_delete=models.PROTECT, related_name='artworks')
     art_work_category = models.ForeignKey(ArtworkCategory, on_delete=models.PROTECT, related_name='artworks')
     width = models.FloatField(_('Largura (cm)'), null=False, blank=False)
@@ -68,7 +106,7 @@ class ArtWork(Product):
         return self.name
     
     def get_absolute_url(self):
-        return reverse("artwork_detail", kwargs={"slug": self.slug, "pk": self.id})
+        return reverse("vitrine:detail_artwork", kwargs={"slug": self.slug, "artwork_id": self.id})
 
     
     class Meta:
@@ -108,6 +146,7 @@ class Souvenir(Product):
     souvenir_category = models.ForeignKey(SouvenirCategory, on_delete=models.PROTECT, related_name='souvenirs')
     material = models.CharField(_('Material'), max_length=100, null=True, blank=True)
     size = models.CharField(_('Tamanho'), max_length=20, choices=SIZE_CHOICES, null=True, blank=True)
+    package = models.OneToOneField(Package, on_delete=models.CASCADE, related_name='souvenirs', null=True, blank=True)
     
     def __str__(self):
         return self.name
