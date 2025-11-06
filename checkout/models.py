@@ -6,11 +6,13 @@ from user.models import User
 import uuid
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from decimal import Decimal, ROUND_HALF_UP
 
 class Cart(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, verbose_name=_("Usuário"), on_delete=models.CASCADE)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_shipping = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     class Meta:
         verbose_name = _("Carrinho")
@@ -20,13 +22,21 @@ class Cart(models.Model):
         return f"Carrinho {self.id} - {self.user}"
 
     def calculate_total_price(self):
-        total = sum(item.subtotal() for item in self.items.all())
-        return total
+        # Soma apenas os produtos
+        return sum(item.subtotal() for item in self.items.all())
 
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.total_price = self.calculate_total_price()
-        super().save(*args, **kwargs)
+    def calculate_total_shipping(self):
+        return sum((item.shipping_value or Decimal('0.00')) for item in self.items.all())
+
+
+    def update_totals(self):
+        self.total_price = self.calculate_total_price()
+        self.total_shipping = self.calculate_total_shipping()
+        self.save(update_fields=['total_price', 'total_shipping'])
+
+    @property
+    def total_geral(self):
+        return self.total_price + self.total_shipping
 
 
 class CartItem(models.Model):
@@ -62,7 +72,8 @@ class CartItem(models.Model):
         return f"Item {self.id}"
 
     def subtotal(self):
-        return (self.unit_price * self.quantity) + (self.shipping_value or 0)
+        return (self.unit_price * self.quantity).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
 
 
 

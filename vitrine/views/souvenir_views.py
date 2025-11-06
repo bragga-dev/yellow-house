@@ -11,7 +11,7 @@ def souvenir_detail(request, slug, souvenir_id):
 
 
 def list_souvenirs(request):
-    queryset = Souvenir.objects.filter(stock__gt=0).order_by('-created_at')
+    queryset = Souvenir.objects.filter(stock__gt=0, package__isnull=False).order_by('-created_at')
 
 
     souvenir_filter = SouvenirFilter(request.GET, queryset=queryset)

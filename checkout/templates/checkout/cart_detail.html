@@ -1,9 +1,8 @@
 {% extends "vitrine/base.html" %}
-{% load range_tags %}  {# Carrega a tag personalizada para o range #}
+{% load range_tags %}
 
 {% block content %}
 <div class="container py-5">
-    <!-- Título e Breadcrumb -->
     <div class="row mb-4">
         <div class="col-12">
             <nav aria-label="breadcrumb">
@@ -16,7 +15,6 @@
         </div>
     </div>
 
-    <!-- Mensagens -->
     {% if messages %}
     <div class="row mb-4">
         <div class="col-12">
@@ -32,7 +30,6 @@
 
     {% if cart.items.all %}
     <div class="row">
-        <!-- Lista de Itens -->
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-white">
@@ -43,47 +40,45 @@
                 </div>
                 <div class="card-body p-0">
                     {% for item in cart.items.all %}
-                    <div class="p-3 border-bottom">
+                    <div class="p-3 border-bottom" id="item-{{ item.id }}">
                         <div class="row align-items-center">
-                            <!-- Imagem do Produto -->
                             <div class="col-md-2 col-3">
-                                    {% if item.artwork %}
-                                        {% with image=item.artwork.images.first %}
-                                            {% if image %}
-                                            <a href="{% url 'vitrine:detail_artwork' item.artwork.slug item.artwork.id %}">
-                                            <img src="{{ image.image.url }}" alt="{{ item.artwork.name }}" 
-                                                class="img-fluid rounded" style="width: 80px; height: 80px; object-fit: cover;">
-                                            </a>
-                                            {% else %}
-                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
-                                                style="width: 80px; height: 80px;">
-                                                <i class="bi bi-image text-muted fs-4"></i>
-                                            </div>
-                                            {% endif %}
-                                        {% endwith %}
-                                        {% elif item.souvenir %}
-                                        {% with image=item.souvenir.images.first %}
-                                            {% if image %}
-                                            <a href="{% url 'vitrine:souvenir_detail' item.souvenir.slug item.souvenir.id %}">
-                                            <img src="{{ image.image.url }}" alt="{{ item.souvenir.name }}" 
-                                                class="img-fluid rounded" style="width: 80px; height: 80px; object-fit: cover;">
-                                            </a>
-                                            {% else %}
-                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
-                                                style="width: 80px; height: 80px;">
-                                                <i class="bi bi-image text-muted fs-4"></i>
-                                            </div>
-                                            {% endif %}
-                                        {% endwith %}
-                                    {% else %}
-                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" 
-                                        style="width: 80px; height: 80px;">
-                                        <i class="bi bi-image text-muted fs-4"></i>
-                                    </div>
-                                    {% endif %}
+                                {% if item.artwork %}
+                                    {% with image=item.artwork.images.first %}
+                                        {% if image %}
+                                        <a href="{% url 'vitrine:detail_artwork' item.artwork.slug item.artwork.id %}">
+                                        <img src="{{ image.image.url }}" alt="{{ item.artwork.name }}" 
+                                            class="img-fluid rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                                        </a>
+                                        {% else %}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                            style="width: 80px; height: 80px;">
+                                            <i class="bi bi-image text-muted fs-4"></i>
+                                        </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% elif item.souvenir %}
+                                    {% with image=item.souvenir.images.first %}
+                                        {% if image %}
+                                        <a href="{% url 'vitrine:souvenir_detail' item.souvenir.slug item.souvenir.id %}">
+                                        <img src="{{ image.image.url }}" alt="{{ item.souvenir.name }}" 
+                                            class="img-fluid rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                                        </a>
+                                        {% else %}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                            style="width: 80px; height: 80px;">
+                                            <i class="bi bi-image text-muted fs-4"></i>
+                                        </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                    style="width: 80px; height: 80px;">
+                                    <i class="bi bi-image text-muted fs-4"></i>
                                 </div>
+                                {% endif %}
+                            </div>
 
-                            <!-- Informações do Produto -->
                             <div class="col-md-4 col-9">
                                 <h6 class="mb-1 fw-bold">
                                     {% if item.artwork %}
@@ -99,9 +94,8 @@
                                         <i class="bi bi-gift me-1"></i>Souvenir
                                     {% endif %}
                                 </p>
-                                <p class="text-primary fw-bold mb-0">R$ {{ item.unit_price }}</p>
+                                <p class="text-primary fw-bold mb-0">R$ {{ item.unit_price|floatformat:2 }}</p>
                                 
-                                <!-- Informação de Stock -->
                                 <small class="text-muted">
                                     Stock disponível: 
                                     {% if item.artwork %}
@@ -112,14 +106,13 @@
                                 </small>
                             </div>
 
-                            <!-- Controle de Quantidade COM LIMITAÇÃO DE STOCK -->
                             <div class="col-md-3 col-6">
                                 <form method="post" action="{% url 'checkout:update_item_quantity' item.id %}" 
-                                      class="d-flex align-items-center">
+                                      class="d-flex align-items-center" id="quantity-form-{{ item.id }}">
                                     {% csrf_token %}
                                     <div class="input-group input-group-sm" style="width: 140px;">
-                                        <select name="quantity" class="form-select" 
-                                                onchange="this.form.submit()"
+                                        <select name="quantity" class="form-select quantity-select" 
+                                                data-item-id="{{ item.id }}"
                                                 style="border-radius: 0.375rem;">
                                             {% if item.artwork %}
                                                 {% for i in 1|to:item.artwork.stock %}
@@ -141,9 +134,10 @@
                                 </form>
                             </div>
 
-                            <!-- Subtotal e Ações -->
                             <div class="col-md-3 col-6 text-end">
-                                <p class="fw-bold h6 mb-2">R$ {{ item.subtotal }}</p>
+                                <p class="fw-bold h6 mb-2 item-subtotal" data-item-id="{{ item.id }}">
+                                    R$ {{ item.subtotal|floatformat:2 }}
+                                </p>
                                 <form method="post" action="{% url 'checkout:remove_item_from_cart' item.id %}" 
                                       class="d-inline">
                                     {% csrf_token %}
@@ -153,13 +147,64 @@
                                 </form>
                             </div>
                         </div>
+
+                        <!-- OPÇÕES DE FRETE -->
+                        <div class="mt-3 pt-3 border-top" id="shipping-options-{{ item.id }}">
+                            <h6 class="mb-2"><i class="bi bi-truck me-1"></i>Opções de Frete</h6>
+                            
+                            {% for key, value in fretes_itens.items %}
+                                {% if key == item.id %}
+                                    {% if value.error %}
+                                        <div class="alert alert-warning py-2 small mb-0">
+                                            <i class="bi bi-exclamation-triangle me-1"></i>
+                                            {{ value.error }}
+                                        </div>
+                                    {% elif value.fretes %}
+                                        <div class="row g-2">
+                                            {% for frete in value.fretes %}
+                                                {% if not frete.Error %}
+                                                <div class="col-md-4">
+                                                    <div class="border rounded p-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input shipping-radio" 
+                                                                   type="radio" 
+                                                                   name="shipping_{{ item.id }}" 
+                                                                   id="shipping_{{ item.id }}_{{ forloop.counter }}"
+                                                                   value="{{ frete.ServiceCode }}"
+                                                                   data-shipping-price="{{ frete.ShippingPrice }}"
+                                                                   data-item-id="{{ item.id }}"
+                                                                   {% if item.shipping_type == frete.ServiceCode %}checked{% endif %}>
+                                                            <label class="form-check-label small" for="shipping_{{ item.id }}_{{ forloop.counter }}">
+                                                                <strong>{{ frete.Carrier }}</strong><br>
+                                                                {{ frete.ServiceDescription }}
+                                                            </label>
+                                                        </div>
+                                                        <div class="small mt-1">
+                                                            <span class="text-success fw-bold">R$ {{ frete.ShippingPrice }}</span>
+                                                            <span class="text-muted ms-2">
+                                                                {{ frete.DeliveryTime }} dia{% if frete.DeliveryTime > 1 %}s{% endif %}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="alert alert-info py-2 small mb-0">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            Nenhuma opção de frete disponível.
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
 
-        <!-- Resumo do Pedido -->
         <div class="col-lg-4 mt-4 mt-lg-0">
             <div class="card shadow-sm">
                 <div class="card-header bg-white">
@@ -171,25 +216,19 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Subtotal:</span>
-                        <span class="fw-semibold">R$ {{ cart.total_price }}</span>
+                        <span class="fw-semibold cart-subtotal">R$ {{ cart.total_price|floatformat:2 }}</span>
                     </div>
                     
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Frete:</span>
-                        <span class="text-success fw-semibold">A calcular</span>
+                         <span class="text-success fw-semibold cart-shipping">R$ {{ cart.total_shipping|floatformat:2 }}</span>
                     </div>
-                    
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Desconto:</span>
-                        <span class="text-success fw-semibold">R$ 0,00</span>
-                    </div>
-                    
+
                     <hr>
-                    
+
                     <div class="d-flex justify-content-between mb-4">
                         <strong class="fs-5">Total:</strong>
-                        <strong class="fs-4 text-primary">R$ {{ cart.total_price }}</strong>
-                    </div>
+        <strong class="fs-4 text-primary cart-total">R$ {{ cart.total_geral|stringformat:".2f" }}</strong> </div>
 
                     <div class="d-grid gap-2">
                         <a href="" class="btn btn-primary btn-lg">
@@ -200,7 +239,6 @@
                         </a>
                     </div>
 
-                    <!-- Informações de Segurança -->
                     <div class="mt-4 pt-3 border-top">
                         <div class="row text-center">
                             <div class="col-4">
@@ -221,29 +259,7 @@
             </div>
         </div>
     </div>
-
-    <!-- Produtos Recomendados -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <h4 class="mb-4">Você também pode gostar</h4>
-            <div class="row">
-                <!-- Aqui você pode adicionar produtos recomendados -->
-                <div class="col-md-3 col-6 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <i class="bi bi-plus-circle text-muted fs-1"></i>
-                            <p class="text-muted mt-2">Mais produtos</p>
-                            <a href="" class="btn btn-outline-primary btn-sm">
-                                Ver mais
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     {% else %}
-    <!-- Carrinho Vazio -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm">
@@ -264,53 +280,102 @@
 
 {% block extra_js %}
 <script>
-    // Funções para incrementar/decrementar quantidade (mantidas para compatibilidade)
-    function incrementQuantity(inputId) {
-        const input = document.getElementById(inputId);
-        input.value = parseInt(input.value) + 1;
-        input.form.submit();
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-    function decrementQuantity(inputId) {
-        const input = document.getElementById(inputId);
-        if (parseInt(input.value) > 1) {
-            input.value = parseInt(input.value) - 1;
-            input.form.submit();
-        }
-    }
-
-    // Confirmar remoção de item
-    document.addEventListener('DOMContentLoaded', function() {
-        const removeButtons = document.querySelectorAll('form[action*="remove_item"]');
-        removeButtons.forEach(form => {
-            form.addEventListener('submit', function(e) {
-                if (!confirm('Tem certeza que deseja remover este item do carrinho?')) {
-                    e.preventDefault();
-                }
-            });
+    // Atualizar quantidade e recarregar a página para recalcular fretes
+    document.querySelectorAll('.quantity-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const itemId = this.getAttribute('data-item-id');
+            const form = document.getElementById(`quantity-form-${itemId}`);
+            
+            // Enviar o formulário normalmente para recarregar a página
+            // Isso garante que os fretes sejam recalculados com a nova quantidade
+            form.submit();
         });
     });
 
-    // Adicionar feedback visual quando o stock estiver baixo
-    document.addEventListener('DOMContentLoaded', function() {
-        const stockIndicators = document.querySelectorAll('.text-muted small');
-        stockIndicators.forEach(indicator => {
-            const stockText = indicator.textContent;
-            const stockMatch = stockText.match(/Stock disponível: (\d+)/);
-            
-            if (stockMatch) {
-                const stock = parseInt(stockMatch[1]);
-                if (stock <= 3) {
-                    indicator.classList.remove('text-muted');
-                    indicator.classList.add('text-warning', 'fw-bold');
+    // Atualizar frete via AJAX
+    document.querySelectorAll('.shipping-radio').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const itemId = this.getAttribute('data-item-id');
+            const serviceCode = this.value;
+            const shippingPrice = this.getAttribute('data-shipping-price');
+
+            updateShipping(itemId, serviceCode, shippingPrice);
+        });
+    });
+
+    function updateShipping(itemId, serviceCode, shippingPrice) {
+        fetch(`/checkout/update_shipping/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                service_code: serviceCode,
+                shipping_price: parseFloat(shippingPrice)
+
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Atualizar totais no resumo
+                document.querySelector('.cart-shipping').textContent = `R$ ${parseFloat(data.total_shipping).toFixed(2).replace('.', ',')}`;
+
+                document.querySelector('.cart-total').textContent = `R$ ${parseFloat(data.total_geral).toFixed(2).replace('.', ',')}`;
+
+                
+                // Atualizar subtotal do item se disponível
+                const itemSubtotal = document.querySelector(`.item-subtotal[data-item-id="${itemId}"]`);
+                if (itemSubtotal && data.item_subtotal) {
+                    itemSubtotal.textContent = `R$ ${parseFloat(data.item_subtotal).toFixed(2)}`;
                 }
-                if (stock === 0) {
-                    indicator.classList.remove('text-warning');
-                    indicator.classList.add('text-danger', 'fw-bold');
+
+                
+                // Atualizar subtotal do carrinho
+                if (data.total_price) {
+                   document.querySelector('.cart-subtotal').textContent = `R$ ${parseFloat(data.total_price).toFixed(2).replace('.', ',')}`;
+
                 }
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao atualizar frete:', error);
+        });
+    }
+
+    // Confirmação para remover item
+    const removeButtons = document.querySelectorAll('form[action*="remove_item"]');
+    removeButtons.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            if (!confirm('Tem certeza que deseja remover este item do carrinho?')) {
+                e.preventDefault();
             }
         });
     });
+
+    // Destacar estoque baixo
+    const stockIndicators = document.querySelectorAll('.text-muted small');
+    stockIndicators.forEach(indicator => {
+        const stockText = indicator.textContent;
+        const stockMatch = stockText.match(/Stock disponível: (\d+)/);
+        
+        if (stockMatch) {
+            const stock = parseInt(stockMatch[1]);
+            if (stock <= 3) {
+                indicator.classList.remove('text-muted');
+                indicator.classList.add('text-warning', 'fw-bold');
+            }
+            if (stock === 0) {
+                indicator.classList.remove('text-warning');
+                indicator.classList.add('text-danger', 'fw-bold');
+            }
+        }
+    });
+});
 </script>
 
 <style>

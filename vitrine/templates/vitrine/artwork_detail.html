@@ -121,9 +121,6 @@
         <div class="product-actions mb-4">
           <form method="POST" action="{% url 'checkout:add_item_in_cart' slug=artwork.slug item_id=artwork.id %}" class="needs-validation" novalidate id="purchase-form">
             {% csrf_token %}    
-            <!-- Campos hidden para o frete -->
-            <input type="hidden" name="shipping_type" id="shipping_type">
-            <input type="hidden" name="shipping_value" id="shipping_value">
             
             <div class="row g-3 align-items-center mb-4">
               <div class="col-auto">
@@ -200,7 +197,6 @@
                          class="form-control" 
                          placeholder="00000-000"
                          maxlength="9"
-                         required
                          pattern="\d{5}-\d{3}">
                   <div class="invalid-feedback">
                     Por favor, informe um CEP válido.
@@ -369,13 +365,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   const quantitySelect = document.getElementById('quantity');
   const quantidadeDisplay = document.getElementById('quantidade-display');
-  const shippingTypeInput = document.getElementById('shipping_type');
-  const shippingValueInput = document.getElementById('shipping_value');
   const purchaseForm = document.getElementById('purchase-form');
-  const addToCartBtn = document.getElementById('add-to-cart-btn');
-
-  // Estado atual do frete selecionado
-  let freteSelecionado = null;
 
   // Atualizar display da quantidade quando o select mudar
   if (quantitySelect && quantidadeDisplay) {
@@ -512,18 +502,11 @@ document.addEventListener('DOMContentLoaded', function() {
               const radio = this.querySelector('.frete-radio');
               radio.checked = true;
               
-              // Atualizar dados do frete selecionado
-              freteSelecionado = {
+              console.log('Frete selecionado:', {
                 serviceCode: this.dataset.service,
                 description: this.dataset.description,
                 price: this.dataset.price
-              };
-              
-              // Atualizar campos hidden
-              shippingTypeInput.value = freteSelecionado.description;
-              shippingValueInput.value = freteSelecionado.price;
-              
-              console.log('Frete selecionado:', freteSelecionado);
+              });
             });
           });
 
@@ -553,39 +536,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Validar se o frete foi selecionado antes de adicionar ao carrinho
-  if (purchaseForm) {
-    purchaseForm.addEventListener('submit', function(e) {
-      if (!freteSelecionado) {
-        e.preventDefault();
-        
-        // Mostrar mensagem de alerta
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-warning alert-dismissible fade show mt-3';
-        alertDiv.innerHTML = `
-          <i class="bi bi-exclamation-triangle me-2"></i>
-          Por favor, calcule e selecione uma opção de frete antes de adicionar ao carrinho.
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        
-        // Inserir alerta antes do formulário de frete
-        const freteCalculator = document.querySelector('.shipping-calculator');
-        if (freteCalculator) {
-          freteCalculator.parentNode.insertBefore(alertDiv, freteCalculator);
-        }
-        
-        // Rolar até o frete
-        freteCalculator.scrollIntoView({ behavior: 'smooth' });
-        
-        // Destacar o campo CEP
-        if (cepInput) {
-          cepInput.focus();
-          cepInput.classList.add('is-invalid');
-        }
-      }
-    });
-  }
-
   // Validação de formulários
   const forms = document.querySelectorAll('.needs-validation');
   forms.forEach(form => {
@@ -599,4 +549,4 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
-{% endblock %}  
+{% endblock %}

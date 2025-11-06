@@ -1,161 +1,52 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 from django.contrib import messages
 from checkout.models import Cart, CartItem
 from vitrine.models import ArtWork, Souvenir
-from vitrine.services.frenet import calcular_frete  # ajuste o path conforme sua estrutura
-
+from vitrine.utils import calcular_frete_item
+from django.http import JsonResponse
+import json
+from decimal import Decimal, InvalidOperation
 @login_required
 def add_item_in_cart(request, slug, item_id):
-    # Busca o produto
     product = ArtWork.objects.filter(slug=slug, id=item_id).first() or Souvenir.objects.filter(slug=slug, id=item_id).first()
     if not product:
         messages.error(request, "Produto não encontrado.")
         return redirect('/')
 
-    # Verifica se o usuário tem endereço principal cadastrado
-    # Garante que o usuário é cliente e tem endereço principal
-    if not hasattr(request.user, 'client'):
+    if not hasattr(request.user, 'client') and not hasattr(request.user, 'artist'):
         messages.warning(request, "Você precisa ter um perfil de cliente para adicionar produtos ao carrinho.")
         return redirect('/')
-
-    endereco_cliente = request.user.client.addresses.filter(principal=True).first()
-    if not endereco_cliente:
-        messages.warning(request, "Você precisa cadastrar um endereço principal antes de adicionar produtos ao carrinho.")
-        return redirect('/')
-
-
-    if not endereco_cliente:
-        messages.warning(request, "Você precisa cadastrar um endereço antes de adicionar produtos ao carrinho.")
-        return redirect('/')  # ajuste para sua rota de perfil/endereço
-
-    # Verifica se o artista tem endereço
-    endereco_artista = getattr(product.artist, 'addresses', None)
-    if not endereco_artista:
-        messages.error(request, "O artista não possui endereço cadastrado, impossível calcular o frete.")
-        return redirect(product.get_absolute_url())
-    endereco_artista = endereco_artista.filter(principal=True).first()
-
-    if not endereco_artista:
-        messages.error(request, "O artista não possui um endereço principal cadastrado.")
-        return redirect(product.get_absolute_url())
-
-    # Quantidade
+    
     try:
         quantity = int(request.POST.get('quantity', 1))
     except ValueError:
         messages.error(request, "Quantidade inválida.")
         return redirect(product.get_absolute_url())
 
-    # Estoque
     available_stock = getattr(product, 'stock', 1)
     if quantity > available_stock:
         messages.error(request, f"Quantidade solicitada excede o estoque disponível ({available_stock}).")
         return redirect(product.get_absolute_url())
 
-    # Pega a embalagem associada ao produto
-    package = getattr(product, 'package', None)
-    if not package:
-        messages.error(request, "Nenhuma embalagem cadastrada para este produto.")
-        return redirect(product.get_absolute_url())
-
-    # Calcula o frete automaticamente
-    peso_total = package.weight * quantity
-    valor_total = float(product.price) * quantity
-    resultado_frete = calcular_frete(
-        origem_cep=endereco_artista.cep,
-        destino_cep=endereco_cliente.cep,
-        peso=peso_total,
-        altura=package.height,
-        largura=package.width,
-        comprimento=package.length,
-        valor=valor_total
-    )
-
-    # Filtra os serviços válidos
-    fretes_validos = [
-        s for s in resultado_frete.get("ShippingSevicesArray", [])
-        if not s.get("Error", True)
-    ]
-
-    if not fretes_validos:
-        messages.error(request, "Não foi possível calcular o frete para este produto.")
-        return redirect(product.get_absolute_url())
-
-    # Escolhe o mais barato automaticamente (ou você pode exibir no frontend)
-    melhor_frete = min(fretes_validos, key=lambda x: float(x["ShippingPrice"]))
-
-    # Obtém o carrinho do usuário
     cart, _ = Cart.objects.get_or_create(user=request.user)
 
-    # Cria ou atualiza o item
     if isinstance(product, ArtWork):
         cart_item, created = CartItem.objects.get_or_create(cart=cart, artwork=product)
     else:
         cart_item, created = CartItem.objects.get_or_create(cart=cart, souvenir=product)
 
-    # Atualiza informações
     cart_item.quantity = quantity
-    cart_item.shipping_type = melhor_frete["ServiceDescription"]
-    cart_item.shipping_value = melhor_frete["ShippingPrice"]
+    cart_item.unit_price = product.price
+    cart_item.shipping_type = None
+    cart_item.shipping_value = Decimal('0.00')
     cart_item.full_clean()
     cart_item.save()
 
     cart.save()
-    messages.success(request, f"Item adicionado ao carrinho com frete {melhor_frete['ServiceDescription']} - R${melhor_frete['ShippingPrice']}")
+    messages.success(request, "Item adicionado ao carrinho. Escolha o frete desejado abaixo do item.")
     return redirect('checkout:cart_detail')
 
-
-# from django.shortcuts import get_object_or_404, redirect, render
-# from django.contrib.auth.decorators import login_required
-# from checkout.models import Cart, CartItem
-# from vitrine.models import ArtWork, Souvenir
-# from django.contrib import messages
-
-# @login_required
-# def add_item_in_cart(request, slug, item_id):
-#     product = ArtWork.objects.filter(slug=slug, id=item_id).first() or Souvenir.objects.filter(slug=slug, id=item_id).first()
-#     if not product:
-#         messages.error(request, "Produto não encontrado.")
-#         return redirect('/')
-
-#     cart, _ = Cart.objects.get_or_create(user=request.user)
-
-#     # Quantidade vinda do formulário
-#     try:
-#         quantity = int(request.POST.get('quantity', 1))
-#     except ValueError:
-#         messages.error(request, "Quantidade inválida.")
-#         return redirect(product.get_absolute_url())
-
-#     # Verifica estoque disponível
-#     available_stock = product.stock
-#     if quantity > available_stock:
-#         messages.error(request, f"Quantidade solicitada excede o estoque disponível ({available_stock}).")
-#         return redirect(product.get_absolute_url())
-
-#     # Cria ou atualiza o item no carrinho
-#     if isinstance(product, ArtWork):
-#         cart_item, created = CartItem.objects.get_or_create(cart=cart, artwork=product)
-#     else:
-#         cart_item, created = CartItem.objects.get_or_create(cart=cart, souvenir=product)
-
-#     if created:
-#         cart_item.quantity = quantity
-#     else:
-#         new_quantity = cart_item.quantity + quantity
-#         if new_quantity > available_stock:
-#             messages.error(request, f"Você já tem {cart_item.quantity} no carrinho. Adicionar mais excederia o estoque.")
-#             return redirect(product.get_absolute_url())
-#         cart_item.quantity = new_quantity
-
-#     cart_item.full_clean()
-#     cart_item.save()
-#     cart.save()
-
-#     messages.success(request, "Item adicionado ao carrinho.")
-#     return redirect('checkout:cart_detail')
 
 
 @login_required
@@ -180,21 +71,93 @@ def update_item_quantity(request, item_id):
             messages.info(request, "Item removido por quantidade zero.")
         else:
             item.quantity = new_quantity
+            item.shipping_type = None  # Resetar frete para forçar nova seleção
+            item.shipping_value = Decimal('0.00')
             item.save()
-            messages.success(request, "Quantidade atualizada.")
+            messages.success(request, "Quantidade atualizada. Selecione o frete novamente.")
     except ValueError:
         messages.error(request, "Quantidade inválida.")
 
-    cart.save()
+    cart.update_totals()  # Garantir que os totais são atualizados
     return redirect('checkout:cart_detail')
-
 
 @login_required
 def cart_detail(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart).all().order_by('-id')
+
+    endereco_cliente = request.user.client.addresses.filter(principal=True).first()
+    cep_destino = endereco_cliente.cep if endereco_cliente else None
+
+    fretes_itens = {}
+
+    for item in cart_items:
+        produto = item.artwork or item.souvenir
+
+        
+        endereco_origem = produto.artist.addresses.filter(principal=True).first() if hasattr(produto, "artist") else None
+        cep_origem = endereco_origem.cep if endereco_origem else None
+
+     
+        package = produto.package
+
+        
+        if not all([cep_origem, cep_destino, package]):
+            fretes_itens[item.id] = {"error": "Dados insuficientes para calcular o frete."}
+            continue
+
+       
+        resultado = calcular_frete_item(
+            origem_cep=cep_origem,
+            destino_cep=cep_destino,
+            package=package,
+            valor_unitario=produto.price,
+            quantidade=item.quantity
+        )
+
+        fretes_itens[item.id] = resultado
+
     context = {
         'cart': cart,
-        'cart_items': cart_items
+        'cart_items': cart_items,
+        'fretes_itens': fretes_itens
     }
+    print(fretes_itens)
     return render(request, 'checkout/cart_detail.html', context)
+
+
+
+
+@login_required
+def update_shipping(request, item_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        service_code = data.get('service_code')
+        shipping_price = data.get('shipping_price', '0')
+
+        try:
+            # Garantir que o preço do frete seja Decimal com precisão correta
+            shipping_price = Decimal(str(shipping_price)).quantize(Decimal('0.01'))
+        except (InvalidOperation, TypeError, ValueError):
+            shipping_price = Decimal('0.00')
+
+        cart = get_object_or_404(Cart, user=request.user)
+        item = get_object_or_404(CartItem, id=item_id, cart=cart)
+
+        item.shipping_type = service_code
+        item.shipping_value = shipping_price
+        item.save()
+
+        cart.update_totals()
+
+        return JsonResponse({
+            'success': True,
+            'shipping_type': service_code,
+            'shipping_value': f"{shipping_price:.2f}",
+            'total_shipping': f"{cart.total_shipping:.2f}",
+            'total_price': f"{cart.total_price:.2f}",
+            'total_geral': f"{cart.total_geral:.2f}",
+            'item_subtotal': f"{item.subtotal():.2f}"
+        })
+
+    return JsonResponse({'success': False}, status=400)
