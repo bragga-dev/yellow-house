@@ -5,7 +5,7 @@ from django.contrib import messages
 from user.forms import ExhibitionForm
 from user.models import Exhibitions, Artist
 from vitrine.models import ArtWork, ArtworkCategory
-from vitrine.forms import ArtWorkForm
+from vitrine.forms import ArtWorkForm, PackageForm
 
 
 @login_required
@@ -16,25 +16,30 @@ def collection(request, slug, pk):
 
     exhibitions = list(artist.exhibitions.all().order_by('id'))
     artworks = list(artist.artworks.all().order_by('id'))
+    
 
     form_exhibition = ExhibitionForm()
     form_artwork = ArtWorkForm()
+    form_package = PackageForm()
 
     form_artwork.fields['art_work_category'].queryset = ArtworkCategory.objects.all()
-
-
+   
+  
     for artwork in artworks:
         artwork.edit_form = ArtWorkForm(instance=artwork)
+        
 
     for exhibition in exhibitions:
         exhibition.edit_form = ExhibitionForm(instance=exhibition)
 
+   
     context = {
         'artist': artist,
         'exhibitions': exhibitions,
         'form_exhibition': form_exhibition,
         'artworks': artworks,
         'form_artwork': form_artwork,
+        'form_package': form_package
     }
     return render(request, 'account/collection.html', context)
 

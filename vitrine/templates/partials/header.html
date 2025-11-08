@@ -66,9 +66,9 @@
           </a>
 
           <!-- Search -->
-          <form class="search-form desktop-search-form">
+          <form class="search-form desktop-search-form" action="{% url 'vitrine:search_results' %}" method="GET">
             <div class="input-group">
-              <input type="text" class="form-control" placeholder="">
+              <input type="text" class="form-control" placeholder="" name="query">
               <button class="btn" type="submit">
                 <i class="bi bi-search"></i>
               </button>
@@ -142,7 +142,7 @@
             </a>
 
             <!-- Cart -->
-            <a href="" class="header-action-btn">
+            <a href="{% url 'checkout:cart_detail' %}" class="header-action-btn">
               <i class="bi bi-cart3"></i>
               <span class="badge">3</span>
             </a>
@@ -162,12 +162,12 @@
           <nav id="navmenu" class="navmenu">
             <ul>
               <li><a href="/">Home</a></li>
-              <li><a href="">Sobre</a></li>
-              <li><a href="">Obras de Arte</a></li>             
-              <li><a href="">Souvenirs</a></li>              
+              <li><a href="{% url 'vitrine:on_view' %}">Sobre</a></li>
+              <li><a href="{% url 'vitrine:list_artworks' %}">Obras de Arte</a></li>             
+              <li><a href="{% url 'vitrine:list_souvenirs' %}">Souvenirs</a></li>              
               <li><a href="{% url 'artist:artists_list' %}">Artistas</a></li>
-              <li><a href="">Carrinho</a></li>
-              <li><a href="">Blog</a></li>       
+              <li><a href="{% url 'checkout:cart_detail' %}">Carrinho</a></li>
+              <li><a href="{% url 'vitrine:blog_list' %}">Blog</a></li>       
               <li><a href="#contato">Contato</a></li>
             </ul>
           </nav>
@@ -178,9 +178,9 @@
     <!-- Mobile Search Form -->
     <div class="collapse" id="mobileSearch">
       <div class="container">
-        <form class="search-form">
+        <form class="search-form" action="{% url 'vitrine:search_results' %}" method="GET">
           <div class="input-group">
-            <input type="text" class="form-control" placeholder="Search for products">
+            <input type="text" class="form-control" placeholder="Search for products" name="query">
             <button class="btn" type="submit">
               <i class="bi bi-search"></i>
             </button>

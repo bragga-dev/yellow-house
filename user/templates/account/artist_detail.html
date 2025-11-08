@@ -2,179 +2,365 @@
 {% load static %}
 
 {% block content %}
-<section class="section">
+<section class="section py-5">
   <div class="container">
 
-    <!-- Banner -->
-    <div class="banner-container" style="width: 100%; height: 300px; overflow: hidden; background-color: #f0f0f0;">
-    {% if artist.banner %}
-        <img src="{{ artist.banner.url }}" alt="Banner do perfil" style="width: 100%; height: 100%; object-fit: cover;">
-    {% else %}
-        <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #6e8efb, #a777e3); display: flex; align-items: center; justify-content: center;">
-        <span style="color: white; font-size: 1.5rem;">Banner do Perfil</span>
-        </div>
-    {% endif %}
-    </div>
-
-    <div class="row">
-      <!-- Foto do artista -->
-      <div class="col-md-3 text-center">
-        {% if artist.user.photo %}
-          <img src="{{ artist.user.photo.url }}" class="img-thumbnail rounded-circle mb-3" alt="Foto de {{ artist.user.get_full_name }}">
+    <!-- Banner do Perfil -->
+    <div class="profile-banner mb-4">
+      <div class="banner-container position-relative" style="height: 400px; overflow: hidden; border-radius: 12px;">
+        {% if artist.banner %}
+          <img src="{{ artist.banner.url }}" alt="Banner do perfil de {{ artist.user.get_full_name }}" 
+               class="w-100 h-100" style="object-fit: cover;">
         {% else %}
-          <img src="{% static 'img/default-profile.jpg' %}" class="img-thumbnail rounded-circle mb-3" alt="Foto padrão">
+          <div class="w-100 h-100 d-flex align-items-center justify-content-center banner-gradient">
+            <div class="text-center text-white">
+              <i class="bi bi-image display-4 mb-3"></i>
+              <h3 class="mb-0">Banner do Perfil</h3>
+            </div>
+          </div>
         {% endif %}
-
-        <h3>{{ artist.user.get_full_name }}</h3>
-        <p class="text-muted">{{ artist.user.username }}</p>
-
-        {% if artist.is_verified %}
-          <span class="badge bg-success">✔ Artista Verificado</span>
-        {% else %}
-          <span class="badge bg-secondary">Não verificado</span>
-        {% endif %}
-      </div>
-
-      <!-- Detalhes -->
-      <div class="col-md-9">
-        <h4>Biografia</h4>
-        <p>
-          {% if artist.bio %}
-            {{ artist.bio|safe }}
-          {% else %}
-            <em>O artista ainda não adicionou uma biografia.</em>
-          {% endif %}
-        </p>       
       </div>
     </div>
 
-    <hr>
-    <!-- Redes sociais -->
-    <div class="mt-4">
-      <h4>Redes Sociais</h4>
-      <p>
-        {% if artist.instagram %}
-        <a href="{{ artist.instagram }}" target="_blank"><i class="bi bi-instagram"></i> Instagram</a>  
-        {% endif %}
-
-        {% if artist.facebook %}
-        <a href="{{ artist.facebook }}" target="_blank" class="ms-3"><i class="bi bi-facebook"></i> Facebook</a>  
-        {% endif %}
-
-        {% if artist.twitter %}
-        <a href="{{ artist.twitter }}" target="_blank" class="ms-3"><i class="bi bi-twitter"></i> Twitter</a>  
-        {% endif %}
-
-        {% if artist.tiktok %}
-        <a href="{{ artist.tiktok }}" target="_blank" class="ms-3"><i class="bi bi-tiktok"></i> TikTok</a>          
-        {% endif %}
-
-        {% if not artist.instagram and not artist.facebook and not artist.twitter and not artist.tiktok %}
-          <em>O artista ainda não adicionou uma rede social.</em>
-        {% endif %}
-      </p>
-    </div>
- <hr>
-   <!-- Exposições -->
-<div class="mt-5">
-  <h4>Exposições</h4>
-
-  {% if artist.exhibitions.all %}
-  <div id="exhibitionsCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-      {% for exhibition in artist.exhibitions.all %}
-      <a href="{% url 'artist:exhibition_detail' slug=exhibition.slug exhibition_id=exhibition.pk %}">
-        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-          <div class="card h-100 shadow-sm mx-auto" style="max-width: 500px;">
-            {% if exhibition.exhibition_banner %}
-              <img src="{{ exhibition.exhibition_banner.url }}" class="card-img-top" alt="{{ exhibition.title }}" style="height: 300px; object-fit: cover;">
+    <!-- Informações do Artista -->
+    <div class="row align-items-start mb-5">
+      <!-- Foto e Informações Básicas -->
+      <div class="col-lg-3 col-md-4 mb-4">
+        <div class="artist-profile-card text-center p-4 rounded-3 shadow-sm">
+          <div class="profile-image-container mb-3">
+            {% if artist.user.photo %}
+              <img src="{{ artist.user.photo.url }}" 
+                   class="img-fluid rounded-circle border" 
+                   alt="Foto de {{ artist.user.get_full_name }}"
+                   style="width: 150px; height: 150px; object-fit: cover;">
             {% else %}
-              <div class="d-flex align-items-center justify-content-center bg-light" style="height: 300px;">
-                <span class="text-muted">Sem imagem</span>
+              <div class="default-profile-image rounded-circle mx-auto d-flex align-items-center justify-content-center bg-light border"
+                   style="width: 150px; height: 150px;">
+                <i class="bi bi-person display-4 text-muted"></i>
               </div>
             {% endif %}
-            <div class="card-body">
-              <h5 class="card-title">{{ exhibition.title }}</h5>
-              <p class="text-muted mb-1">
-                <strong>Local:</strong> {{ exhibition.location }}
-              </p>
-              <p class="text-muted mb-1">
-                <strong>Data:</strong> {{ exhibition.date|date:"d/m/Y" }}
-              </p>
-              <p class="card-text">{{ exhibition.description|truncatewords:20 }}</p>
-            </div>
           </div>
-        </div>
-      </a>
-      {% endfor %}
-    </div>
+          
+          <h2 class="h4 fw-bold text-dark mb-2">{{ artist.user.get_full_name }}</h2>
+          <p class="text-muted mb-3">@{{ artist.user.username }}</p>
 
-    <!-- Controles -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#exhibitionsCarousel" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true" 
-      style="background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 15px;"></span>
-      <span class="visually-hidden">Anterior</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#exhibitionsCarousel" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"
-      style="background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 15px;"></span>
-      <span class="visually-hidden">Próximo</span>
-    </button>
-  </div>
-  {% else %}
-    <p class="text-muted">Nenhuma exposição registrada ainda.</p>
-  {% endif %}
-</div>
-
-    <hr>
-<div class="mt-5">
-
-
-  <h4>Artistas Relacionados</h4>
-  {% if artists %}
-  <div id="relatedArtistsCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-      {% for related_artist in artists %}
-        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-          <div class="d-flex justify-content-center">
-            <div class="text-center">
-              <a href="{% url 'artist:artist_detail' slug=related_artist.user.slug pk=related_artist.user.pk %}">
-                {% if related_artist.user.photo %}
-                  <img src="{{ related_artist.user.photo.url }}" 
-                       class="rounded-circle shadow-sm" 
-                       style="width: 120px; height: 120px; object-fit: cover;" 
-                       alt="Foto de {{ related_artist.user.get_full_name }}">
-                {% else %}
-                  <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" 
-                       style="width: 120px; height: 120px;">
-                    <span class="text-white">Sem foto</span>
-                  </div>
-                {% endif %}
-              </a>
-              <p class="mt-2 fw-semibold">{{ related_artist.user.get_full_name }}</p>
+          {% if artist.is_verified %}
+            <div class="verified-badge mb-3">
+              <span class="badge bg-success px-3 py-2">
+                <i class="bi bi-patch-check-fill me-1"></i>Artista Verificado
+              </span>
             </div>
-          </div>
+          {% else %}
+            <div class="verified-badge mb-3">
+              <span class="badge bg-secondary px-3 py-2">Não verificado</span>
+            </div>
+          {% endif %}
         </div>
-      {% endfor %}
-    </div>
-   <!-- Controles -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#relatedArtistsCarousel" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"
-            style="background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 15px;"></span>
-      <span class="visually-hidden">Anterior</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#relatedArtistsCarousel" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"
-            style="background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 15px;"></span>
-      <span class="visually-hidden">Próximo</span>
-    </button>
-
       </div>
+
+      <!-- Biografia e Detalhes -->
+      <div class="col-lg-9 col-md-8">
+        <div class="artist-bio-card p-4 rounded-3 shadow-sm h-100">
+          <h3 class="h5 fw-bold mb-3 text-primary">Biografia</h3>
+          <div class="bio-content">
+            {% if artist.bio %}
+              <div class="text-dark lh-base">{{ artist.bio|safe }}</div>
+            {% else %}
+              <div class="text-muted fst-italic">
+                <i class="bi bi-info-circle me-2"></i>O artista ainda não adicionou uma biografia.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Redes Sociais -->
+    <div class="social-links-card p-4 rounded-3 shadow-sm mb-5">
+      <h3 class="h5 fw-bold mb-4 text-primary">Redes Sociais</h3>
+      <div class="social-links">
+        {% if artist.instagram or artist.facebook or artist.twitter or artist.tiktok %}
+          <div class="d-flex flex-wrap gap-3">
+            {% if artist.instagram %}
+              <a href="{{ artist.instagram }}" target="_blank" class="btn btn-outline-primary btn-sm social-btn">
+                <i class="bi bi-instagram me-2"></i>Instagram
+              </a>
+            {% endif %}
+            
+            {% if artist.facebook %}
+              <a href="{{ artist.facebook }}" target="_blank" class="btn btn-outline-primary btn-sm social-btn">
+                <i class="bi bi-facebook me-2"></i>Facebook
+              </a>
+            {% endif %}
+            
+            {% if artist.twitter %}
+              <a href="{{ artist.twitter }}" target="_blank" class="btn btn-outline-primary btn-sm social-btn">
+                <i class="bi bi-twitter-x me-2"></i>Twitter
+              </a>
+            {% endif %}
+            
+            {% if artist.tiktok %}
+              <a href="{{ artist.tiktok }}" target="_blank" class="btn btn-outline-primary btn-sm social-btn">
+                <i class="bi bi-tiktok me-2"></i>TikTok
+              </a>
+            {% endif %}
+          </div>
+        {% else %}
+          <div class="text-muted text-center py-3">
+            <i class="bi bi-share me-2"></i>O artista ainda não adicionou redes sociais.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Obras -->
+    <div class="artworks-section mb-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="h5 fw-bold text-primary">Obras</h3>
+        {% if artist.artworks.all %}
+          <span class="badge bg-primary">{{ artist.artworks.count }} obra{{ artist.artworks.count|pluralize }}</span>
+        {% endif %}
+      </div>
+
+      {% if artist.artworks.all %}
+        <div id="artworksCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for artwork in artist.artworks.all %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="row justify-content-center">
+                  <div class="col-lg-6 col-md-8">
+                    <a href="{% url 'vitrine:detail_artwork' slug=artwork.slug artwork_id=artwork.id %}" class="text-decoration-none">
+                      <div class="card artwork-card h-100 shadow-sm border-0">
+                        {% if artwork.images.first %}
+                          <div class="artwork-image-container" style="height: 300px;">
+                            <img src="{{ artwork.images.first.image.url }}" 
+                                 class="card-img-top h-100" 
+                                 alt="{{ artwork.title }}"
+                                 style="object-fit: cover;">
+                          </div>
+                        {% else %}
+                          <div class="artwork-placeholder d-flex align-items-center justify-content-center bg-light" style="height: 300px;">
+                            <div class="text-center text-muted">
+                              <i class="bi bi-image display-4 mb-2"></i>
+                              <p class="mb-0">Sem imagem</p>
+                            </div>
+                          </div>
+                        {% endif %}
+                        
+                        <div class="card-body">
+                          <h5 class="card-title text-dark fw-bold">{{ artwork.title }}</h5>
+                          <div class="artwork-meta text-muted mb-2">
+                            <small class="d-block">
+                              <i class="bi bi-tag me-1"></i><strong>Categoria:</strong> {{ artwork.art_work_category.name }}
+                            </small>
+                            <small class="d-block">
+                              <i class="bi bi-currency-dollar me-1"></i><strong>Preço:</strong> R$ {{ artwork.price|floatformat:2 }}
+                            </small>
+                          </div>
+                          <p class="card-text text-dark">{{ artwork.description|truncatewords:20 }}</p>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          
+          <!-- Controles do Carrossel -->
+          <button class="carousel-control-prev" type="button" data-bs-target="#artworksCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon custom-carousel-control" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#artworksCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon custom-carousel-control" aria-hidden="true"></span>
+            <span class="visually-hidden">Próximo</span>
+          </button>
+        </div>
       {% else %}
-        <p class="text-muted">Nenhum artista relacionado encontrado.</p>
+        <div class="empty-state text-center py-5">
+          <i class="bi bi-palette display-4 text-muted mb-3"></i>
+          <p class="text-muted">Nenhuma obra registrada ainda.</p>
+        </div>
       {% endif %}
     </div>
+
+    <!-- Exposições -->
+    <div class="exhibitions-section mb-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="h5 fw-bold text-primary">Exposições</h3>
+        {% if artist.exhibitions.all %}
+          <span class="badge bg-primary">{{ artist.exhibitions.count }} exposição{{ artist.exhibitions.count|pluralize }}</span>
+        {% endif %}
+      </div>
+
+      {% if artist.exhibitions.all %}
+        <div id="exhibitionsCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for exhibition in artist.exhibitions.all %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="row justify-content-center">
+                  <div class="col-lg-6 col-md-8">
+                    <a href="{% url 'artist:exhibition_detail' slug=exhibition.slug exhibition_id=exhibition.pk %}" class="text-decoration-none">
+                      <div class="card exhibition-card h-100 shadow-sm border-0">
+                        {% if exhibition.exhibition_banner %}
+                          <div class="exhibition-image-container" style="height: 300px;">
+                            <img src="{{ exhibition.exhibition_banner.url }}" 
+                                 class="card-img-top h-100" 
+                                 alt="{{ exhibition.title }}"
+                                 style="object-fit: cover;">
+                          </div>
+                        {% else %}
+                          <div class="exhibition-placeholder d-flex align-items-center justify-content-center bg-light" style="height: 300px;">
+                            <div class="text-center text-muted">
+                              <i class="bi bi-calendar-event display-4 mb-2"></i>
+                              <p class="mb-0">Sem imagem</p>
+                            </div>
+                          </div>
+                        {% endif %}
+                        
+                        <div class="card-body">
+                          <h5 class="card-title text-dark fw-bold">{{ exhibition.title }}</h5>
+                          <div class="exhibition-meta text-muted mb-2">
+                            <small class="d-block">
+                              <i class="bi bi-geo-alt me-1"></i><strong>Local:</strong> {{ exhibition.location }}
+                            </small>
+                            <small class="d-block">
+                              <i class="bi bi-calendar me-1"></i><strong>Data:</strong> {{ exhibition.date|date:"d/m/Y" }}
+                            </small>
+                          </div>
+                          <p class="card-text text-dark">{{ exhibition.description|truncatewords:20 }}</p>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Controles do Carrossel -->
+          <button class="carousel-control-prev" type="button" data-bs-target="#exhibitionsCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon custom-carousel-control" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#exhibitionsCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon custom-carousel-control" aria-hidden="true"></span>
+            <span class="visually-hidden">Próximo</span>
+          </button>
+        </div>
+      {% else %}
+        <div class="empty-state text-center py-5">
+          <i class="bi bi-calendar-event display-4 text-muted mb-3"></i>
+          <p class="text-muted">Nenhuma exposição registrada ainda.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Artistas Relacionados -->
+    <div class="related-artists-section">
+      <h3 class="h5 fw-bold mb-4 text-primary">Artistas Relacionados</h3>
+      
+      {% if artists %}
+        <div id="relatedArtistsCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for related_artist in artists %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="row justify-content-center">
+                  <div class="col-auto">
+                    <a href="{% url 'artist:artist_detail' slug=related_artist.user.slug pk=related_artist.user.pk %}" class="text-decoration-none">
+                      <div class="related-artist-card text-center">
+                        <div class="artist-avatar mb-3">
+                          {% if related_artist.user.photo %}
+                            <img src="{{ related_artist.user.photo.url }}" 
+                                 class="rounded-circle shadow-sm border" 
+                                 style="width: 120px; height: 120px; object-fit: cover;" 
+                                 alt="Foto de {{ related_artist.user.get_full_name }}">
+                          {% else %}
+                            <div class="rounded-circle bg-light border d-flex align-items-center justify-content-center mx-auto" 
+                                 style="width: 120px; height: 120px;">
+                              <i class="bi bi-person text-muted" style="font-size: 2rem;"></i>
+                            </div>
+                          {% endif %}
+                        </div>
+                        <h6 class="fw-bold text-dark mb-1">{{ related_artist.user.get_full_name }}</h6>
+                        <small class="text-muted">@{{ related_artist.user.username }}</small>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          
+          <!-- Controles do Carrossel -->
+          <button class="carousel-control-prev" type="button" data-bs-target="#relatedArtistsCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon custom-carousel-control" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#relatedArtistsCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon custom-carousel-control" aria-hidden="true"></span>
+            <span class="visually-hidden">Próximo</span>
+          </button>
+        </div>
+      {% else %}
+        <div class="empty-state text-center py-5">
+          <i class="bi bi-people display-4 text-muted mb-3"></i>
+          <p class="text-muted">Nenhum artista relacionado encontrado.</p>
+        </div>
+      {% endif %}
     </div>
   </div>
 </section>
+
+<style>
+.banner-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.artist-profile-card, .artist-bio-card, .social-links-card {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+}
+
+.custom-carousel-control {
+  background-color: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  background-size: 1.5rem;
+}
+
+.artwork-card, .exhibition-card, .related-artist-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.artwork-card:hover, .exhibition-card:hover, .related-artist-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+.social-btn {
+  transition: all 0.2s ease-in-out;
+}
+
+.social-btn:hover {
+  transform: translateY(-1px);
+}
+
+.empty-state {
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+  .profile-banner .banner-container {
+    height: 200px;
+  }
+  
+  .artist-profile-card, .artist-bio-card {
+    text-align: center;
+  }
+}
+</style>
 {% endblock %}

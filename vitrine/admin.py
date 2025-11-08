@@ -1,5 +1,7 @@
 from django.contrib import admin
-from vitrine.models import ArtWork, ArtworkImage, ArtworkCategory, Souvenir, SouvenirCategory, SouvenirImage
+from vitrine.models import ArtWork, ArtworkImage, \
+ArtworkCategory, Souvenir, SouvenirCategory, SouvenirImage, BannerGroup, BannerImage, Blog
+
 
 # ---------- Inline para imagens de Artwork ----------
 class ArtworkImageInline(admin.TabularInline):
@@ -35,10 +37,10 @@ class ArtworkImageAdmin(admin.ModelAdmin):
 # ---------- Admin de ArtworkCategory ----------
 @admin.register(ArtworkCategory)
 class ArtworkCategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'image')
+    list_display = ('name', )
     search_fields = ('name',)
     ordering = ('name',)
-    readonly_fields = ('slug',)
+   
 
 
 # ---------- Inline para imagens de Souvenir ----------
@@ -74,7 +76,40 @@ class SouvenirImageAdmin(admin.ModelAdmin):
 # ---------- Admin de SouvenirCategory ----------
 @admin.register(SouvenirCategory)
 class SouvenirCategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'image')
+    list_display = ('name', )
     search_fields = ('name',)
     ordering = ('name',)
-    readonly_fields = ('slug',)
+  
+
+
+class BannerImageInline(admin.TabularInline):
+    model = BannerImage
+    extra = 1  # Quantas imagens extras mostrar para adicionar
+    fields = ('image', 'is_primary')  # Campos a exibir
+    readonly_fields = ()
+    show_change_link = True  # Mostra link para editar imagem separadamente
+    max_num = 10  # Limita a quantidade máxima de imagens
+
+@admin.register(BannerGroup)
+class BannerGroupAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active')
+    inlines = [BannerImageInline]
+    search_fields = ('name',)
+
+    
+# Caso queira registrar BannerImage separadamente também
+@admin.register(BannerImage)
+class BannerImageAdmin(admin.ModelAdmin):
+    list_display = ('group', 'is_primary', 'image')
+    list_filter = ('group', 'is_primary')
+    search_fields = ('group__name',)
+
+
+
+@admin.register(Blog)
+class BlogAdmin(admin.ModelAdmin):
+    list_display = ('title', 'is_published', 'created_at', 'updated_at')
+    list_filter = ('is_published', 'created_at')
+    search_fields = ('title', 'text')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('-created_at',)

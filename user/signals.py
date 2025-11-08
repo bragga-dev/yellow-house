@@ -94,3 +94,13 @@ def delete_artist_banner_on_change(sender, instance, **kwargs):
     new_file = instance.banner
     if old_file and old_file != new_file and not is_default_file(old_file):
         old_file.delete(save=False)
+
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from user.models import User, Client
+
+@receiver(post_save, sender=User)
+def create_client_for_user(sender, instance, created, **kwargs):
+    if created and instance.is_client and not hasattr(instance, 'client'):
+        Client.objects.create(user=instance)

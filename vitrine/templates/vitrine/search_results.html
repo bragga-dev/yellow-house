@@ -1,0 +1,169 @@
+{% extends "vitrine/base.html" %}
+{% block title %}Resultados da Busca{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <!-- Cabeçalho -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="fw-bold text-primary mb-2">Resultados da Busca</h1>
+      {% if query %}
+        <p class="text-muted">Resultados para: "<strong>"{{ query }}"</strong>"</p>
+      {% else %}
+        <p class="text-muted">Digite algo no campo de busca</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if not query %}
+    <div class="row">
+      <div class="col-12">
+        <div class="text-center py-5">
+          <i class="bi bi-search display-1 text-muted"></i>
+          <h3 class="mt-3 text-muted">Busca vazia</h3>
+          <p class="text-muted">Por favor, digite algo para pesquisar.</p>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    {% if not artworks and not souvenirs and not artists %}
+      <div class="row">
+        <div class="col-12">
+          <div class="text-center py-5">
+            <i class="bi bi-search display-1 text-muted"></i>
+            <h3 class="mt-3 text-muted">Nenhum resultado encontrado</h3>
+            <p class="text-muted">Tente ajustar os termos da sua busca.</p>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <!-- Artworks -->
+      {% if artworks %}
+      <div class="row mb-5">
+        <div class="col-12">
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-palette2 text-primary fs-4 me-2"></i>
+            <h4 class="fw-bold mb-0">Obras de Arte</h4>
+            <span class="badge bg-primary ms-2">{{ artworks.count }}</span>
+          </div>
+          <div class="row g-3">
+            {% for art in artworks %}
+              <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 artwork-card">
+                  {% if art.images.first %}
+                    <img src="{{ art.images.first.image.url }}" class="card-img-top" alt="{{ art.name }}" style="height: 200px; object-fit: cover;">
+                  {% endif %}
+                  <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ art.name|truncatewords:8 }}</h5>
+                    <p class="text-muted small">{{ art.description|truncatewords:12 }}</p>
+                    <p class="text-success fw-bold mt-auto">R$ {{ art.price }}</p>
+                    <div class="mt-2">
+                      <a href="{% url 'vitrine:detail_artwork' art.slug art.pk %}" 
+                         class="btn btn-outline-primary w-100">
+                        Ver detalhes
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Souvenirs -->
+      {% if souvenirs %}
+      <div class="row mb-5">
+        <div class="col-12">
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-gift text-primary fs-4 me-2"></i>
+            <h4 class="fw-bold mb-0">Souvenirs</h4>
+            <span class="badge bg-primary ms-2">{{ souvenirs.count }}</span>
+          </div>
+          <div class="row g-3">
+            {% for s in souvenirs %}
+              <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 artwork-card">
+                  {% if s.images.first %}
+                    <img src="{{ s.images.first.image.url }}" class="card-img-top" alt="{{ s.name }}" style="height: 200px; object-fit: cover;">
+                  {% endif %}
+                  <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ s.name|truncatewords:8 }}</h5>
+                    <p class="text-muted small">{{ s.description|truncatewords:12 }}</p>
+                    <p class="text-success fw-bold mt-auto">R$ {{ s.price }}</p>
+                    <div class="mt-2">
+                      <a href="{% url 'vitrine:souvenir_detail' s.slug s.pk %}" 
+                         class="btn btn-outline-primary w-100">
+                        Ver detalhes
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Artists -->
+      {% if artists %}
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-person text-primary fs-4 me-2"></i>
+            <h4 class="fw-bold mb-0">Artistas</h4>
+            <span class="badge bg-primary ms-2">{{ artists.count }}</span>
+          </div>
+          <div class="row g-3">
+            {% for artist in artists %}
+              <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 artwork-card">
+                  {% if artist.user.photo %}
+                    <img src="{{ artist.user.photo.url }}" class="card-img-top" alt="{{ artist.name }}" style="height: 200px; object-fit: cover;">
+                  {% else %}
+                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
+                      <i class="bi bi-person-circle text-muted" style="font-size: 3rem;"></i>
+                    </div>
+                  {% endif %}
+                  <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-center">{{ artist.user.first_name }}</h5>
+                    <p class="text-muted small text-center">{{ artist.user.username }}</p>
+                    <div class="mt-auto">
+                     <a href="{% url 'artist:artist_detail' slug=artist.user.slug pk=artist.user.pk %}" 
+                         class="btn btn-outline-primary w-100">
+                        Ver perfil
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+</div>
+
+<style>
+.artwork-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.artwork-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.card-img-top {
+  transition: transform 0.3s ease;
+}
+
+.artwork-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+</style>
+{% endblock %}

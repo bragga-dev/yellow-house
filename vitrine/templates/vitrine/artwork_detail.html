@@ -1,0 +1,552 @@
+{% extends "vitrine/base.html" %}
+{% load range_tags %}
+
+{% block title %}{{ artwork.name }} - Detalhes da Obra{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row">
+    <!-- Galeria de Imagens -->
+    <div class="col-lg-7 mb-4">
+      <div class="product-images">
+        <!-- Imagem principal -->
+        <div class="main-image-container mb-4">
+          {% if artwork.images.first %}
+            <img src="{{ artwork.images.first.image.url }}" class="main-image img-fluid rounded-3 shadow" alt="{{ artwork.name }}" id="mainImage">
+          {% else %}
+            <div class="d-flex align-items-center justify-content-center bg-light rounded-3" style="height: 500px;">
+              <i class="bi bi-image display-1 text-muted"></i>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Miniaturas -->
+        {% if artwork.images.count > 1 %}
+        <div class="thumbnails-container">
+          <div class="thumbnails-scrollbar d-flex gap-3 pb-3 overflow-auto">
+            {% for image in artwork.images.all %}
+            <div class="thumbnail-item position-relative {% if forloop.first %}active{% endif %}" data-image="{{ image.image.url }}">
+              <img src="{{ image.image.url }}" class="thumbnail-img" alt="Thumbnail {{ forloop.counter }}">
+              <div class="thumbnail-overlay"></div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Detalhes da Obra -->
+    <div class="col-lg-5">
+      <div class="product-info">
+        <!-- Cabeçalho -->
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="badge bg-primary text-uppercase">{{ artwork.art_work_category.name }}</span>
+          {% if artwork.stock <= 5 and artwork.stock > 0 %}
+          <span class="badge bg-warning text-dark">Últimas unidades</span>
+          {% elif artwork.stock == 0 %}
+          <span class="badge bg-danger">Esgotado</span>
+          {% endif %}
+        </div>
+
+        <h1 class="product-title display-6 fw-bold mb-3">{{ artwork.name }}</h1>
+        <p class="text-muted mb-4">por <strong class="text-dark">{{ artwork.artist }}</strong></p>
+
+        <!-- Preço -->
+        <div class="product-price-container mb-4">
+          <span class="current-price display-5 fw-bold text-dark">R$ {{ artwork.price }}</span>
+          {% if artwork.original_price and artwork.original_price > artwork.price %}
+          <span class="original-price text-muted text-decoration-line-through fs-5 ms-2">R$ {{ artwork.original_price }}</span>
+          <span class="discount-badge badge bg-success ms-2 fs-6">
+            {{ artwork.discount_percentage }}% OFF
+          </span>
+          {% endif %}
+        </div>
+
+        <!-- Descrição resumida -->
+        <div class="product-description mb-4">
+          <p class="lead text-secondary">{{ artwork.description|truncatewords:30 }}</p>
+        </div>
+
+        <!-- Detalhes Técnicos -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-transparent border-0 py-3">
+            <h5 class="card-title mb-0 fw-semibold">
+              <i class="bi bi-info-circle me-2"></i>Especificações da Obra
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-sm-6">
+                <div class="spec-item">
+                  <span class="spec-label text-muted">Artista</span>
+                  <span class="spec-value fw-semibold">{{ artwork.artist }}</span>
+                </div>
+              </div>
+              {% if artwork.year_created %}
+              <div class="col-sm-6">
+                <div class="spec-item">
+                  <span class="spec-label text-muted">Ano</span>
+                  <span class="spec-value fw-semibold">{{ artwork.year_created|date:"Y" }}</span>
+                </div>
+              </div>
+              {% endif %}
+              {% if artwork.technique %}
+              <div class="col-sm-6">
+                <div class="spec-item">
+                  <span class="spec-label text-muted">Técnica</span>
+                  <span class="spec-value fw-semibold">{{ artwork.technique }}</span>
+                </div>
+              </div>
+              {% endif %}
+              {% if artwork.style %}
+              <div class="col-sm-6">
+                <div class="spec-item">
+                  <span class="spec-label text-muted">Estilo</span>
+                  <span class="spec-value fw-semibold">{{ artwork.style }}</span>
+                </div>
+              </div>
+              {% endif %}
+              <div class="col-12">
+                <div class="spec-item">
+                  <span class="spec-label text-muted">Dimensões</span>
+                  <span class="spec-value fw-semibold">{{ artwork.width }} × {{ artwork.height }} cm</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulário de Compra -->
+        <div class="product-actions mb-4">
+          <form method="POST" action="{% url 'checkout:add_item_in_cart' slug=artwork.slug item_id=artwork.id %}" class="needs-validation" novalidate id="purchase-form">
+            {% csrf_token %}    
+            
+            <div class="row g-3 align-items-center mb-4">
+              <div class="col-auto">
+                <label for="quantity" class="form-label fw-semibold mb-0">Quantidade:</label>
+              </div>
+              <div class="col-auto">
+                <select name="quantity" id="quantity" class="form-select" {% if artwork.stock == 0 %}disabled{% endif %}>
+                  {% for i in 1|to:artwork.stock %}
+                    <option value="{{ i }}">{{ i }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col">
+                <small class="text-muted">
+                  {% if artwork.stock > 10 %}
+                    Em estoque
+                  {% elif artwork.stock > 0 %}
+                    Apenas {{ artwork.stock }} unidade(s) disponível(s)
+                  {% else %}
+                    Produto esgotado
+                  {% endif %}
+                </small>
+              </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+              {% if artwork.stock > 0 %}
+              <button type="submit" class="btn btn-primary btn-lg py-3 fw-semibold" id="add-to-cart-btn">
+                <i class="bi bi-cart-plus me-2"></i>Adicionar ao Carrinho
+              </button>
+              <button type="button" class="btn btn-outline-dark btn-lg py-3 fw-semibold">
+                <i class="bi bi-lightning me-2"></i>Comprar Agora
+              </button>
+              {% else %}
+              <button type="button" class="btn btn-secondary btn-lg py-3 fw-semibold" disabled>
+                <i class="bi bi-envelope me-2"></i>Avise-me quando chegar
+              </button>
+              {% endif %}
+            </div>
+          </form>
+        </div>
+
+        <!-- Ações Secundárias -->
+        <div class="product-secondary-actions mb-4">
+          <div class="d-flex gap-2 justify-content-center">
+            <button class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-heart me-1"></i>Favoritar
+            </button>
+            <button class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-share me-1"></i>Compartilhar
+            </button>
+            <button class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-flag me-1"></i>Reportar
+            </button>
+          </div>
+        </div>
+
+        <!-- Cálculo de Frete -->
+        <div class="shipping-calculator card border-0 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-3">
+              <i class="bi bi-truck me-2"></i>Calcular Frete e Prazo
+            </h5>
+            
+            <form id="frete-form" class="needs-validation" novalidate>
+              {% csrf_token %}
+              
+              <div class="row g-3">
+                <div class="col-md-7">
+                  <label for="cep_destino" class="form-label fw-semibold small">CEP</label>
+                  <input type="text" 
+                         id="cep_destino" 
+                         name="cep_destino" 
+                         class="form-control" 
+                         placeholder="00000-000"
+                         maxlength="9"
+                         pattern="\d{5}-\d{3}">
+                  <div class="invalid-feedback">
+                    Por favor, informe um CEP válido.
+                  </div>
+                </div>
+                
+                <div class="col-md-5">
+                  <label class="form-label fw-semibold small">Qtd</label>
+                  <div class="form-control bg-light">
+                    <span id="quantidade-display">1</span>
+                  </div>
+                  <small class="text-muted">Use o seletor acima</small>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-outline-primary w-100 mt-3" {% if artwork.stock == 0 %}disabled{% endif %}>
+                <i class="bi bi-calculator me-2"></i>Calcular Frete
+              </button>
+            </form>
+
+            <div id="frete-resultado" class="mt-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resto do template permanece igual -->
+  <!-- ... -->
+</div>
+
+<!-- Estilos CSS -->
+<style>
+.product-images {
+  position: sticky;
+  top: 20px;
+}
+
+.main-image-container {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8f9fa;
+}
+
+.main-image-container img {
+  width: 100%;
+  height: 500px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.main-image-container img:hover {
+  transform: scale(1.02);
+}
+
+.thumbnail-item {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.thumbnail-item.active,
+.thumbnail-item:hover {
+  border-color: var(--bs-primary);
+}
+
+.thumbnail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnail-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.1);
+  transition: background 0.3s ease;
+}
+
+.thumbnail-item:hover .thumbnail-overlay {
+  background: rgba(0,0,0,0);
+}
+
+.thumbnails-scrollbar::-webkit-scrollbar {
+  height: 6px;
+}
+
+.thumbnails-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #dee2e6;
+  border-radius: 3px;
+}
+
+.thumbnails-scrollbar::-webkit-scrollbar-track {
+  background-color: #f8f9fa;
+}
+
+.spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.spec-label {
+  font-size: 0.875rem;
+}
+
+.spec-value {
+  font-size: 1rem;
+}
+
+.product-tabs .nav-link {
+  color: #6c757d;
+  border: none;
+  padding: 1rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.product-tabs .nav-link.active {
+  color: var(--bs-primary);
+  background: transparent;
+  border-bottom: 3px solid var(--bs-primary);
+}
+
+.product-tabs .nav-link:hover {
+  color: var(--bs-primary);
+  background: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.tab-content {
+  min-height: 200px;
+}
+
+/* Loading animation */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--bs-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.frete-selecionado {
+  background-color: rgba(25, 135, 84, 0.1) !important;
+  border-color: #198754 !important;
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const quantitySelect = document.getElementById('quantity');
+  const quantidadeDisplay = document.getElementById('quantidade-display');
+  const purchaseForm = document.getElementById('purchase-form');
+
+  // Atualizar display da quantidade quando o select mudar
+  if (quantitySelect && quantidadeDisplay) {
+    quantitySelect.addEventListener('change', function() {
+      quantidadeDisplay.textContent = this.value;
+    });
+    
+    // Inicializar o display com o valor atual
+    quantidadeDisplay.textContent = quantitySelect.value;
+  }
+
+  // Trocar imagem principal
+  document.querySelectorAll('.thumbnail-item').forEach(item => {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.thumbnail-item').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById('mainImage').src = this.dataset.image;
+    });
+  });
+
+  // Formatação de CEP
+  const cepInput = document.getElementById('cep_destino');
+  if (cepInput) {
+    cepInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 5) {
+        value = value.substring(0, 5) + '-' + value.substring(5, 8);
+      }
+      e.target.value = value;
+    });
+  }
+
+  // Cálculo de frete assíncrono
+  const freteForm = document.getElementById('frete-form');
+  const resultadoDiv = document.getElementById('frete-resultado');
+
+  if (freteForm) {
+    freteForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!freteForm.checkValidity()) {
+        e.stopPropagation();
+        freteForm.classList.add('was-validated');
+        return;
+      }
+
+      const formData = new FormData();
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      const currentQuantity = quantitySelect ? quantitySelect.value : '1';
+
+      // Adicionar dados ao FormData
+      formData.append('cep_destino', document.getElementById('cep_destino').value);
+      formData.append('quantity', currentQuantity);
+      formData.append('csrfmiddlewaretoken', csrfToken);
+
+      resultadoDiv.innerHTML = `
+        <div class="text-center py-3">
+          <div class="loading-spinner mb-2"></div>
+          <p class="text-muted mb-0">Calculando frete...</p>
+        </div>
+      `;
+
+      try {
+        const response = await fetch(window.location.href, {
+          method: 'POST',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrfToken,
+          },
+          body: formData,
+        });
+
+        const data = await response.json();
+        resultadoDiv.innerHTML = '';
+
+        if (data.error) {
+          resultadoDiv.innerHTML = `
+            <div class="alert alert-danger d-flex align-items-center">
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              <div>${data.error}</div>
+            </div>
+          `;
+        } else if (data.fretes && data.fretes.length > 0) {
+          let html = `
+            <h6 class="mb-3 text-dark">
+              <i class="bi bi-truck me-2"></i>Opções de Envio
+            </h6>
+            <div class="list-group" id="opcoes-frete">
+          `;
+          
+          data.fretes.forEach((f, index) => {
+            const isRecommended = f.ServiceDescription.toLowerCase().includes('express') || 
+                                f.DeliveryTime <= 7;
+            
+            html += `
+              <div class="list-group-item list-group-item-action border-0 rounded-3 mb-2 opcao-frete" data-service="${f.ServiceCode}" data-description="${f.ServiceDescription}" data-price="${f.ShippingPrice}">
+                <div class="d-flex w-100 justify-content-between align-items-start">
+                  <div class="me-3">
+                    <input type="radio" name="frete" id="frete_${index}" value="${f.ServiceCode}" 
+                           class="form-check-input mt-0 frete-radio">
+                  </div>
+                  <div class="flex-grow-1">
+                    <label class="form-check-label w-100 cursor-pointer" for="frete_${index}">
+                      <div class="d-flex justify-content-between align-items-center mb-1">
+                        <strong class="text-dark">${f.ServiceDescription}</strong>
+                        ${isRecommended ? '<span class="badge bg-primary">Recomendado</span>' : ''}
+                      </div>
+                      <div class="d-flex justify-content-between text-muted small">
+                        <span>Prazo: ${f.DeliveryTime} dia(s) útil(eis)</span>
+                        <strong class="text-success fs-6">R$ ${parseFloat(f.ShippingPrice).toFixed(2)}</strong>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+          
+          html += `</div>`;
+          resultadoDiv.innerHTML = html;
+
+          // Adicionar event listeners para as opções de frete
+          document.querySelectorAll('.opcao-frete').forEach(opcao => {
+            opcao.addEventListener('click', function() {
+              // Remover seleção anterior
+              document.querySelectorAll('.opcao-frete').forEach(o => {
+                o.classList.remove('frete-selecionado');
+              });
+              
+              // Adicionar seleção atual
+              this.classList.add('frete-selecionado');
+              
+              // Marcar o radio button
+              const radio = this.querySelector('.frete-radio');
+              radio.checked = true;
+              
+              console.log('Frete selecionado:', {
+                serviceCode: this.dataset.service,
+                description: this.dataset.description,
+                price: this.dataset.price
+              });
+            });
+          });
+
+          // Selecionar automaticamente a primeira opção
+          const primeiraOpcao = document.querySelector('.opcao-frete');
+          if (primeiraOpcao) {
+            primeiraOpcao.click();
+          }
+
+        } else {
+          resultadoDiv.innerHTML = `
+            <div class="alert alert-warning">
+              <i class="bi bi-info-circle me-2"></i>
+              Nenhuma opção de frete disponível para este CEP.
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Erro ao calcular frete:', error);
+        resultadoDiv.innerHTML = `
+          <div class="alert alert-danger">
+            <i class="bi bi-exclamation-octagon me-2"></i>
+            Erro ao calcular o frete. Tente novamente.
+          </div>
+        `;
+      }
+    });
+  }
+
+  // Validação de formulários
+  const forms = document.querySelectorAll('.needs-validation');
+  forms.forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+});
+</script>
+{% endblock %}

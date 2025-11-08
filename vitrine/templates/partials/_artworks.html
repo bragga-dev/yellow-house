@@ -1,0 +1,74 @@
+
+  <!-- Container principal para HTMX -->
+  <div id="artworks-container">
+    <div class="row g-3">
+      {% for artwork in artworks %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+          <div class="card h-100 shadow-sm border-0 artwork-card">
+            {% if artwork.images.first %}
+              <img src="{{ artwork.images.first.image.url }}" class="card-img-top" alt="{{ artwork.name }}" style="height: 200px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">{{ artwork.name|truncatewords:8 }}</h5>
+              <p class="text-success fw-bold">R$ {{ artwork.price }}</p>
+              <div class="mt-auto">
+                <a href="{% url 'vitrine:detail_artwork' artwork.slug artwork.id %}" 
+                   class="btn btn-outline-primary w-100">
+                  Ver detalhes
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12 text-center py-4">
+          <h5 class="text-muted">Nenhuma obra encontrada</h5>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if artworks.has_other_pages %}
+    <nav class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% if artworks.has_previous %}
+          <li class="page-item">
+            <a hx-get="{% url 'vitrine:artworks_partial' %}?page={{ artworks.previous_page_number }}"
+               hx-target="#artworks-container" hx-swap="outerHTML" class="page-link">&laquo;</a>
+          </li>
+        {% endif %}
+        {% for i in artworks.paginator.page_range %}
+          <li class="page-item {% if artworks.number == i %}active{% endif %}">
+            <a hx-get="{% url 'vitrine:artworks_partial' %}?page={{ i }}"
+               hx-target="#artworks-container" hx-swap="outerHTML" class="page-link">{{ i }}</a>
+          </li>
+        {% endfor %}
+        {% if artworks.has_next %}
+          <li class="page-item">
+            <a hx-get="{% url 'vitrine:artworks_partial' %}?page={{ artworks.next_page_number }}"
+               hx-target="#artworks-container" hx-swap="outerHTML" class="page-link">&raquo;</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.artwork-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.artwork-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.card-img-top {
+  transition: transform 0.3s ease;
+}
+
+.artwork-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+</style>

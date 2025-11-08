@@ -1,27 +1,25 @@
 
 from django import forms
-from vitrine.models import  ArtworkCategory, SouvenirCategory, ArtWork, Souvenir, ArtworkImage, SouvenirImage
+from vitrine.models import  ArtworkCategory, SouvenirCategory, ArtWork, Souvenir, ArtworkImage, SouvenirImage, Package
 
 
 
 class ArtworkCategoryForm(forms.ModelForm):
     class Meta:
         model = ArtworkCategory
-        fields = ['name', 'description', 'image']   
+        fields = ['name']   
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome da categoria'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descrição da categoria', 'rows': 3}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+
         }
 
 class SouvenirCategoryForm(forms.ModelForm):
     class Meta:
         model = SouvenirCategory
-        fields = ['name', 'description', 'image']   
+        fields = ['name']   
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome da categoria'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descrição da categoria', 'rows': 3}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            
         }   
 
 class ArtWorkForm(forms.ModelForm):
@@ -41,6 +39,20 @@ class ArtWorkForm(forms.ModelForm):
             'stock': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Quantidade em estoque'}),
             
         }   
+
+
+
+class PackageForm(forms.ModelForm):
+    class Meta:
+        model = Package
+        fields = ['weight', 'width', 'height', 'length']
+        widgets = {
+            'weight': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Peso em kg'}),
+            'width': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Largura da embalagem (cm)'}),
+            'height': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Altura da embalagem (cm)'}),
+            'length': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Comprimento da embalagem (cm)'}),
+        }
+
 
 class SouvenirForm(forms.ModelForm):
     class Meta:
@@ -75,3 +87,13 @@ class SouvenirImageForm(forms.ModelForm):
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'is_primary': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+
+class SearchForm(forms.Form):
+    query = forms.CharField(label='', widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Buscar obras, souvenirs ou artistas...'
+    }))
+
+
+
