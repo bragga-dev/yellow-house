@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'casa_amarela.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'casa_amarela.settings.dev')
 
 application = get_wsgi_application()
