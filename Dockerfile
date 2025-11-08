@@ -42,9 +42,9 @@ COPY . .
 ARG DJANGO_ENV=dev
 ENV DJANGO_ENV=${DJANGO_ENV}
 
-RUN if [ "$DJANGO_ENV" = "prod" ]; then \
-    python manage.py collectstatic --noinput --settings=casa_amarela.settings.prod; \
-    fi
+# RUN if [ "$DJANGO_ENV" = "prod" ]; then \
+#     python manage.py collectstatic --noinput --settings=casa_amarela.settings.prod; \
+#     fi
 
 # Comando padrão (pode ser sobrescrito no docker-compose)
 CMD ["gunicorn", "casa_amarela.wsgi:application", "--bind", "0.0.0.0:8000", "--workers=3"]
