@@ -31,12 +31,6 @@ STATIC_ROOT = '/vol/static'
 MEDIA_ROOT = '/vol/media'
 
 
-# Usar o nginx como proxy para os arquivos do MinIO
-AWS_S3_CUSTOM_DOMAIN = '3.145.213.53/media'  # Seu IP público
-
-# OU se tiver domínio
-# AWS_S3_CUSTOM_DOMAIN = 'seu-dominio.com/media'
-
-# Configurações importantes
-AWS_QUERYSTRING_AUTH = False  # Para URLs públicas
+AWS_S3_CUSTOM_DOMAIN = '3.145.213.53/media'
+AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = 'public-read'
