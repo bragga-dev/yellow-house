@@ -201,7 +201,7 @@ class SouvenirImage(models.Model):
         max_images = 5
         if not self.souvenir_id:
             return  
-        if self.artwork.images.exclude(pk=self.pk).count() >= max_images:
+        if self.souvenir.images.exclude(pk=self.pk).count() >= max_images:
             raise ValidationError({'image': f'Uma obra não pode ter mais que {max_images} imagens.'})
 
 
