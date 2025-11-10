@@ -13,11 +13,13 @@ class S3MediaStorage(S3Boto3Storage):
         kwargs["region_name"] = None
         super().__init__(*args, **kwargs)
 
-        parsed = urlparse(settings.MINIO_ACCESS_URL)
-        self._base_url = f"http://{parsed.netloc}/{settings.AWS_STORAGE_BUCKET_NAME}"
+        if not settings.DEBUG:
+            # Produção → usa o domínio público / Nginx
+            self._base_url = f"http://{settings.AWS_S3_CUSTOM_DOMAIN}/media"
+        else:
+            # Desenvolvimento → acessa direto o MinIO local
+            parsed = urlparse(settings.MINIO_ACCESS_URL)
+            self._base_url = f"http://{parsed.netloc}/{settings.AWS_STORAGE_BUCKET_NAME}"
 
     def url(self, name):
-        """
-        Força sempre http:// em vez de https://
-        """
         return f"{self._base_url}/{name.lstrip('/')}"
