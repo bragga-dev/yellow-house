@@ -26,7 +26,7 @@ def ensure_default_media():
 # Slug generation utility
 def generate_unique_slug(instance, *args):
     field_value = "-".join(str(arg) for arg in args if arg)
-    base_slug = slugify(field_value, allow_unicode=True)
+    base_slug = slugify(field_value)
     
     unique_slug = base_slug
     num = 1
