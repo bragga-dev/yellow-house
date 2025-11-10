@@ -30,7 +30,17 @@ X_FRAME_OPTIONS = 'DENY'
 STATIC_ROOT = '/vol/static'
 MEDIA_ROOT = '/vol/media'
 
+# Configurações MinIO - CORRIGIDAS
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', 'minio')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', 'minio123') 
+AWS_STORAGE_BUCKET_NAME = 'media'
+AWS_S3_ENDPOINT_URL = 'http://minio:9000'
+AWS_S3_USE_SSL = False
 
-AWS_S3_CUSTOM_DOMAIN = '3.145.213.53/media'
+# DOMÍNIO CORRETO para acesso externo
+AWS_S3_CUSTOM_DOMAIN = '3.145.213.53:9000/media'  # ⚠️ ADICIONE :9000
 AWS_QUERYSTRING_AUTH = False
 AWS_DEFAULT_ACL = 'public-read'
+
+# Storage configuration
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
