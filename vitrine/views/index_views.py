@@ -3,7 +3,12 @@ from vitrine.models import BannerGroup, ArtWork, Souvenir
 from django.core.paginator import Paginator
 from django.db.models import Q
 from user.models import Artist
-from vitrine.forms import SearchForm
+from vitrine.forms import SearchForm, ContactForm
+from django.conf import settings
+from django.core.mail import send_mail
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+
 
 def index(request):
     group = BannerGroup.objects.filter(is_active=True).first()
@@ -78,3 +83,46 @@ def search_results(request):
     }
 
     return render(request, 'vitrine/search_results.html', context)
+
+
+def contact(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+
+        if request.POST.get('website'):
+            messages.error(request, 'Envio inválido detectado.')
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            subject = form.cleaned_data['subject']
+            message = form.cleaned_data['message']
+
+
+
+            email_content = f"""
+                    Nova mensagem recebida pelo site:
+                    Nome: {name}
+                    Email: {email}
+                    Assunto: {subject}
+                    Mensagem:{message}
+                                """
+
+            try:
+                send_mail(
+                    subject=f'📬 Contato - {subject}',
+                    message=email_content,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[settings.DEFAULT_FROM_EMAIL],
+                    fail_silently=False,
+                )
+                messages.success(request, 'Mensagem enviada com sucesso! Obrigado pelo contato.')
+            except Exception as e:
+                messages.error(request, f'Ocorreu um erro ao enviar o e-mail: {e}')
+        else:
+            messages.error(request, 'Por favor, corrija os erros no formulário.')
+    else:
+        form = ContactForm()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))

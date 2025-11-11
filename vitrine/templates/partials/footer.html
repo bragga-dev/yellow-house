@@ -49,21 +49,6 @@
                     </div>
                 </div>
 
-                <!-- Customer Support -->
-                <div class="col-lg-2 col-md-6">
-                    <div class="footer-widget">
-                        <h4>Suporte</h4>
-                        <ul class="footer-links">
-                            <li><a href="ajuda.html">Central de Ajuda</a></li>
-                            <li><a href="trocas.html">Trocas & Devoluções</a></li>
-                            <li><a href="entregas.html">Política de Entregas</a></li>
-                            <li><a href="pagamentos.html">Formas de Pagamento</a></li>
-                            <li><a href="privacidade.html">Privacidade</a></li>
-                            <li><a href="termos.html">Termos de Uso</a></li>
-                        </ul>
-                    </div>
-                </div>
-
                 <!-- Contact & Social -->
                 <div class="col-lg-4 col-md-6">
                     <div class="footer-widget">
@@ -92,11 +77,8 @@
                         <div class="payment-methods mt-4">
                             <h5 class="mb-3">Formas de Pagamento</h5>
                             <div class="payment-icons">
-                                <i class="bi bi-credit-card" title="Cartão de Crédito"></i>
-                                <i class="bi bi-paypal" title="PayPal"></i>
-                                <i class="bi bi-bank" title="Transferência"></i>
-                                <i class="bi bi-cash-coin" title="Dinheiro"></i>
-                                <i class="bi bi-piggy-bank" title="Pix"></i>
+                                <!-- Opções para PIX -->
+                                <i class="bi bi-qr-code" title="PIX"></i>
                             </div>
                         </div>
                     </div>
@@ -106,14 +88,15 @@
     </div>
 
     <!-- Contact & Map Section -->
-    <div class="footer-contact-section">
+    <div id="contato" class="footer-contact-section">
         <div class="container">
             <div class="row gy-4">
                 <!-- Contact Form -->
                 <div class="col-lg-6">
                     <div class="contact-form-wrapper">
                         <h4 class="mb-4">Envie sua Mensagem</h4>
-                        <form action="/contato" method="POST" class="contact-form">
+                        <form action="{% url 'vitrine:contact' %}" method="POST" class="contact-form">
+                            {% csrf_token %}
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <input type="text" name="name" class="form-control" placeholder="Nome completo" required>
@@ -125,7 +108,11 @@
                                     <input type="text" name="subject" class="form-control" placeholder="Assunto" required>
                                 </div>
                                 <div class="col-12">
-                                    <textarea name="message" rows="5" class="form-control" placeholder="Sua mensagem..." required></textarea>
+                                    <textarea name="message" rows="10" class="form-control" placeholder="Sua mensagem..." required></textarea>
+                                </div>
+                                <div style="position:absolute; left:-9999px;" aria-hidden="true">
+                                    <label for="website">Não preencha este campo</label>
+                                    <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
                                 </div>
                                 <div class="col-12 text-end">
                                     <button type="submit" class="btn btn-primary">
@@ -182,4 +169,16 @@
 <script>
     // Script simples para o ano atual - pode ser colocado em arquivo JS separado
     document.getElementById('current-year').textContent = new Date().getFullYear();
+
+   
+    document.querySelector('.contact-form').addEventListener('submit', function(event) {
+        const email = this.querySelector('input[name="email"]').value;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+        if (!emailPattern.test(email)) {
+            alert('Por favor, insira um e-mail válido.');
+            event.preventDefault();
+        }
+    });
 </script>
+

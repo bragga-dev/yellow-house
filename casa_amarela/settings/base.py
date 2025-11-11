@@ -58,6 +58,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'vitrine.context_processors.global_search_context',
+                'vitrine.context_processors.global_contact_context',
                 'checkout.context_processors.cart_context',
             ],
         },
@@ -142,6 +143,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "samaedo666@gmail.com"
 EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+ADMINS = [('Administrador', 'samaedo666@gmail.com')]
+EMAIL_TIMEOUT = 30
 # ------------------------------------------------------------------------------
 # OUTRAS CONFIGURAÇÕES
 # ------------------------------------------------------------------------------

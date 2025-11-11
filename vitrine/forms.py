@@ -97,3 +97,40 @@ class SearchForm(forms.Form):
 
 
 
+
+class ContactForm(forms.Form):
+    name = forms.CharField(
+        label='',
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nome completo',
+            'required': True
+        })
+    )
+    email = forms.EmailField(
+        label='',
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control', 
+            'placeholder': 'Seu melhor email',
+            'required': True
+        })
+    )
+    subject = forms.CharField(
+        label='',
+        max_length=200,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Assunto',
+            'required': True
+        })
+    )
+    message = forms.CharField(
+        label='',
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': 'Sua mensagem...',
+            'rows': 5,
+            'required': True
+        })
+    )
