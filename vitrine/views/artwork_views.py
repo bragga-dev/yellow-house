@@ -9,6 +9,10 @@ from django.http import JsonResponse
 from vitrine.models import ArtWork
 from vitrine.services.frenet import calcular_frete
 from vitrine.utils import calcular_frete_item
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
+from vitrine.utils import calcular_frete_item  
+
 
 @login_required
 def create_artwork(request):
@@ -97,7 +101,7 @@ def update_artwork(request, slug, artwork_id):
             else:
                
                 selected_primary_index = int(request.POST.get("is_primary", 0))
-                images_qs = artwork.images.all().order_by('id')  # garantir a ordem correta
+                images_qs = artwork.images.all().order_by('id')  
                 for i, img in enumerate(images_qs):
                     img.is_primary = (i == selected_primary_index)
                     img.save()
@@ -146,58 +150,10 @@ def list_artworks_by_artist(request, slug, pk):
 
 
 
-# def detail_artwork(request, slug, artwork_id):
-#     artwork = get_object_or_404(ArtWork, slug=slug, id=artwork_id)
-#     resultado_frete = None
-#     resultado_frete_valido = []
-
-#     if request.method == "POST" and request.headers.get("x-requested-with") == "XMLHttpRequest":
-#         endereco_principal = artwork.artist.addresses.filter(principal=True).first()
-#         if not endereco_principal:
-#             return JsonResponse({"error": "O artista não possui um endereço principal cadastrado."})
-
-#         cep_origem = endereco_principal.cep
-#         cep_destino = request.POST.get("cep_destino")
-#         quantidade = int(request.POST.get("quantidade", 1))
-
-#         package = artwork.package
-#         if not package:
-#             return JsonResponse({"error": "Nenhuma embalagem cadastrada para esta obra."})
-
-#         peso_total = package.weight * quantidade
-#         valor_total = float(artwork.price) * quantidade
-
-#         resultado_frete = calcular_frete(
-#             origem_cep=cep_origem,
-#             destino_cep=cep_destino,
-#             peso=peso_total,
-#             altura=package.height,
-#             largura=package.width,
-#             comprimento=package.length,
-#             valor=valor_total
-#         )
-
-#         resultado_frete_valido = [
-#             s for s in resultado_frete.get("ShippingSevicesArray", [])
-#             if not s.get("Error", True)
-#         ]
-
-#         return JsonResponse({"fretes": resultado_frete_valido})
-
-#     context = {
-#         "artwork": artwork,
-#     }
-#     return render(request, "vitrine/artwork_detail.html", context)
-
-
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
-from vitrine.utils import calcular_frete_item  # ajuste conforme o caminho real
-
 def detail_artwork(request, slug, artwork_id):
     artwork = get_object_or_404(ArtWork, slug=slug, id=artwork_id)
 
-    # Se for uma requisição AJAX para cálculo de frete
+   
     if request.method == "POST" and request.headers.get("x-requested-with") == "XMLHttpRequest":
         cep_destino = request.POST.get("cep_destino")
         try:
@@ -228,7 +184,7 @@ def detail_artwork(request, slug, artwork_id):
 
         return JsonResponse({"fretes": resultado["fretes"]})
 
-    # Renderização normal da página
+  
     return render(request, "vitrine/artwork_detail.html", {"artwork": artwork})
 
 def list_artworks(request):

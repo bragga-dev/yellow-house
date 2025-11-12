@@ -5,7 +5,9 @@ import os
 import logging
 from django.utils.text import slugify
 from vitrine.services.frenet import calcular_frete
-
+from brazilcep import get_address_from_cep, WebService
+from brazilcep.exceptions import BrazilCEPException
+from django.core.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 # Ensure default media files are present in storage
@@ -97,3 +99,17 @@ def calcular_frete_item(origem_cep, destino_cep, package, valor_unitario, quanti
         s["DeliveryTime"] = int(s.get("DeliveryTime", 0))
 
     return {"fretes": fretes_validos}
+
+
+
+# Validação de cep
+
+def validar_cep(value):
+    cep = value.replace('-', '').strip()
+    if len(cep) != 8 or not cep.isdigit():
+        raise ValidationError('CEP inválido: formato incorreto.')
+
+    try:
+        get_address_from_cep(cep, webservice=WebService.VIACEP)
+    except BrazilCEPException:
+        raise ValidationError('CEP inválido ou não encontrado.')

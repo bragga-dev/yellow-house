@@ -7,9 +7,25 @@ from vitrine.utils import generate_unique_slug
 from django.utils.translation import gettext_lazy as _  
 from django.core.validators import MinValueValidator
 from django.urls import reverse
+from vitrine.utils import validar_cep
 
 
+class DefaultAddress(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    cep = models.CharField(_('CEP'), max_length=8, null=False, blank=False, validators=[validar_cep])
+    city = models.CharField(_('Cidade'), max_length=100, null=False, blank=False)
+    state = models.CharField(_('Estado'), max_length=100, null=False, blank=False)
+    district = models.CharField(_('Bairro'), max_length=100, null=False, blank=False)
+    street = models.CharField(_('Rua'), max_length=100, null=False, blank=False)
+    number = models.CharField(_('Número'), max_length=100, null=False, blank=False)
+    complement = models.CharField(_('Complemento'), max_length=100, null=True, blank=True)
 
+    def __str__(self):
+        return f"{self.cep} - {self.city}/{self.state}"
+
+    class Meta:
+        verbose_name = "Endereço Padrão"
+        verbose_name_plural = "Endereços Padrão"
 class Package(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     weight = models.FloatField(_('Peso'), help_text="Peso total em kg", null=False, blank=False, validators=[MinValueValidator(0.00)])
@@ -147,6 +163,7 @@ class Souvenir(Product):
     material = models.CharField(_('Material'), max_length=100, null=True, blank=True)
     size = models.CharField(_('Tamanho'), max_length=20, choices=SIZE_CHOICES, null=True, blank=True)
     package = models.OneToOneField(Package, on_delete=models.CASCADE, related_name='souvenirs', null=True, blank=True)
+    default_address = models.ForeignKey(DefaultAddress, on_delete=models.PROTECT, related_name='souvenirs', null=False, blank=False)
     
     def __str__(self):
         return self.name

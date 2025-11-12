@@ -1,7 +1,12 @@
 from django.contrib import admin
 from vitrine.models import ArtWork, ArtworkImage, \
-ArtworkCategory, Souvenir, SouvenirCategory, SouvenirImage, BannerGroup, BannerImage, Blog
+ArtworkCategory, Souvenir, SouvenirCategory, \
+SouvenirImage, BannerGroup, BannerImage, Blog, DefaultAddress
 
+@admin.register(DefaultAddress)
+class DefaultAddressAdmin(admin.ModelAdmin):
+    model = DefaultAddress
+    list_display = ('street', 'cep', 'city', 'district', 'number', 'complement', 'state')   
 
 # ---------- Inline para imagens de Artwork ----------
 class ArtworkImageInline(admin.TabularInline):
@@ -55,7 +60,7 @@ class SouvenirImageInline(admin.TabularInline):
 # ---------- Admin de Souvenir ----------
 @admin.register(Souvenir)
 class SouvenirAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'stock', 'size')
+    list_display = ('name', 'price', 'stock', 'size', 'default_address')
     search_fields = ('name', 'artist__user__username', 'souvenir_category__name')
     list_filter = ('souvenir_category', 'created_at')
     ordering = ('-created_at',)
@@ -63,14 +68,6 @@ class SouvenirAdmin(admin.ModelAdmin):
 
 
 # ---------- Admin de SouvenirImage ----------
-@admin.register(SouvenirImage)
-class SouvenirImageAdmin(admin.ModelAdmin):
-    list_display = ('souvenir', 'image', 'is_primary')
-    search_fields = ('souvenir__name',)
-    list_filter = ('is_primary',)
-    ordering = ('-is_primary', 'id')
-    readonly_fields = ('id',)
-    autocomplete_fields = ('souvenir',)
 
 
 # ---------- Admin de SouvenirCategory ----------
