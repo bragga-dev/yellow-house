@@ -48,31 +48,26 @@ class ArtworkCategoryAdmin(admin.ModelAdmin):
    
 
 
-# ---------- Inline para imagens de Souvenir ----------
-class SouvenirImageInline(admin.TabularInline):
-    model = SouvenirImage
-    extra = 1
-    readonly_fields = ('id',)
-    fields = ('image', 'is_primary', 'id')
-    ordering = ('-is_primary', 'id')
 
 
 # ---------- Admin de Souvenir ----------
 @admin.register(Souvenir)
 class SouvenirAdmin(admin.ModelAdmin):
+    model = Souvenir
     list_display = ('name', 'price', 'stock', 'size', 'default_address')
     search_fields = ('name', 'artist__user__username', 'souvenir_category__name')
     list_filter = ('souvenir_category', 'created_at')
     ordering = ('-created_at',)
-    inlines = [SouvenirImageInline]  # adiciona as imagens inline
+    
 
 
-# ---------- Admin de SouvenirImage ----------
+
 
 
 # ---------- Admin de SouvenirCategory ----------
 @admin.register(SouvenirCategory)
 class SouvenirCategoryAdmin(admin.ModelAdmin):
+    model = SouvenirCategory
     list_display = ('name', )
     search_fields = ('name',)
     ordering = ('name',)
