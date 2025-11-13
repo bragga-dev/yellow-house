@@ -8,6 +8,11 @@ from django.http import JsonResponse
 import json
 from decimal import Decimal, InvalidOperation
 from user.models import Client
+import logging
+from django.shortcuts import render
+
+
+
 @login_required
 def add_item_in_cart(request, slug, item_id):
     product = ArtWork.objects.filter(slug=slug, id=item_id).first() or Souvenir.objects.filter(slug=slug, id=item_id).first()
@@ -72,37 +77,26 @@ def update_item_quantity(request, item_id):
             messages.info(request, "Item removido por quantidade zero.")
         else:
             item.quantity = new_quantity
-            item.shipping_type = None  # Resetar frete para forçar nova seleção
+            item.shipping_type = None  
             item.shipping_value = Decimal('0.00')
             item.save()
             messages.success(request, "Quantidade atualizada. Selecione o frete novamente.")
     except ValueError:
         messages.error(request, "Quantidade inválida.")
 
-    cart.update_totals()  # Garantir que os totais são atualizados
+    cart.update_totals() 
     return redirect('checkout:cart_detail')
 
-import logging
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from checkout.models import Cart, CartItem
-from vitrine.utils import calcular_frete_item
 
 logger = logging.getLogger(__name__)
 
 @login_required
 def cart_detail(request):
-    """Exibe o carrinho de compras do usuário com cálculo de frete por item."""
-
-    # Obtém ou cria o carrinho do usuário
     cart, _ = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart).order_by('-id')
 
+    # Endereço de entrega (destino)
     endereco_cliente = None
-    cep_destino = None
-
-    # Identifica se o usuário é cliente ou artista
     try:
         if hasattr(request.user, 'client'):
             endereco_cliente = request.user.client.addresses.filter(principal=True).first()
@@ -111,24 +105,27 @@ def cart_detail(request):
     except Exception as e:
         logger.error(f"Erro ao buscar endereço do usuário {request.user.id}: {e}")
 
-    if endereco_cliente and endereco_cliente.cep:
-        cep_destino = endereco_cliente.cep
-    else:
+    cep_destino = getattr(endereco_cliente, 'cep', None)
+    if not cep_destino:
         messages.warning(request, "Não foi possível determinar o endereço de entrega. Verifique seus dados.")
         logger.warning(f"Usuário {request.user.id} sem endereço principal definido.")
 
     fretes_itens = {}
 
+    # Loop de cálculo de frete
     for item in cart_items:
         produto = item.artwork or item.souvenir
-        endereco_origem = getattr(produto, 'artist', None)
-        cep_origem = None
-
-        if endereco_origem and hasattr(endereco_origem, 'addresses'):
-            endereco_origem = endereco_origem.addresses.filter(principal=True).first()
-            cep_origem = endereco_origem.cep if endereco_origem else None
-
         package = getattr(produto, 'package', None)
+
+        # Determina o endereço de origem
+        if item.artwork and hasattr(produto, 'artist') and produto.artist:
+            endereco_origem = produto.artist.addresses.filter(principal=True).first()
+        elif item.souvenir and hasattr(produto, 'default_address') and produto.default_address:
+            endereco_origem = produto.default_address
+        else:
+            endereco_origem = None
+
+        cep_origem = getattr(endereco_origem, 'cep', None)
 
         if not all([cep_origem, cep_destino, package]):
             fretes_itens[item.id] = {"error": "Dados insuficientes para calcular o frete."}
@@ -152,8 +149,8 @@ def cart_detail(request):
         'cart_items': cart_items,
         'fretes_itens': fretes_itens,
     }
-    return render(request, 'checkout/cart_detail.html', context)
 
+    return render(request, 'checkout/cart_detail.html', context)
 
 
 
@@ -166,7 +163,6 @@ def update_shipping(request, item_id):
         shipping_price = data.get('shipping_price', '0')
 
         try:
-            # Garantir que o preço do frete seja Decimal com precisão correta
             shipping_price = Decimal(str(shipping_price)).quantize(Decimal('0.01'))
         except (InvalidOperation, TypeError, ValueError):
             shipping_price = Decimal('0.00')
