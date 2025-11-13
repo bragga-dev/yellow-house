@@ -9,15 +9,28 @@
     <!-- Galeria de Imagens -->
     <div class="col-lg-7 mb-4">
       <div class="product-images">
-        <!-- Imagem principal -->
-        <div class="main-image-container mb-4">
+        <!-- Imagem principal com zoom -->
+        <div class="main-image-container mb-4 position-relative">
           {% if souvenir.images.first %}
-            <img src="{{ souvenir.images.first.image.url }}" class="main-image img-fluid rounded-3 shadow" alt="{{ souvenir.name }}" id="mainImage">
+            <div class="zoom-container" style="overflow: hidden; border-radius: 12px;">
+              <img src="{{ souvenir.images.first.image.url }}" 
+                   class="main-image img-fluid" 
+                   alt="{{ souvenir.name }}" 
+                   id="mainImage"
+                   data-zoom-image="{{ souvenir.images.first.image.url }}">
+            </div>
           {% else %}
             <div class="d-flex align-items-center justify-content-center bg-light rounded-3" style="height: 500px;">
               <i class="bi bi-image display-1 text-muted"></i>
             </div>
           {% endif %}
+          
+          <!-- Indicador de zoom -->
+          <div class="zoom-indicator position-absolute top-0 end-0 m-3">
+            <span class="badge bg-dark bg-opacity-75 px-3 py-2">
+              <i class="bi bi-zoom-in me-1"></i>Clique para zoom
+            </span>
+          </div>
         </div>
 
         <!-- Miniaturas -->
@@ -25,7 +38,9 @@
         <div class="thumbnails-container">
           <div class="thumbnails-scrollbar d-flex gap-3 pb-3 overflow-auto">
             {% for image in souvenir.images.all %}
-            <div class="thumbnail-item position-relative {% if forloop.first %}active{% endif %}" data-image="{{ image.image.url }}">
+            <div class="thumbnail-item position-relative {% if forloop.first %}active{% endif %}" 
+                 data-image="{{ image.image.url }}" 
+                 data-zoom-image="{{ image.image.url }}">
               <img src="{{ image.image.url }}" class="thumbnail-img" alt="Thumbnail {{ forloop.counter }}">
               <div class="thumbnail-overlay"></div>
             </div>
@@ -42,25 +57,43 @@
         <!-- Cabeçalho -->
         <div class="d-flex justify-content-between align-items-start mb-2">
           {% if souvenir.souvenir_category %}
-          <span class="badge bg-primary text-uppercase">{{ souvenir.souvenir_category.name }}</span>
+          <span class="badge bg-primary text-uppercase fs-6">{{ souvenir.souvenir_category.name }}</span>
           {% endif %}
           {% if souvenir.stock <= 5 and souvenir.stock > 0 %}
-          <span class="badge bg-warning text-dark">Últimas unidades</span>
+          <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Últimas unidades</span>
           {% elif souvenir.stock == 0 %}
-          <span class="badge bg-danger">Esgotado</span>
+          <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Esgotado</span>
           {% endif %}
         </div>
 
         <h1 class="product-title display-6 fw-bold mb-3">{{ souvenir.name }}</h1>
 
+        <!-- Avaliação -->
+        <div class="product-rating mb-3">
+          <div class="d-flex align-items-center">
+            <div class="rating-stars me-2">
+              {% for i in "12345"|make_list %}
+                {% if forloop.counter <= souvenir.average_rating|default:0 %}
+                  <i class="bi bi-star-fill text-warning"></i>
+                {% else %}
+                  <i class="bi bi-star text-muted"></i>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <span class="text-muted">({{ souvenir.review_count|default:0 }} avaliações)</span>
+          </div>
+        </div>
+
         <!-- Preço -->
         <div class="product-price-container mb-4">
           <span class="current-price display-5 fw-bold text-dark">R$ {{ souvenir.price }}</span>
           {% if souvenir.original_price and souvenir.original_price > souvenir.price %}
-          <span class="original-price text-muted text-decoration-line-through fs-5 ms-2">R$ {{ souvenir.original_price }}</span>
-          <span class="discount-badge badge bg-success ms-2 fs-6">
-            {{ souvenir.discount_percentage }}% OFF
-          </span>
+          <div class="d-flex align-items-center mt-1">
+            <span class="original-price text-muted text-decoration-line-through fs-5 me-2">R$ {{ souvenir.original_price }}</span>
+            <span class="discount-badge badge bg-success fs-6">
+              {{ souvenir.discount_percentage }}% OFF
+            </span>
+          </div>
           {% endif %}
         </div>
 
@@ -113,11 +146,11 @@
                   <span class="spec-label text-muted">Disponibilidade</span>
                   <span class="spec-value fw-semibold">
                     {% if souvenir.stock > 10 %}
-                      Em estoque
+                      <span class="text-success"><i class="bi bi-check-circle me-1"></i>Em estoque</span>
                     {% elif souvenir.stock > 0 %}
-                      Últimas unidades
+                      <span class="text-warning"><i class="bi bi-exclamation-triangle me-1"></i>Últimas unidades</span>
                     {% else %}
-                      Esgotado
+                      <span class="text-danger"><i class="bi bi-x-circle me-1"></i>Esgotado</span>
                     {% endif %}
                   </span>
                 </div>
@@ -145,11 +178,11 @@
               <div class="col">
                 <small class="text-muted">
                   {% if souvenir.stock > 10 %}
-                    Em estoque
+                    <i class="bi bi-check-circle text-success me-1"></i>Em estoque
                   {% elif souvenir.stock > 0 %}
-                    Apenas {{ souvenir.stock }} unidade(s) disponível(s)
+                    <i class="bi bi-exclamation-triangle text-warning me-1"></i>Apenas {{ souvenir.stock }} unidade(s) disponível(s)
                   {% else %}
-                    Produto esgotado
+                    <i class="bi bi-x-circle text-danger me-1"></i>Produto esgotado
                   {% endif %}
                 </small>
               </div>
@@ -160,7 +193,7 @@
               <button type="submit" class="btn btn-primary btn-lg py-3 fw-semibold" id="add-to-cart-btn">
                 <i class="bi bi-cart-plus me-2"></i>Adicionar ao Carrinho
               </button>
-              <button type="button" class="btn btn-outline-dark btn-lg py-3 fw-semibold">
+              <button type="button" class="btn btn-outline-dark btn-lg py-3 fw-semibold" id="buy-now-btn">
                 <i class="bi bi-lightning me-2"></i>Comprar Agora
               </button>
               {% else %}
@@ -175,13 +208,13 @@
         <!-- Ações Secundárias -->
         <div class="product-secondary-actions mb-4">
           <div class="d-flex gap-2 justify-content-center">
-            <button class="btn btn-outline-secondary btn-sm">
+            <button class="btn btn-outline-secondary btn-sm" id="wishlist-btn">
               <i class="bi bi-heart me-1"></i>Favoritar
             </button>
-            <button class="btn btn-outline-secondary btn-sm">
+            <button class="btn btn-outline-secondary btn-sm" id="share-btn">
               <i class="bi bi-share me-1"></i>Compartilhar
             </button>
-            <button class="btn btn-outline-secondary btn-sm">
+            <button class="btn btn-outline-secondary btn-sm" id="report-btn">
               <i class="bi bi-flag me-1"></i>Reportar
             </button>
           </div>
@@ -206,7 +239,8 @@
                          class="form-control" 
                          placeholder="00000-000"
                          maxlength="9"
-                         pattern="\d{5}-\d{3}">
+                         pattern="\d{5}-\d{3}"
+                         required>
                   <div class="invalid-feedback">
                     Por favor, informe um CEP válido.
                   </div>
@@ -214,8 +248,8 @@
                 
                 <div class="col-md-5">
                   <label class="form-label fw-semibold small">Qtd</label>
-                  <div class="form-control bg-light">
-                    <span id="quantidade-display">1</span>
+                  <div class="form-control bg-light d-flex align-items-center" style="height: 38px;">
+                    <span id="quantidade-display" class="fw-semibold">1</span>
                   </div>
                   <small class="text-muted">Use o seletor acima</small>
                 </div>
@@ -246,6 +280,11 @@
           <li class="nav-item" role="presentation">
             <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab">
               <i class="bi bi-gear me-2"></i>Detalhes Técnicos
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">
+              <i class="bi bi-star me-2"></i>Avaliações ({{ souvenir.review_count|default:0 }})
             </button>
           </li>
           <li class="nav-item" role="presentation">
@@ -325,6 +364,43 @@
             </div>
           </div>
 
+          <div class="tab-pane fade" id="reviews" role="tabpanel">
+            <div class="reviews-section">
+              <h4 class="mb-4">Avaliações dos Clientes</h4>
+              
+              {% if souvenir.reviews %}
+                <div class="reviews-list">
+                  {% for review in souvenir.reviews %}
+                  <div class="review-item border-bottom pb-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div>
+                        <strong>{{ review.user_name }}</strong>
+                        <div class="rating-stars small mt-1">
+                          {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= review.rating %}
+                              <i class="bi bi-star-fill text-warning"></i>
+                            {% else %}
+                              <i class="bi bi-star text-muted"></i>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                      </div>
+                      <small class="text-muted">{{ review.created_at|date:"d/m/Y" }}</small>
+                    </div>
+                    <p class="mb-0">{{ review.comment }}</p>
+                  </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="text-center py-4">
+                  <i class="bi bi-chat-square-text display-4 text-muted mb-3"></i>
+                  <p class="text-muted">Este produto ainda não possui avaliações.</p>
+                  <button class="btn btn-outline-primary">Seja o primeiro a avaliar</button>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
           <div class="tab-pane fade" id="shipping" role="tabpanel">
             <div class="shipping-info">
               <h4 class="mb-4">Política de Envio e Devolução</h4>
@@ -371,7 +447,7 @@
                         </li>
                         <li class="mb-2">
                           <i class="bi bi-tag text-info me-2"></i>
-                          Etiquas e lacres intactos
+                          Etiquetas e lacres intactos
                         </li>
                       </ul>
                     </div>
@@ -381,6 +457,20 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Zoom da Imagem -->
+<div class="modal fade" id="imageZoomModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content bg-transparent border-0">
+      <div class="modal-header border-0">
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img src="" alt="" id="zoomedImage" class="img-fluid" style="max-height: 80vh;">
       </div>
     </div>
   </div>
@@ -397,6 +487,7 @@
   border-radius: 12px;
   overflow: hidden;
   background: #f8f9fa;
+  cursor: zoom-in;
 }
 
 .main-image-container img {
@@ -479,6 +570,7 @@
   border: none;
   padding: 1rem 1.5rem;
   transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 .product-tabs .nav-link.active {
@@ -501,6 +593,14 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
+.rating-stars {
+  color: #ffc107;
+}
+
+.zoom-indicator {
+  z-index: 10;
+}
+
 /* Loading animation */
 .loading-spinner {
   display: inline-block;
@@ -521,6 +621,20 @@
   background-color: rgba(25, 135, 84, 0.1) !important;
   border-color: #198754 !important;
 }
+
+.breadcrumb-item a:hover {
+  color: var(--bs-primary);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.review-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
 </style>
 
 <!-- JavaScript -->
@@ -529,6 +643,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const quantitySelect = document.getElementById('quantity');
   const quantidadeDisplay = document.getElementById('quantidade-display');
   const purchaseForm = document.getElementById('purchase-form');
+  const mainImage = document.getElementById('mainImage');
+  const imageZoomModal = new bootstrap.Modal(document.getElementById('imageZoomModal'));
+  const zoomedImage = document.getElementById('zoomedImage');
 
   // Atualizar display da quantidade quando o select mudar
   if (quantitySelect && quantidadeDisplay) {
@@ -545,9 +662,19 @@ document.addEventListener('DOMContentLoaded', function() {
     item.addEventListener('click', function() {
       document.querySelectorAll('.thumbnail-item').forEach(t => t.classList.remove('active'));
       this.classList.add('active');
-      document.getElementById('mainImage').src = this.dataset.image;
+      const newImageSrc = this.dataset.image;
+      mainImage.src = newImageSrc;
+      mainImage.dataset.zoomImage = this.dataset.zoomImage;
     });
   });
+
+  // Funcionalidade de zoom na imagem
+  if (mainImage) {
+    mainImage.addEventListener('click', function() {
+      zoomedImage.src = this.dataset.zoomImage || this.src;
+      imageZoomModal.show();
+    });
+  }
 
   // Formatação de CEP
   const cepInput = document.getElementById('cep_destino');
@@ -710,6 +837,60 @@ document.addEventListener('DOMContentLoaded', function() {
       form.classList.add('was-validated');
     }, false);
   });
+
+  // Botão "Comprar Agora"
+  const buyNowBtn = document.getElementById('buy-now-btn');
+  if (buyNowBtn) {
+    buyNowBtn.addEventListener('click', function() {
+      // Redirecionar diretamente para o checkout
+      const quantity = quantitySelect ? quantitySelect.value : 1;
+      window.location.href = `{% url 'checkout:add_item_in_cart' slug=souvenir.slug item_id=souvenir.id %}?quantity=${quantity}&buy_now=true`;
+    });
+  }
+
+  // Funcionalidade de favoritos
+  const wishlistBtn = document.getElementById('wishlist-btn');
+  if (wishlistBtn) {
+    wishlistBtn.addEventListener('click', function() {
+      this.classList.toggle('active');
+      if (this.classList.contains('active')) {
+        this.innerHTML = '<i class="bi bi-heart-fill me-1"></i>Favoritado';
+        this.classList.remove('btn-outline-secondary');
+        this.classList.add('btn-danger');
+      } else {
+        this.innerHTML = '<i class="bi bi-heart me-1"></i>Favoritar';
+        this.classList.remove('btn-danger');
+        this.classList.add('btn-outline-secondary');
+      }
+    });
+  }
+
+  // Funcionalidade de compartilhamento
+  const shareBtn = document.getElementById('share-btn');
+  if (shareBtn && navigator.share) {
+    shareBtn.addEventListener('click', async function() {
+      try {
+        await navigator.share({
+          title: '{{ souvenir.name }}',
+          text: 'Confira este souvenir incrível!',
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.log('Erro ao compartilhar:', err);
+      }
+    });
+  } else if (shareBtn) {
+    // Fallback para copiar URL
+    shareBtn.addEventListener('click', function() {
+      navigator.clipboard.writeText(window.location.href).then(function() {
+        const originalText = shareBtn.innerHTML;
+        shareBtn.innerHTML = '<i class="bi bi-check me-1"></i>Copiado!';
+        setTimeout(() => {
+          shareBtn.innerHTML = originalText;
+        }, 2000);
+      });
+    });
+  }
 });
 </script>
 {% endblock %}
