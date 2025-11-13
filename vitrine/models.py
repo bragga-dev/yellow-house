@@ -28,10 +28,10 @@ class DefaultAddress(models.Model):
         verbose_name_plural = "Endereços Padrão"
 class Package(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    weight = models.FloatField(_('Peso'), help_text="Peso total em kg", null=False, blank=False, validators=[MinValueValidator(0.00)])
-    width = models.FloatField(_('Largura'), help_text="Largura em cm", null=False, blank=False, validators=[MinValueValidator(0.00)])
-    height = models.FloatField(_('Altura'), help_text="Altura em cm", null=False, blank=False, validators=[MinValueValidator(0.00)])
-    length = models.FloatField(_('Comprimento'), help_text="Comprimento em cm", null=False, blank=False, validators=[MinValueValidator(0.00)])
+    package_weight = models.FloatField(_('Peso'), help_text="Peso total em kg", null=False, blank=False, validators=[MinValueValidator(0.00)])
+    package_width = models.FloatField(_('Largura'), help_text="Largura em cm", null=False, blank=False, validators=[MinValueValidator(0.00)])
+    package_height = models.FloatField(_('Altura'), help_text="Altura em cm", null=False, blank=False, validators=[MinValueValidator(0.00)])
+    package_length = models.FloatField(_('Comprimento'), help_text="Comprimento em cm", null=False, blank=False, validators=[MinValueValidator(0.00)])
 
     def clean(self):
         errors = {}
@@ -42,18 +42,18 @@ class Package(models.Model):
             except (TypeError, ValueError):
                 return None
 
-        weight = safe_float(self.weight)
-        width = safe_float(self.width)
-        height = safe_float(self.height)
-        length = safe_float(self.length)
+        package_weight = safe_float(self.package_weight)
+        package_width = safe_float(self.package_width)
+        package_height = safe_float(self.package_height)
+        package_length = safe_float(self.package_length)
 
-        if weight is not None and weight < 0:
+        if package_weight is not None and package_weight < 0:
             errors['weight'] = 'O peso não pode ser negativo.'
-        if width is not None and width < 0:
+        if package_width is not None and package_width < 0:
             errors['width'] = 'A largura não pode ser negativa.'
-        if height is not None and height < 0:
+        if package_height is not None and package_height < 0:
             errors['height'] = 'A altura não pode ser negativa.'
-        if length is not None and length < 0:
+        if package_length is not None and package_length < 0:
             errors['length'] = 'O comprimento não pode ser negativo.'
 
         if errors:
@@ -293,6 +293,7 @@ class Blog(models.Model):
         return reverse("vitrine:blog_detail", kwargs={"slug": self.slug, "blog_id": self.id})
         
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = generate_unique_slug(self, self.title, self.id)
+        new_slug = generate_unique_slug(self, self.title, self.id)
+        if self.slug != new_slug:
+            self.slug = new_slug
         super().save(*args, **kwargs)

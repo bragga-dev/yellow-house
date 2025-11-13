@@ -79,10 +79,10 @@ class DefaultAddressAdmin(admin.ModelAdmin):
 
 @admin.register(Package)
 class PackageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'weight', 'width', 'height', 'length', 'artwork_link', 'souvenir_link')
-    list_filter = ('weight',)
+    list_display = ('id', 'package_weight', 'package_width', 'package_height', 'package_length', 'artwork_link', 'souvenir_link')
+    list_filter = ('package_weight',)
     search_fields = ('id',)
-    fields = (('weight', 'width'), ('height', 'length'))
+    fields = (('package_weight', 'package_width'), ('package_height', 'package_length'))
     readonly_fields = ('artwork_link', 'souvenir_link')
     
     def artwork_link(self, obj):

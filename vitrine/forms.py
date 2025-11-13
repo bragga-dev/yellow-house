@@ -45,12 +45,12 @@ class ArtWorkForm(forms.ModelForm):
 class PackageForm(forms.ModelForm):
     class Meta:
         model = Package
-        fields = ['weight', 'width', 'height', 'length']
+        fields = ['package_weight', 'package_width', 'package_height', 'package_length']
         widgets = {
-            'weight': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Peso em kg'}),
-            'width': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Largura da embalagem (cm)'}),
-            'height': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Altura da embalagem (cm)'}),
-            'length': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Comprimento da embalagem (cm)'}),
+            'package_weight': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Peso em kg'}),
+            'package_width': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Largura da embalagem (cm)'}),
+            'package_height': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Altura da embalagem (cm)'}),
+            'package_length': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Comprimento da embalagem (cm)'}),
         }
 
 

@@ -12,7 +12,7 @@ from vitrine.utils import calcular_frete_item
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from vitrine.utils import calcular_frete_item  
-
+from user.models import Artist
 
 @login_required
 def create_artwork(request):
@@ -200,8 +200,5 @@ def list_artworks(request):
         'filter': artwork_filter,
         'artworks': artworks_page,  
         'art_work_categories': ArtworkCategory.objects.all(),
-        'styles': ArtWork.objects.values_list('style', flat=True)
-                                 .distinct()
-                                 .exclude(style__isnull=True)
-                                 .exclude(style=''),
+        'artists': Artist.objects.all()
     })
