@@ -3,113 +3,147 @@
 
 {% block title %}Blog - Casa Amarela{% endblock %}
 
+{% block meta_description %}Descubra histórias, inspirações e o processo criativo por trás das obras da Casa Amarela. Artigos exclusivos sobre arte e cultura.{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <!-- Cabeçalho da página -->
+<div class="container mt-4">
+    <!-- Cabeçalho do Blog -->
     <div class="row mb-5">
-        <div class="col-12 text-center">
-            <h1 class="display-4 text-dark mb-3">Blog da Casa Amarela</h1>
-            <p class="lead text-muted">Descubra histórias, inspirações e o processo criativo por trás das obras</p>
-            <div class="border-bottom border-warning w-25 mx-auto"></div>
+        <div class="col-12">
+            <div class="text-center">
+                <h1 class="fw-bold text-dark mb-3 display-4">Blog da Casa Amarela</h1>
+                <p class="lead text-muted mb-4">Descubra histórias, inspirações e o processo criativo por trás das obras</p>
+            </div>
         </div>
     </div>
 
     <!-- Lista de Posts -->
-    <div class="row">
-        {% for blog in blogs %}
-        <div class="col-lg-6 col-md-6 mb-4">
-            <div class="card h-100 shadow-sm border-0 blog-card">
-                <!-- Imagem do Post -->
-                {% if blog.image %}
-                <img src="{{ blog.image.url }}" class="card-img-top" alt="{{ blog.title }}" style="height: 250px; object-fit: cover;">
-                {% else %}
-                <img src="{% static 'images/blog-placeholder.jpg' %}" class="card-img-top" alt="Imagem padrão" style="height: 250px; object-fit: cover;">
-                {% endif %}
-                
-                <div class="card-body d-flex flex-column">
-                    <!-- Data de Publicação -->
-                    <div class="mb-2">
-                        <small class="text-muted">
-                            <i class="far fa-calendar-alt me-1"></i>
-                            {{ blog.created_at|date:"d/m/Y" }}
-                        </small>
+    <div class="row" id="blog-grid">
+        {% if blogs %}
+            {% for blog in blogs %}
+                <div class="col-xl-4 col-lg-6 col-md-6 mb-4 blog-item">
+                    <div class="card h-100 shadow-sm border-0 blog-card position-relative">
+                        <!-- Badge de Atualização -->
                         {% if blog.updated_at != blog.created_at %}
-                        <small class="text-muted ms-2">
-                            <i class="fas fa-sync-alt me-1"></i>
-                            Atualizado em {{ blog.updated_at|date:"d/m/Y" }}
-                        </small>
+                        <div class="position-absolute top-0 start-0 end-0 p-2 d-flex justify-content-end">
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-sync-alt me-1"></i>Atualizado
+                            </span>
+                        </div>
                         {% endif %}
+
+                        <!-- Imagem do Post -->
+                        <div class="position-relative overflow-hidden">
+                            {% if blog.image %}
+                                <img src="{{ blog.image.url }}" 
+                                     class="card-img-top blog-image" 
+                                     alt="{{ blog.title }}"
+                                     loading="lazy"
+                                     style="height: 250px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                     style="height: 250px;">
+                                    <i class="fas fa-image text-muted display-4"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Overlay de Ações -->
+                            <div class="blog-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <div class="btn-group">
+                                    <a href="{{ blog.get_absolute_url }}" 
+                                       class="btn btn-light btn-sm">
+                                        <i class="fas fa-eye me-1"></i>Ler Mais
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informações do Post -->
+                        <div class="card-body d-flex flex-column">
+                        <!-- Título -->
+                            <h5 class="card-title fw-bold text-dark mb-3">{{ blog.title }}</h5>
+
+                            <!-- Data de Publicação -->
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center text-muted small">
+                                    <i class="far fa-calendar-alt me-2"></i>
+                                    <span>{{ blog.created_at|date:"d/m/Y" }}</span>
+                                    {% if blog.updated_at != blog.created_at %}
+                                    <span class="ms-3">
+                                        <i class="fas fa-sync-alt me-1"></i>
+                                        Atualizado em {{ blog.updated_at|date:"d/m/Y" }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            
+                            
+                            <!-- Resumo -->
+                            <p class="card-text text-muted mb-4 flex-grow-1">
+                                {{ blog.text|truncatewords:30 }}
+                            </p>
+
+                            <!-- Botão de Ação -->
+                            <div class="mt-auto">
+                                <a href="{{ blog.get_absolute_url }}" 
+                                   class="btn btn-outline-dark w-100 btn-hover-primary">
+                                    <i class="fas fa-book me-2"></i>Ler Artigo Completo
+                                </a>
+                            </div>
+                        </div>
                     </div>
-
-                    <!-- Título -->
-                    <h3 class="card-title h5 text-dark">{{ blog.title }}</h3>
-
-                    <!-- Texto Resumido -->
-                    <p class="card-text flex-grow-1 text-muted">
-                        {{ blog.text|truncatewords:30 }}
-                    </p>
-
-                    <!-- Botão Ler Mais -->
-                    <div class="mt-auto">
-                        <a href="{{ blog.get_absolute_url }}" class="btn btn-warning btn-sm">
-                            Ler Mais <i class="fas fa-arrow-right ms-1"></i>
+                </div>
+            {% endfor %}
+        {% else %}
+            <!-- Estado Vazio -->
+            <div class="col-12">
+                <div class="text-center py-5 my-5">
+                    <i class="fas fa-book-open display-1 text-muted mb-4"></i>
+                    <h3 class="text-muted mb-3">Nenhum post publicado ainda</h3>
+                    <p class="text-muted mb-4">Em breve teremos novidades por aqui!</p>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i>Voltar ao Início
                         </a>
                     </div>
                 </div>
             </div>
-        </div>
-        {% empty %}
-        <!-- Mensagem quando não há posts -->
-        <div class="col-12 text-center py-5">
-            <div class="bg-light rounded p-5">
-                <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
-                <h3 class="text-muted">Nenhum post publicado ainda</h3>
-                <p class="text-muted">Em breve teremos novidades por aqui!</p>
-            </div>
-        </div>
-        {% endfor %}
+        {% endif %}
     </div>
 
     <!-- Paginação -->
-    {% if posts.has_other_pages %}
+    {% if blogs.has_other_pages %}
     <div class="row mt-5">
         <div class="col-12">
             <nav aria-label="Navegação de páginas do blog">
                 <ul class="pagination justify-content-center">
-                    {% if posts.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link text-dark" href="?page={{ posts.previous_page_number }}" aria-label="Anterior">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link">&laquo;</span>
-                    </li>
+                    {% if blogs.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ blogs.previous_page_number }}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
                     {% endif %}
 
-                    {% for i in posts.paginator.page_range %}
-                        {% if posts.number == i %}
-                        <li class="page-item active">
-                            <span class="page-link bg-warning border-warning">{{ i }}</span>
-                        </li>
+                    {% for i in blogs.paginator.page_range %}
+                        {% if blogs.number == i %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ i }}</span>
+                            </li>
                         {% else %}
-                        <li class="page-item">
-                            <a class="page-link text-dark" href="?page={{ i }}">{{ i }}</a>
-                        </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                            </li>
                         {% endif %}
                     {% endfor %}
 
-                    {% if posts.has_next %}
-                    <li class="page-item">
-                        <a class="page-link text-dark" href="?page={{ posts.next_page_number }}" aria-label="Próximo">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link">&raquo;</span>
-                    </li>
+                    {% if blogs.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ blogs.next_page_number }}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
                     {% endif %}
                 </ul>
             </nav>
@@ -118,33 +152,88 @@
     {% endif %}
 </div>
 
-<!-- Estilos customizados -->
 <style>
-    .blog-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .blog-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
-    }
-    
-    .card-img-top {
-        transition: transform 0.3s ease;
-    }
-    
-    .blog-card:hover .card-img-top {
-        transform: scale(1.05);
-    }
-    
-    .page-link {
-        border-color: #dee2e6;
-    }
-    
-    .page-link:hover {
-        background-color: #ffc107;
-        border-color: #ffc107;
-        color: #212529;
-    }
+.blog-card {
+  transition: all 0.3s ease;
+  border: 1px solid #f8f9fa;
+}
+
+.blog-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.15) !important;
+  border-color: #e9ecef;
+}
+
+.blog-image {
+  transition: transform 0.3s ease;
+}
+
+.blog-card:hover .blog-image {
+  transform: scale(1.05);
+}
+
+.blog-overlay {
+  background: rgba(0,0,0,0.7);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.blog-card:hover .blog-overlay {
+  opacity: 1;
+}
+
+.btn-hover-primary:hover {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: white;
+}
+
+/* Badges com destaque */
+.badge {
+  font-size: 0.7em;
+  font-weight: 500;
+}
+
+/* Animações suaves */
+.card {
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsividade melhorada */
+@media (max-width: 768px) {
+  .display-4 {
+    font-size: 2rem;
+  }
+  
+  .blog-card {
+    margin-bottom: 1.5rem;
+  }
+}
+
+.page-link {
+  border-color: #dee2e6;
+}
+
+.page-link:hover {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: white;
+}
+
+.page-item.active .page-link {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
 </style>
 {% endblock %}

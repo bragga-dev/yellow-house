@@ -1,366 +1,544 @@
 {% extends "vitrine/base.html" %}
 {% load static %}
 
+{% block title %}{{ artist.user.get_full_name }} - Artista | Casa Amarela{% endblock %}
+
+{% block meta_description %}Conheça {{ artist.user.get_full_name }}, artista da Casa Amarela. {{ artist.bio|truncatewords:30 }}{% endblock %}
+
 {% block content %}
-<section class="section py-5">
-  <div class="container">
+<div class="container mt-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Início</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'vitrine:list_artworks' %}" class="text-decoration-none">Artistas</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ artist.user.get_full_name }}</li>
+        </ol>
+    </nav>
 
     <!-- Banner do Perfil -->
-    <div class="profile-banner mb-4">
-      <div class="banner-container position-relative" style="height: 400px; overflow: hidden; border-radius: 12px;">
-        {% if artist.banner %}
-          <img src="{{ artist.banner.url }}" alt="Banner do perfil de {{ artist.user.get_full_name }}" 
-               class="w-100 h-100" style="object-fit: cover;">
-        {% else %}
-          <div class="w-100 h-100 d-flex align-items-center justify-content-center banner-gradient">
-            <div class="text-center text-white">
-              <i class="bi bi-image display-4 mb-3"></i>
-              <h3 class="mb-0">Banner do Perfil</h3>
-            </div>
-          </div>
-        {% endif %}
-      </div>
+    <div class="profile-banner mb-5">
+        <div class="banner-container position-relative rounded-3 overflow-hidden shadow-sm" style="height: 300px;">
+            {% if artist.banner %}
+                <img src="{{ artist.banner.url }}" 
+                     alt="Banner do perfil de {{ artist.user.get_full_name }}" 
+                     class="w-100 h-100 banner-image"
+                     style="object-fit: cover;">
+            {% else %}
+                <div class="w-100 h-100 d-flex align-items-center justify-content-center banner-gradient">
+                    <div class="text-center text-white">
+                        <i class="fas fa-image display-4 mb-3"></i>
+                        <h4 class="mb-0 fw-light">Banner do Artista</h4>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
     </div>
 
     <!-- Informações do Artista -->
     <div class="row align-items-start mb-5">
-      <!-- Foto e Informações Básicas -->
-      <div class="col-lg-3 col-md-4 mb-4">
-        <div class="artist-profile-card text-center p-4 rounded-3 shadow-sm">
-          <div class="profile-image-container mb-3">
-            {% if artist.user.photo %}
-              <img src="{{ artist.user.photo.url }}" 
-                   class="img-fluid rounded-circle border" 
-                   alt="Foto de {{ artist.user.get_full_name }}"
-                   style="width: 150px; height: 150px; object-fit: cover;">
-            {% else %}
-              <div class="default-profile-image rounded-circle mx-auto d-flex align-items-center justify-content-center bg-light border"
-                   style="width: 150px; height: 150px;">
-                <i class="bi bi-person display-4 text-muted"></i>
-              </div>
-            {% endif %}
-          </div>
-          
-          <h2 class="h4 fw-bold text-dark mb-2">{{ artist.user.get_full_name }}</h2>
-          <p class="text-muted mb-3">@{{ artist.user.username }}</p>
+        <!-- Foto e Informações Básicas -->
+        <div class="col-xl-3 col-lg-4 col-md-5 mb-4">
+            <div class="card shadow-sm border-0 artist-profile-card h-100">
+                <div class="card-body text-center p-4">
+                    <div class="profile-image-container mb-4">
+                        {% if artist.user.photo %}
+                            <img src="{{ artist.user.photo.url }}" 
+                                 class="img-fluid rounded-circle profile-image shadow" 
+                                 alt="Foto de {{ artist.user.get_full_name }}"
+                                 style="width: 180px; height: 180px; object-fit: cover;">
+                        {% else %}
+                            <div class="default-profile-image rounded-circle mx-auto d-flex align-items-center justify-content-center bg-light border shadow"
+                                 style="width: 180px; height: 180px;">
+                                <i class="fas fa-user display-4 text-muted"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <h1 class="h3 fw-bold text-dark mb-2">{{ artist.user.get_full_name }}</h1>
+                    <p class="text-muted mb-3">@{{ artist.user.username }}</p>
 
-          {% if artist.is_verified %}
-            <div class="verified-badge mb-3">
-              <span class="badge bg-success px-3 py-2">
-                <i class="bi bi-patch-check-fill me-1"></i>Artista Verificado
-              </span>
-            </div>
-          {% else %}
-            <div class="verified-badge mb-3">
-              <span class="badge bg-secondary px-3 py-2">Não verificado</span>
-            </div>
-          {% endif %}
-        </div>
-      </div>
+                    {% if artist.is_verified %}
+                        <div class="verified-badge mb-4">
+                            <span class="badge bg-success px-3 py-2">
+                                <i class="fas fa-check-circle me-2"></i>Artista Verificado
+                            </span>
+                        </div>
+                    {% endif %}
 
-      <!-- Biografia e Detalhes -->
-      <div class="col-lg-9 col-md-8">
-        <div class="artist-bio-card p-4 rounded-3 shadow-sm h-100">
-          <h3 class="h5 fw-bold mb-3 text-primary">Biografia</h3>
-          <div class="bio-content">
-            {% if artist.bio %}
-              <div class="text-dark lh-base">{{ artist.bio|safe }}</div>
-            {% else %}
-              <div class="text-muted fst-italic">
-                <i class="bi bi-info-circle me-2"></i>O artista ainda não adicionou uma biografia.
-              </div>
-            {% endif %}
-          </div>
+                    <!-- Estatísticas -->
+                    <div class="artist-stats border-top pt-3">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="stat-number fw-bold text-primary fs-4">{{ artist.artworks.count }}</div>
+                                <div class="stat-label text-muted small">Obras</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-number fw-bold text-primary fs-4">{{ artist.exhibitions.count }}</div>
+                                <div class="stat-label text-muted small">Exposições</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <!-- Biografia e Detalhes -->
+        <div class="col-xl-9 col-lg-8 col-md-7">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h3 class="h4 fw-bold text-dark mb-4">Biografia do Artista</h3>
+                    <div class="bio-content">
+                        {% if artist.bio %}
+                            <div class="text-dark lh-lg fs-6">{{ artist.bio|safe }}</div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-info-circle display-4 text-muted mb-3"></i>
+                                <p class="text-muted mb-0">O artista ainda não adicionou uma biografia.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Redes Sociais -->
-    <div class="social-links-card p-4 rounded-3 shadow-sm mb-5">
-      <h3 class="h5 fw-bold mb-4 text-primary">Redes Sociais</h3>
-      <div class="social-links">
-        {% if artist.instagram or artist.facebook or artist.twitter or artist.tiktok %}
-          <div class="d-flex flex-wrap gap-3">
-            {% if artist.instagram %}
-              <a href="{{ artist.instagram }}" target="_blank" class="btn btn-outline-primary btn-sm social-btn">
-                <i class="bi bi-instagram me-2"></i>Instagram
-              </a>
-            {% endif %}
-            
-            {% if artist.facebook %}
-              <a href="{{ artist.facebook }}" target="_blank" class="btn btn-outline-primary btn-sm social-btn">
-                <i class="bi bi-facebook me-2"></i>Facebook
-              </a>
-            {% endif %}
-            
-            {% if artist.twitter %}
-              <a href="{{ artist.twitter }}" target="_blank" class="btn btn-outline-primary btn-sm social-btn">
-                <i class="bi bi-twitter-x me-2"></i>Twitter
-              </a>
-            {% endif %}
-            
-            {% if artist.tiktok %}
-              <a href="{{ artist.tiktok }}" target="_blank" class="btn btn-outline-primary btn-sm social-btn">
-                <i class="bi bi-tiktok me-2"></i>TikTok
-              </a>
-            {% endif %}
-          </div>
-        {% else %}
-          <div class="text-muted text-center py-3">
-            <i class="bi bi-share me-2"></i>O artista ainda não adicionou redes sociais.
-          </div>
-        {% endif %}
-      </div>
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 py-3">
+                    <h3 class="h5 fw-bold text-dark mb-0">
+                        <i class="fas fa-share-alt me-2"></i>Redes Sociais
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if artist.instagram or artist.facebook or artist.twitter or artist.tiktok %}
+                        <div class="d-flex flex-wrap gap-3 justify-content-center">
+                            {% if artist.instagram %}
+                                <a href="{{ artist.instagram }}" target="_blank" class="btn btn-outline-primary btn-lg social-btn">
+                                    <i class="fab fa-instagram me-2"></i>Instagram
+                                </a>
+                            {% endif %}
+                            
+                            {% if artist.facebook %}
+                                <a href="{{ artist.facebook }}" target="_blank" class="btn btn-outline-primary btn-lg social-btn">
+                                    <i class="fab fa-facebook-f me-2"></i>Facebook
+                                </a>
+                            {% endif %}
+                            
+                            {% if artist.twitter %}
+                                <a href="{{ artist.twitter }}" target="_blank" class="btn btn-outline-info btn-lg social-btn">
+                                    <i class="fab fa-twitter me-2"></i>Twitter
+                                </a>
+                            {% endif %}
+                            
+                            {% if artist.tiktok %}
+                                <a href="{{ artist.tiktok }}" target="_blank" class="btn btn-outline-dark btn-lg social-btn">
+                                    <i class="fab fa-tiktok me-2"></i>TikTok
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-share-nodes display-4 text-muted mb-3"></i>
+                            <p class="text-muted mb-0">O artista ainda não adicionou redes sociais.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Obras -->
-    <div class="artworks-section mb-5">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="h5 fw-bold text-primary">Obras</h3>
-        {% if artist.artworks.all %}
-          <span class="badge bg-primary">{{ artist.artworks.count }} obra{{ artist.artworks.count|pluralize }}</span>
-        {% endif %}
-      </div>
+    <!-- Obras do Artista -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h4 fw-bold text-dark mb-0">
+                    <i class="fas fa-palette me-2"></i>Obras do Artista
+                </h2>
+                {% if artist.artworks.all %}
+                    <span class="badge bg-primary fs-6 px-3 py-2">
+                        {{ artist.artworks.count }} obra{{ artist.artworks.count|pluralize }}
+                    </span>
+                {% endif %}
+            </div>
 
-      {% if artist.artworks.all %}
-        <div id="artworksCarousel" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner">
-            {% for artwork in artist.artworks.all %}
-              <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <div class="row justify-content-center">
-                  <div class="col-lg-6 col-md-8">
-                    <a href="{% url 'vitrine:detail_artwork' slug=artwork.slug artwork_id=artwork.id %}" class="text-decoration-none">
-                      <div class="card artwork-card h-100 shadow-sm border-0">
-                        {% if artwork.images.first %}
-                          <div class="artwork-image-container" style="height: 300px;">
-                            <img src="{{ artwork.images.first.image.url }}" 
-                                 class="card-img-top h-100" 
-                                 alt="{{ artwork.title }}"
-                                 style="object-fit: cover;">
-                          </div>
-                        {% else %}
-                          <div class="artwork-placeholder d-flex align-items-center justify-content-center bg-light" style="height: 300px;">
-                            <div class="text-center text-muted">
-                              <i class="bi bi-image display-4 mb-2"></i>
-                              <p class="mb-0">Sem imagem</p>
+            {% if artist.artworks.all %}
+                <div class="row" id="artworks-grid">
+                    {% for artwork in artist.artworks.all %}
+                        <div class="col-xl-3 col-lg-4 col-md-6 mb-4 artwork-item">
+                            <div class="card h-100 shadow-sm border-0 artwork-card position-relative">
+                                <!-- Badge de Edição Limitada -->
+                                {% if artwork.is_limited_edition %}
+                                <div class="position-absolute top-0 start-0 end-0 p-2 d-flex justify-content-end">
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-award me-1"></i>Edição Limitada
+                                    </span>
+                                </div>
+                                {% endif %}
+
+                                <!-- Imagem da Obra -->
+                                <div class="position-relative overflow-hidden">
+                                    {% if artwork.images.first %}
+                                        <img src="{{ artwork.images.first.image.url }}" 
+                                             class="card-img-top artwork-image" 
+                                             alt="{{ artwork.name }}"
+                                             loading="lazy"
+                                             style="height: 250px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                             style="height: 250px;">
+                                            <i class="fas fa-image text-muted display-4"></i>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Overlay de Ações -->
+                                    <div class="artwork-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                        <div class="btn-group">
+                                            <a href="{% url 'vitrine:detail_artwork' artwork.slug artwork.id %}" 
+                                               class="btn btn-light btn-sm">
+                                                <i class="fas fa-eye me-1"></i>Detalhes
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Informações da Obra -->
+                                <div class="card-body d-flex flex-column">
+                                    <!-- Categoria -->
+                                    {% if artwork.art_work_category %}
+                                        <div class="mb-2">
+                                            <span class="badge bg-primary bg-opacity-90 text-white">
+                                                {{ artwork.art_work_category.name }}
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <h5 class="card-title fw-bold text-dark mb-2">{{ artwork.name }}</h5>
+                                    
+                                    {% if artwork.technique %}
+                                    <p class="card-text text-muted small mb-2">
+                                        <i class="fas fa-brush me-1"></i>{{ artwork.technique }}
+                                    </p>
+                                    {% endif %}
+                                    
+                                    <p class="card-text text-muted small mb-3">
+                                        <i class="fas fa-arrows-alt me-1"></i>
+                                        {{ artwork.width }} × {{ artwork.height }} cm
+                                    </p>
+
+                                    <!-- Preço -->
+                                    <div class="mt-auto">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <span class="fw-bold text-success fs-5">R$ {{ artwork.price }}</span>
+                                            {% if artwork.original_price and artwork.original_price > artwork.price %}
+                                                <span class="text-muted text-decoration-line-through small">R$ {{ artwork.original_price }}</span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <a href="{% url 'vitrine:detail_artwork' artwork.slug artwork.id %}" 
+                                           class="btn btn-outline-dark w-100 btn-hover-primary">
+                                            <i class="fas fa-eye me-2"></i>Ver Detalhes
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                          </div>
-                        {% endif %}
-                        
-                        <div class="card-body">
-                          <h5 class="card-title text-dark fw-bold">{{ artwork.title }}</h5>
-                          <div class="artwork-meta text-muted mb-2">
-                            <small class="d-block">
-                              <i class="bi bi-tag me-1"></i><strong>Categoria:</strong> {{ artwork.art_work_category.name }}
-                            </small>
-                            <small class="d-block">
-                              <i class="bi bi-currency-dollar me-1"></i><strong>Preço:</strong> R$ {{ artwork.price|floatformat:2 }}
-                            </small>
-                          </div>
-                          <p class="card-text text-dark">{{ artwork.description|truncatewords:20 }}</p>
                         </div>
-                      </div>
-                    </a>
-                  </div>
+                    {% endfor %}
                 </div>
-              </div>
-            {% endfor %}
-          </div>
-          
-          <!-- Controles do Carrossel -->
-          <button class="carousel-control-prev" type="button" data-bs-target="#artworksCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon custom-carousel-control" aria-hidden="true"></span>
-            <span class="visually-hidden">Anterior</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#artworksCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon custom-carousel-control" aria-hidden="true"></span>
-            <span class="visually-hidden">Próximo</span>
-          </button>
+            {% else %}
+                <div class="text-center py-5 my-3">
+                    <i class="fas fa-palette display-1 text-muted mb-4"></i>
+                    <h4 class="text-muted mb-3">Nenhuma obra registrada</h4>
+                    <p class="text-muted mb-4">Este artista ainda não possui obras cadastradas em nossa galeria.</p>
+                </div>
+            {% endif %}
         </div>
-      {% else %}
-        <div class="empty-state text-center py-5">
-          <i class="bi bi-palette display-4 text-muted mb-3"></i>
-          <p class="text-muted">Nenhuma obra registrada ainda.</p>
-        </div>
-      {% endif %}
     </div>
 
     <!-- Exposições -->
-    <div class="exhibitions-section mb-5">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="h5 fw-bold text-primary">Exposições</h3>
-        {% if artist.exhibitions.all %}
-          <span class="badge bg-primary">{{ artist.exhibitions.count }} exposição{{ artist.exhibitions.count|pluralize }}</span>
-        {% endif %}
-      </div>
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h4 fw-bold text-dark mb-0">
+                    <i class="fas fa-calendar-alt me-2"></i>Exposições
+                </h2>
+                {% if artist.exhibitions.all %}
+                    <span class="badge bg-primary fs-6 px-3 py-2">
+                        {{ artist.exhibitions.count }} exposição{{ artist.exhibitions.count|pluralize }}
+                    </span>
+                {% endif %}
+            </div>
 
-      {% if artist.exhibitions.all %}
-        <div id="exhibitionsCarousel" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner">
-            {% for exhibition in artist.exhibitions.all %}
-              <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <div class="row justify-content-center">
-                  <div class="col-lg-6 col-md-8">
-                    <a href="{% url 'artist:exhibition_detail' slug=exhibition.slug exhibition_id=exhibition.pk %}" class="text-decoration-none">
-                      <div class="card exhibition-card h-100 shadow-sm border-0">
-                        {% if exhibition.exhibition_banner %}
-                          <div class="exhibition-image-container" style="height: 300px;">
-                            <img src="{{ exhibition.exhibition_banner.url }}" 
-                                 class="card-img-top h-100" 
-                                 alt="{{ exhibition.title }}"
-                                 style="object-fit: cover;">
-                          </div>
-                        {% else %}
-                          <div class="exhibition-placeholder d-flex align-items-center justify-content-center bg-light" style="height: 300px;">
-                            <div class="text-center text-muted">
-                              <i class="bi bi-calendar-event display-4 mb-2"></i>
-                              <p class="mb-0">Sem imagem</p>
+            {% if artist.exhibitions.all %}
+                <div class="row" id="exhibitions-grid">
+                    {% for exhibition in artist.exhibitions.all %}
+                        <div class="col-xl-4 col-lg-6 col-md-6 mb-4 exhibition-item">
+                            <div class="card h-100 shadow-sm border-0 exhibition-card position-relative">
+                                <!-- Imagem da Exposição -->
+                                <div class="position-relative overflow-hidden">
+                                    {% if exhibition.exhibition_banner %}
+                                        <img src="{{ exhibition.exhibition_banner.url }}" 
+                                             class="card-img-top exhibition-image" 
+                                             alt="{{ exhibition.title }}"
+                                             loading="lazy"
+                                             style="height: 200px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                             style="height: 200px;">
+                                            <i class="fas fa-calendar-alt text-muted display-4"></i>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Overlay de Ações -->
+                                    <div class="exhibition-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                        <div class="btn-group">
+                                            <a href="{% url 'artist:exhibition_detail' exhibition.slug exhibition.pk %}" 
+                                               class="btn btn-light btn-sm">
+                                                <i class="fas fa-eye me-1"></i>Detalhes
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Informações da Exposição -->
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title fw-bold text-dark mb-3">{{ exhibition.title }}</h5>
+                                    
+                                    <div class="exhibition-meta text-muted mb-3">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-map-marker-alt me-2"></i>
+                                            <small>{{ exhibition.location }}</small>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-calendar me-2"></i>
+                                            <small>{{ exhibition.date|date:"d/m/Y" }}</small>
+                                        </div>
+                                    </div>
+
+                                    <p class="card-text text-muted small flex-grow-1">
+                                        {{ exhibition.description|truncatewords:20 }}
+                                    </p>
+
+                                    <div class="mt-auto">
+                                        <a href="{% url 'artist:exhibition_detail' exhibition.slug exhibition.pk %}" 
+                                           class="btn btn-outline-dark w-100 btn-hover-primary">
+                                            <i class="fas fa-info-circle me-2"></i>Ver Detalhes
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                          </div>
-                        {% endif %}
-                        
-                        <div class="card-body">
-                          <h5 class="card-title text-dark fw-bold">{{ exhibition.title }}</h5>
-                          <div class="exhibition-meta text-muted mb-2">
-                            <small class="d-block">
-                              <i class="bi bi-geo-alt me-1"></i><strong>Local:</strong> {{ exhibition.location }}
-                            </small>
-                            <small class="d-block">
-                              <i class="bi bi-calendar me-1"></i><strong>Data:</strong> {{ exhibition.date|date:"d/m/Y" }}
-                            </small>
-                          </div>
-                          <p class="card-text text-dark">{{ exhibition.description|truncatewords:20 }}</p>
                         </div>
-                      </div>
-                    </a>
-                  </div>
+                    {% endfor %}
                 </div>
-              </div>
-            {% endfor %}
-          </div>
-
-          <!-- Controles do Carrossel -->
-          <button class="carousel-control-prev" type="button" data-bs-target="#exhibitionsCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon custom-carousel-control" aria-hidden="true"></span>
-            <span class="visually-hidden">Anterior</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#exhibitionsCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon custom-carousel-control" aria-hidden="true"></span>
-            <span class="visually-hidden">Próximo</span>
-          </button>
+            {% else %}
+                <div class="text-center py-5 my-3">
+                    <i class="fas fa-calendar-alt display-1 text-muted mb-4"></i>
+                    <h4 class="text-muted mb-3">Nenhuma exposição</h4>
+                    <p class="text-muted mb-4">Este artista ainda não participou de exposições registradas.</p>
+                </div>
+            {% endif %}
         </div>
-      {% else %}
-        <div class="empty-state text-center py-5">
-          <i class="bi bi-calendar-event display-4 text-muted mb-3"></i>
-          <p class="text-muted">Nenhuma exposição registrada ainda.</p>
-        </div>
-      {% endif %}
     </div>
 
     <!-- Artistas Relacionados -->
-    <div class="related-artists-section">
-      <h3 class="h5 fw-bold mb-4 text-primary">Artistas Relacionados</h3>
-      
-      {% if artists %}
-        <div id="relatedArtistsCarousel" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner">
-            {% for related_artist in artists %}
-              <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <div class="row justify-content-center">
-                  <div class="col-auto">
-                    <a href="{% url 'artist:artist_detail' slug=related_artist.user.slug pk=related_artist.user.pk %}" class="text-decoration-none">
-                      <div class="related-artist-card text-center">
-                        <div class="artist-avatar mb-3">
-                          {% if related_artist.user.photo %}
-                            <img src="{{ related_artist.user.photo.url }}" 
-                                 class="rounded-circle shadow-sm border" 
-                                 style="width: 120px; height: 120px; object-fit: cover;" 
-                                 alt="Foto de {{ related_artist.user.get_full_name }}">
-                          {% else %}
-                            <div class="rounded-circle bg-light border d-flex align-items-center justify-content-center mx-auto" 
-                                 style="width: 120px; height: 120px;">
-                              <i class="bi bi-person text-muted" style="font-size: 2rem;"></i>
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h4 fw-bold text-dark mb-0">
+                    <i class="fas fa-users me-2"></i>Artistas Relacionados
+                </h2>
+            </div>
+
+            {% if artists %}
+                <div class="row" id="related-artists-grid">
+                    {% for related_artist in artists %}
+                        <div class="col-xl-3 col-lg-4 col-md-6 mb-4 related-artist-item">
+                            <div class="card h-100 shadow-sm border-0 text-center related-artist-card">
+                                <div class="card-body p-4 d-flex flex-column">
+                                    <!-- Avatar do Artista -->
+                                    <div class="related-artist-avatar mb-3">
+                                        {% if related_artist.user.photo %}
+                                            <img src="{{ related_artist.user.photo.url }}" 
+                                                 class="rounded-circle shadow-sm border related-artist-image" 
+                                                 alt="Foto de {{ related_artist.user.get_full_name }}"
+                                                 style="width: 120px; height: 120px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="rounded-circle bg-light border d-flex align-items-center justify-content-center mx-auto" 
+                                                 style="width: 120px; height: 120px;">
+                                                <i class="fas fa-user text-muted display-5"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Informações do Artista -->
+                                    <h5 class="fw-bold text-dark mb-2">{{ related_artist.user.get_full_name }}</h5>
+                                    <p class="text-muted small mb-3">@{{ related_artist.user.username }}</p>
+                                    
+                                    <!-- Badge de Verificação -->
+                                    {% if related_artist.is_verified %}
+                                        <div class="mb-3">
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>Verificado
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Estatísticas -->
+                                    <div class="related-artist-stats mt-auto">
+                                        <div class="row text-center">
+                                            <div class="col-6">
+                                                <div class="stat-number fw-bold text-primary">{{ related_artist.artworks.count }}</div>
+                                                <div class="stat-label text-muted small">Obras</div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="stat-number fw-bold text-primary">{{ related_artist.exhibitions.count }}</div>
+                                                <div class="stat-label text-muted small">Exposições</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Botão de Ação -->
+                                    <div class="mt-3">
+                                        <a href="{% url 'artist:artist_detail' related_artist.user.slug related_artist.user.pk %}" 
+                                           class="btn btn-outline-dark w-100 btn-hover-primary btn-sm">
+                                            <i class="fas fa-user me-2"></i>Ver Perfil
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                          {% endif %}
                         </div>
-                        <h6 class="fw-bold text-dark mb-1">{{ related_artist.user.get_full_name }}</h6>
-                        <small class="text-muted">@{{ related_artist.user.username }}</small>
-                      </div>
-                    </a>
-                  </div>
+                    {% endfor %}
                 </div>
-              </div>
-            {% endfor %}
-          </div>
-          
-          <!-- Controles do Carrossel -->
-          <button class="carousel-control-prev" type="button" data-bs-target="#relatedArtistsCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon custom-carousel-control" aria-hidden="true"></span>
-            <span class="visually-hidden">Anterior</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#relatedArtistsCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon custom-carousel-control" aria-hidden="true"></span>
-            <span class="visually-hidden">Próximo</span>
-          </button>
+            {% else %}
+                <div class="text-center py-5 my-3">
+                    <i class="fas fa-users display-1 text-muted mb-4"></i>
+                    <h4 class="text-muted mb-3">Nenhum artista relacionado</h4>
+                    <p class="text-muted mb-4">Não encontramos artistas relacionados no momento.</p>
+                </div>
+            {% endif %}
         </div>
-      {% else %}
-        <div class="empty-state text-center py-5">
-          <i class="bi bi-people display-4 text-muted mb-3"></i>
-          <p class="text-muted">Nenhum artista relacionado encontrado.</p>
-        </div>
-      {% endif %}
     </div>
-  </div>
-</section>
+</div>
 
 <style>
 .banner-gradient {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-info) 100%);
 }
 
-.artist-profile-card, .artist-bio-card, .social-links-card {
-  background: #ffffff;
-  border: 1px solid #e9ecef;
+.artist-profile-card, .artwork-card, .exhibition-card, .related-artist-card {
+    transition: all 0.3s ease;
+    border: 1px solid #f8f9fa;
 }
 
-.custom-carousel-control {
-  background-color: rgba(0,0,0,0.6);
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  background-size: 1.5rem;
+.artist-profile-card:hover, .artwork-card:hover, .exhibition-card:hover, .related-artist-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    border-color: #e9ecef;
 }
 
-.artwork-card, .exhibition-card, .related-artist-card {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+.artwork-image, .exhibition-image, .banner-image, .profile-image, .related-artist-image {
+    transition: transform 0.3s ease;
 }
 
-.artwork-card:hover, .exhibition-card:hover, .related-artist-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+.artwork-card:hover .artwork-image,
+.exhibition-card:hover .exhibition-image,
+.related-artist-card:hover .related-artist-image {
+    transform: scale(1.05);
+}
+
+.artwork-overlay, .exhibition-overlay {
+    background: rgba(0,0,0,0.7);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.artwork-card:hover .artwork-overlay,
+.exhibition-card:hover .exhibition-overlay {
+    opacity: 1;
+}
+
+.btn-hover-primary:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
 }
 
 .social-btn {
-  transition: all 0.2s ease-in-out;
+    transition: all 0.3s ease;
+    border-radius: 25px;
+    padding: 0.5rem 1.5rem;
 }
 
 .social-btn:hover {
-  transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.empty-state {
-  background: #f8f9fa;
-  border-radius: 12px;
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 2rem;
 }
 
+.breadcrumb-item a {
+    color: #6c757d;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--bs-primary);
+}
+
+.stat-number {
+    font-weight: 700;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Animações suaves */
+.card {
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsividade */
 @media (max-width: 768px) {
-  .profile-banner .banner-container {
-    height: 200px;
-  }
-  
-  .artist-profile-card, .artist-bio-card {
-    text-align: center;
-  }
+    .banner-container {
+        height: 200px !important;
+    }
+    
+    .profile-image-container img,
+    .default-profile-image {
+        width: 120px !important;
+        height: 120px !important;
+    }
+    
+    .social-btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .related-artist-avatar img,
+    .related-artist-avatar .rounded-circle {
+        width: 80px !important;
+        height: 80px !important;
+    }
 }
 </style>
 {% endblock %}

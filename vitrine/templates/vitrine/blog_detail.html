@@ -3,8 +3,10 @@
 
 {% block title %}{{ blog.title }} - Blog Casa Amarela{% endblock %}
 
+{% block meta_description %}{{ blog.text|truncatewords:30 }}{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-4">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
@@ -14,69 +16,79 @@
     </nav>
 
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <!-- Cabeçalho do Post -->
-            <article class="blog-detail">
-                <!-- Imagem Principal -->
-                {% if blog.image %}
-                <div class="mb-4">
-                    <img src="{{ blog.image.url }}" class="img-fluid rounded shadow" alt="{{ blog.title }}" style="width: 100%; height: 400px; object-fit: cover;">
-                </div>
-                {% endif %}
-
-                <!-- Metadados -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <small class="text-muted">
-                            <i class="far fa-calendar-alt me-1"></i>
-                            Publicado em {{ blog.created_at|date:"d/m/Y" }}
-                        </small>
-                        {% if blog.updated_at != blog.created_at %}
-                        <small class="text-muted ms-3">
-                            <i class="fas fa-sync-alt me-1"></i>
-                            Atualizado em {{ blog.updated_at|date:"d/m/Y" }}
-                        </small>
-                        {% endif %}
+        <div class="col-lg-10">
+            <!-- Artigo Principal -->
+            <article class="blog-detail-card card shadow-sm border-0">
+                <div class="card-body p-5">
+                    <!-- Imagem Principal -->
+                    {% if blog.image %}
+                    <div class="mb-5 text-center">
+                        <img src="{{ blog.image.url }}" 
+                             class="img-fluid rounded blog-main-image" 
+                             alt="{{ blog.title }}"
+                             style="width: 100%; max-height: 500px; object-fit: cover;">
                     </div>
-                    <div>
-                        <span class="badge bg-warning text-dark">
-                            <i class="fas fa-book-open me-1"></i>
-                            Blog
-                        </span>
+                    {% endif %}
+
+                    <!-- Metadados -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="d-flex align-items-center text-muted">
+                                <i class="far fa-calendar-alt me-2"></i>
+                                <span class="small">Publicado em {{ blog.created_at|date:"d/m/Y" }}</span>
+                            </div>
+                            {% if blog.updated_at != blog.created_at %}
+                            <div class="d-flex align-items-center text-muted">
+                                <i class="fas fa-sync-alt me-2"></i>
+                                <span class="small">Atualizado em {{ blog.updated_at|date:"d/m/Y" }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <span class="badge bg-primary bg-opacity-90 text-white">
+                                <i class="fas fa-book-open me-1"></i>
+                                Artigo
+                            </span>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Título -->
-                <h1 class="display-5 text-dark mb-4">{{ blog.title }}</h1>
+                    <!-- Título -->
+                    <h1 class="fw-bold text-dark mb-4 display-5">{{ blog.title }}</h1>
 
-                <!-- Conteúdo do Post -->
-                <div class="blog-content">
-                    {{ blog.text|linebreaks }}
-                </div>
+                    <!-- Conteúdo do Post -->
+                    <div class="blog-content">
+                        {{ blog.text|linebreaks }}
+                    </div>
 
-                <!-- Divisor -->
-                <hr class="my-5">
+                    <!-- Divisor -->
+                    <hr class="my-5">
 
-                <!-- Ações -->
-                <div class="d-flex justify-content-between align-items-center">
-                    <!-- Botão Voltar -->
-                    <a href="{% url 'vitrine:blog_list' %}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>
-                        Voltar para o Blog
-                    </a>
-
-                    <!-- Compartilhamento -->
-                    <div class="share-buttons">
-                        <small class="text-muted me-2">Compartilhar:</small>
-                        <a href="#" class="text-decoration-none text-muted me-2" onclick="shareOnFacebook()">
-                            <i class="fab fa-facebook fa-lg"></i>
+                    <!-- Ações -->
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <!-- Botão Voltar -->
+                        <a href="{% url 'vitrine:blog_list' %}" class="btn btn-outline-dark btn-hover-primary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar para o Blog
                         </a>
-                        <a href="#" class="text-decoration-none text-muted me-2" onclick="shareOnTwitter()">
-                            <i class="fab fa-twitter fa-lg"></i>
-                        </a>
-                        <a href="#" class="text-decoration-none text-muted" onclick="shareOnLinkedIn()">
-                            <i class="fab fa-linkedin fa-lg"></i>
-                        </a>
+
+                        <!-- Compartilhamento -->
+                        <div class="share-buttons d-flex align-items-center">
+                            <span class="text-muted me-3 fw-semibold">Compartilhar:</span>
+                            <div class="d-flex gap-2">
+                                <a href="#" class="btn btn-outline-primary btn-sm share-btn" onclick="shareOnFacebook()">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-info btn-sm share-btn" onclick="shareOnTwitter()">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-primary btn-sm share-btn" onclick="shareOnLinkedIn()">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-danger btn-sm share-btn" onclick="shareOnWhatsApp()">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </article>
@@ -87,24 +99,77 @@
     {% if related_posts %}
     <div class="row mt-5">
         <div class="col-12">
-            <h3 class="text-dark mb-4">Posts Relacionados</h3>
-            <div class="row">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold text-dark mb-0">Posts Relacionados</h3>
+                <a href="{% url 'vitrine:blog_list' %}" class="btn btn-outline-primary btn-sm">
+                    Ver Todos <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            
+            <div class="row" id="related-posts-grid">
                 {% for related in related_posts %}
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        {% if related.image %}
-                        <img src="{{ related.image.url }}" class="card-img-top" alt="{{ related.title }}" style="height: 200px; object-fit: cover;">
-                        {% else %}
-                        <img src="{% static 'images/blog-placeholder.jpg' %}" class="card-img-top" alt="Imagem padrão" style="height: 200px; object-fit: cover;">
+                <div class="col-xl-4 col-lg-6 col-md-6 mb-4 related-post-item">
+                    <div class="card h-100 shadow-sm border-0 blog-card position-relative">
+                        <!-- Badge de Atualização -->
+                        {% if related.updated_at != related.created_at %}
+                        <div class="position-absolute top-0 start-0 end-0 p-2 d-flex justify-content-end">
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-sync-alt me-1"></i>Atualizado
+                            </span>
+                        </div>
                         {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title h6">{{ related.title }}</h5>
-                            <p class="card-text text-muted small">
+
+                        <!-- Imagem do Post -->
+                        <div class="position-relative overflow-hidden">
+                            {% if related.image %}
+                                <img src="{{ related.image.url }}" 
+                                     class="card-img-top blog-image" 
+                                     alt="{{ related.title }}"
+                                     loading="lazy"
+                                     style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                     style="height: 200px;">
+                                    <i class="fas fa-image text-muted display-6"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Overlay de Ações -->
+                            <div class="blog-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <div class="btn-group">
+                                    <a href="{{ related.get_absolute_url }}" 
+                                       class="btn btn-light btn-sm">
+                                        <i class="fas fa-eye me-1"></i>Ler Mais
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informações do Post -->
+                        <div class="card-body d-flex flex-column">
+                            <!-- Data -->
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="far fa-calendar-alt me-1"></i>
+                                    {{ related.created_at|date:"d/m/Y" }}
+                                </small>
+                            </div>
+
+                            <!-- Título -->
+                            <h5 class="card-title fw-bold text-dark mb-3">{{ related.title }}</h5>
+                            
+                            <!-- Resumo -->
+                            <p class="card-text text-muted mb-3 flex-grow-1 small">
                                 {{ related.text|truncatewords:20 }}
                             </p>
-                            <a href="{{ related.get_absolute_url }}" class="btn btn-warning btn-sm">
-                                Ler Mais
-                            </a>
+
+                            <!-- Botão de Ação -->
+                            <div class="mt-auto">
+                                <a href="{{ related.get_absolute_url }}" 
+                                   class="btn btn-outline-dark w-100 btn-hover-primary btn-sm">
+                                    <i class="fas fa-book me-1"></i>Ler Artigo
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -119,59 +184,179 @@
 <script>
 function shareOnFacebook() {
     const url = encodeURIComponent(window.location.href);
-    const title = encodeURIComponent("{{ blog.title }}");
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${title}`, '_blank');
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
 }
 
 function shareOnTwitter() {
     const url = encodeURIComponent(window.location.href);
     const text = encodeURIComponent("{{ blog.title }}");
-    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank', 'width=600,height=400');
 }
 
 function shareOnLinkedIn() {
     const url = encodeURIComponent(window.location.href);
-    const title = encodeURIComponent("{{ blog.title }}");
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank', 'width=600,height=400');
 }
+
+function shareOnWhatsApp() {
+    const text = encodeURIComponent("{{ blog.title }} - " + window.location.href);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+// Adicionar efeitos de hover nos botões de compartilhamento
+document.addEventListener('DOMContentLoaded', function() {
+    const shareButtons = document.querySelectorAll('.share-btn');
+    shareButtons.forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
 </script>
 
-<!-- Estilos Customizados -->
 <style>
-    .blog-content {
-        font-size: 1.1rem;
-        line-height: 1.8;
-        color: #495057;
+.blog-detail-card {
+    transition: all 0.3s ease;
+    border: 1px solid #f8f9fa;
+}
+
+.blog-detail-card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+.blog-main-image {
+    transition: transform 0.3s ease;
+}
+
+.blog-detail-card:hover .blog-main-image {
+    transform: scale(1.02);
+}
+
+.blog-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #495057;
+}
+
+.blog-content p {
+    margin-bottom: 1.5rem;
+}
+
+.blog-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+}
+
+.share-btn {
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-hover-primary:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+}
+
+/* Estilos dos cards de posts relacionados */
+.blog-card {
+    transition: all 0.3s ease;
+    border: 1px solid #f8f9fa;
+}
+
+.blog-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.15) !important;
+    border-color: #e9ecef;
+}
+
+.blog-image {
+    transition: transform 0.3s ease;
+}
+
+.blog-card:hover .blog-image {
+    transform: scale(1.05);
+}
+
+.blog-overlay {
+    background: rgba(0,0,0,0.7);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.blog-card:hover .blog-overlay {
+    opacity: 1;
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 2rem;
+}
+
+.breadcrumb-item a {
+    color: #6c757d;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--bs-primary);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .blog-detail-card .card-body {
+        padding: 2rem 1.5rem;
     }
     
-    .blog-content p {
-        margin-bottom: 1.5rem;
+    .display-5 {
+        font-size: 2rem;
     }
     
-    .share-buttons a:hover {
-        color: #ffc107 !important;
-        transform: scale(1.1);
-        transition: all 0.3s ease;
+    .share-buttons {
+        width: 100%;
+        justify-content: center;
+        margin-top: 1rem;
     }
     
-    .breadcrumb {
-        background-color: transparent;
-        padding: 0;
+    .d-flex.justify-content-between.align-items-center.mb-4 {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem;
     }
-    
-    .breadcrumb-item a {
-        color: #6c757d;
+}
+
+/* Animações suaves */
+.card {
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
-    .breadcrumb-item a:hover {
-        color: #ffc107;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    
-    .blog-detail {
-        background: white;
-        padding: 2rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
+}
 </style>
 {% endblock %}

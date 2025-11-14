@@ -108,21 +108,24 @@
                 </div>
                 <div class="dropdown-body">
                 {% if request.user.is_authenticated %}
-                 <a class="dropdown-item d-flex align-items-center" href="{% url 'shared:profile_redirect' request.user.slug request.user.pk %}">
+                 {% if request.user.is_artist and request.user.artist.is_verified %}   
+                 <a class="dropdown-item d-flex align-items-center" href="{% url 'artist:artist_detail' slug=request.user.slug pk=request.user.pk %}">
                     <i class="bi bi-person-circle me-2"></i>
-                    <span>My Profile</span>
-                  </a>                  
-                  <a class="dropdown-item d-flex align-items-center" href="">
-                    <i class="bi bi-bag-check me-2"></i>
-                    <span>My Orders</span>
-                  </a>              
-                  <a class="dropdown-item d-flex align-items-center" href="">
+                    <span>PERFIL</span>
+                  </a>    
+                            
+                  <a class="dropdown-item d-flex align-items-center" href="{% url 'artist:collection' slug=request.user.slug pk=request.user.pk %}">
+                    <i class="bi bi-palette me-2"></i> 
+                    <span>ACERVO</span>
+                  </a>   
+                  {% endif %}           
+                  <a class="dropdown-item d-flex align-items-center" href="{% url 'shared:profile_redirect' request.user.slug request.user.pk %}">
                     <i class="bi bi-gear me-2"></i>
-                    <span>Settings</span>
+                    <span>CONFIGURAÇÕES</span>
                   </a>
                   <a class="dropdown-item d-flex align-items-center" href="{% url 'account_logout' %}">
                     <i class="bi bi-box-arrow-right me-2"></i>
-                    <span>Logout</span>
+                    <span>LOGOUT</span>
                   </a>
                 {% endif %}
                 </div>

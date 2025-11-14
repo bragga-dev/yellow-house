@@ -19,12 +19,8 @@
                                 <span>Av. das Formigas, 318 - Jequié, BA</span>
                             </div>
                             <div class="contact-item">
-                                <i class="bi bi-whatsapp"></i>
-                                <span>(73) 99999-9999</span>
-                            </div>
-                            <div class="contact-item">
                                 <i class="bi bi-envelope"></i>
-                                <span>contato@casamarela.com.br</span>
+                                <span>felipebrmoraes@gmail.com</span>
                             </div>
                             <div class="contact-item">
                                 <i class="bi bi-building"></i>
@@ -39,12 +35,12 @@
                     <div class="footer-widget">
                         <h4>Navegação</h4>
                         <ul class="footer-links">
-                            <li><a href="index.html">Início</a></li>
-                            <li><a href="sobre.html">Sobre Nós</a></li>
-                            <li><a href="colecoes.html">Coleções</a></li>
-                            <li><a href="artesanato.html">Artesanato</a></li>
-                            <li><a href="arte-autoral.html">Arte Autoral</a></li>
-                            <li><a href="blog.html">Blog</a></li>
+                            <li><a href="{% url 'vitrine:index' %}">Início</a></li>
+                            <li><a href="{% url 'vitrine:on_view' %}">Sobre Nós</a></li>
+                            <li><a href="{% url 'vitrine:list_artworks' %}">Coleções</a></li>
+                            <li><a href="{% url 'vitrine:list_souvenirs' %}">Artesanato</a></li>
+                            <li><a href="{% url 'artist:artists_list' %}">Arte Autoral</a></li>
+                            <li><a href="{% url 'vitrine:blog_list' %}">Blog</a></li>
                         </ul>
                     </div>
                 </div>
@@ -58,18 +54,6 @@
                         <div class="social-icons mb-4">
                             <a href="https://www.instagram.com/felipemoraes.arte/" aria-label="Instagram" class="instagram">
                                 <i class="bi bi-instagram"></i>
-                            </a>
-                            <a href="#" aria-label="Facebook" class="facebook">
-                                <i class="bi bi-facebook"></i>
-                            </a>
-                            <a href="#" aria-label="WhatsApp" class="whatsapp">
-                                <i class="bi bi-whatsapp"></i>
-                            </a>
-                            <a href="#" aria-label="Pinterest" class="pinterest">
-                                <i class="bi bi-pinterest"></i>
-                            </a>
-                            <a href="#" aria-label="YouTube" class="youtube">
-                                <i class="bi bi-youtube"></i>
                             </a>
                         </div>
 
@@ -108,7 +92,7 @@
                                     <input type="text" name="subject" class="form-control" placeholder="Assunto" required>
                                 </div>
                                 <div class="col-12">
-                                    <textarea name="message" rows="10" class="form-control" placeholder="Sua mensagem..." required></textarea>
+                                    <textarea name="message" rows="6" class="form-control" placeholder="Sua mensagem..." required></textarea>
                                 </div>
                                 <div style="position:absolute; left:-9999px;" aria-hidden="true">
                                     <label for="website">Não preencha este campo</label>

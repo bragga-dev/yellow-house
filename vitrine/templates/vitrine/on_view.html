@@ -1,63 +1,99 @@
 {% extends "vitrine/base.html" %}
-{% block title %}Sobre{% endblock %}
+{% load static %}
+
+{% block title %}Sobre - Casa Amarela{% endblock %}
+
+{% block meta_description %}Conheça a Casa Amarela, espaço de arte criado pelo artista Felipe Moraes. Obras autorais, souvenirs especiais e uma visão única através da cor e sensibilidade.{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-lg-10 mx-auto">
-            <!-- Cabeçalho da página -->
-            <div class="text-center mb-5">
-                <h1 class="display-4 text-dark mb-3">Sobre a Casa Amarela</h1>
-                <div class="border-bottom border-warning w-25 mx-auto"></div>
-            </div>
+<div class="container mt-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Início</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Sobre</li>
+        </ol>
+    </nav>
 
-            <!-- Conteúdo principal -->
-            <div class="card shadow-sm border-0 mb-4">
+    <!-- Cabeçalho da página -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="text-center">
+                <h1 class="fw-bold text-dark mb-3 display-4">Sobre a Casa Amarela</h1>
+                <p class="lead text-muted mb-4">Um espaço de arte, cor e sensibilidade</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="card shadow-sm border-0">
                 <div class="card-body p-4 p-md-5">
-                    <div class="row align-items-center">
-                        <!-- Texto sobre -->
+                    <div class="row align-items-center mb-4">
                         <div class="col-lg-12">
-                            <p class="lead text-dark mb-4">
-                                A <strong class="text-warning">Casa Amarela</strong> nasce como um espaço de arte, cor e sensibilidade criado pelo artista plástico <strong>Felipe Moraes</strong>.
+                            <p class="lead text-dark mb-4 fs-5">
+                                A <strong class="text-primary">Casa Amarela</strong> nasce como um espaço de arte, cor e sensibilidade criado pelo artista plástico <strong>Felipe Moraes</strong>.
                             </p>
                             
-                            <p class="mb-4">
+                            <p class="text-dark mb-4 lh-lg">
                                 Mais do que um e-commerce, é um ateliê expandido — um lugar onde pintura, experimentação e emoção se encontram para dar forma a obras únicas e souvenirs cheios de significado.
                             </p>
 
+                            <!-- Cards de Destaque -->
                             <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <div class="p-3 bg-light rounded">
-                                        <h5 class="text-warning">O Artista</h5>
-                                        <p class="mb-0">
-                                            Nascido no Brasil, em 1992, Felipe se dedica à pintura desde cedo, explorando formas de <strong>experimentação técnica e conceitual</strong>.
-                                        </p>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 border-0 shadow-sm bg-light">
+                                        <div class="card-body p-4">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <i class="fas fa-user-circle text-primary fs-2 me-3"></i>
+                                                <h5 class="card-title text-dark mb-0">O Artista</h5>
+                                            </div>
+                                            <p class="card-text text-dark mb-0">
+                                                Nascido no Brasil, em 1992, Felipe se dedica à pintura desde cedo, explorando formas de <strong>experimentação técnica e conceitual</strong>.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="p-3 bg-light rounded">
-                                        <h5 class="text-warning">A Essência</h5>
-                                        <p class="mb-0">
-                                            Munido do poder da cor e de seus reflexos emocionais, o artista constrói uma produção marcada por <strong>formas abstratas e figurativas</strong>.
-                                        </p>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 border-0 shadow-sm bg-light">
+                                        <div class="card-body p-4">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <i class="fas fa-heart text-primary fs-2 me-3"></i>
+                                                <h5 class="card-title text-dark mb-0">A Essência</h5>
+                                            </div>
+                                            <p class="card-text text-dark mb-0">
+                                                Munido do poder da cor e de seus reflexos emocionais, o artista constrói uma produção marcada por <strong>formas abstratas e figurativas</strong>.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <p class="mb-4">
+                            <p class="text-dark mb-4 lh-lg">
                                 Sua passagem pelo Recôncavo Baiano marcou uma fase de descobertas e trocas. Inserido em um contexto cosmopolita, Felipe experimentou novas percepções visuais e mergulhou nas estéticas e saberes locais, desenvolvendo uma poética que une <strong>investigação acadêmica</strong> e <strong>tradição popular</strong>.
                             </p>
 
-                            <div class="bg-warning bg-opacity-10 p-4 rounded mb-4">
-                                <h4 class="text-dark mb-3">Nossa Proposta</h4>
-                                <p class="mb-0">
-                                    Na Casa Amarela, essa essência se traduz em um catálogo que reúne desde <strong>quadros autorais</strong> até <strong>souvenirs inspirados em suas obras</strong>. Cada peça reflete a busca do artista por traduzir o mundo através da cor — entendendo-o e repintando-o à sua maneira.
-                                </p>
+                            <!-- Destaque da Proposta -->
+                            <div class="card border-0 bg-primary bg-opacity-10 mb-4">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fas fa-bullseye text-primary fs-2 me-3"></i>
+                                        <h4 class="text-dark mb-0">Nossa Proposta</h4>
+                                    </div>
+                                    <p class="text-dark mb-0 lh-lg">
+                                        Na Casa Amarela, essa essência se traduz em um catálogo que reúne desde <strong>quadros autorais</strong> até <strong>souvenirs inspirados em suas obras</strong>. Cada peça reflete a busca do artista por traduzir o mundo através da cor — entendendo-o e repintando-o à sua maneira.
+                                    </p>
+                                </div>
                             </div>
 
-                            <div class="text-center mt-5">
+                            <!-- Convite Especial -->
+                            <div class="text-center mt-5 pt-4 border-top">
+                                <div class="d-flex justify-content-center mb-3">
+                                    <i class="fas fa-handshake text-primary fs-1"></i>
+                                </div>
                                 <h3 class="text-dark mb-3">Um Convite Especial</h3>
-                                <p class="fs-5 text-muted">
+                                <p class="fs-5 text-muted lh-lg">
                                     A Casa Amarela é, portanto, um convite: conhecer, sentir e levar um pouco dessa visão para dentro da sua própria casa.
                                 </p>
                             </div>
@@ -65,51 +101,160 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Seção de destaques -->
-            <div class="row mt-4">
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="fas fa-palette text-warning fa-2x mb-3"></i>
-                            <h5 class="card-title">Arte Autoral</h5>
-                            <p class="card-text text-muted">Quadros únicos criados com técnicas mistas e muita sensibilidade.</p>
+    <!-- Seção de Valores -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h2 class="h3 fw-bold text-dark mb-3">Nossos Pilares</h2>
+                <p class="text-muted">Os valores que guiam nosso trabalho e inspiram nossa arte</p>
+            </div>
+
+            <div class="row">
+                <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0 text-center value-card">
+                        <div class="card-body p-4">
+                            <div class="value-icon mb-3">
+                                <i class="fas fa-palette text-primary display-5"></i>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark mb-3">Arte Autoral</h5>
+                            <p class="card-text text-muted">
+                                Quadros únicos criados com técnicas mistas e muita sensibilidade, cada peça conta uma história especial.
+                            </p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="fas fa-gift text-warning fa-2x mb-3"></i>
-                            <h5 class="card-title">Souvenirs Especiais</h5>
-                            <p class="card-text text-muted">Peças inspiradas nas obras, cheias de significado e cor.</p>
+                <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0 text-center value-card">
+                        <div class="card-body p-4">
+                            <div class="value-icon mb-3">
+                                <i class="fas fa-gift text-primary display-5"></i>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark mb-3">Souvenirs Especiais</h5>
+                            <p class="card-text text-muted">
+                                Peças inspiradas nas obras principais, cheias de significado e cor para momentos especiais.
+                            </p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="fas fa-heart text-warning fa-2x mb-3"></i>
-                            <h5 class="card-title">Feito com Amor</h5>
-                            <p class="card-text text-muted">Cada peça é criada com dedicação e atenção aos detalhes.</p>
+                <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0 text-center value-card">
+                        <div class="card-body p-4">
+                            <div class="value-icon mb-3">
+                                <i class="fas fa-heart text-primary display-5"></i>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark mb-3">Feito com Amor</h5>
+                            <p class="card-text text-muted">
+                                Cada peça é criada com dedicação, atenção aos detalhes e muito carinho no processo criativo.
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Adicionando um pouco de estilo extra -->
+    <!-- Chamada para Ação -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 bg-dark text-white">
+                <div class="card-body p-5 text-center">
+                    <h3 class="h2 fw-bold mb-3">Pronto para Descobrir Nossa Arte?</h3>
+                    <p class="lead mb-4 opacity-75">
+                        Explore nossa coleção e encontre a peça perfeita para levar um pouco da Casa Amarela para sua casa.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="{% url 'vitrine:list_artworks' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-palette me-2"></i>Ver Galeria
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
 <style>
-    .card {
-        transition: transform 0.2s ease-in-out;
+.value-card {
+    transition: all 0.3s ease;
+    border: 1px solid #f8f9fa;
+}
+
+.value-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.15) !important;
+    border-color: #e9ecef;
+}
+
+.value-icon {
+    transition: transform 0.3s ease;
+}
+
+.value-card:hover .value-icon {
+    transform: scale(1.1);
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 2rem;
+}
+
+.breadcrumb-item a {
+    color: #6c757d;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--bs-primary);
+}
+
+/* Animações suaves */
+.card {
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    .card:hover {
-        transform: translateY(-5px);
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    .border-warning {
-        border-color: #ffc107 !important;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
     }
+    
+    .card-body.p-4.p-md-5 {
+        padding: 2rem 1.5rem !important;
+    }
+    
+    .d-flex.justify-content-center.gap-3 {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-lg {
+        width: 100%;
+        max-width: 300px;
+        margin-bottom: 0.5rem;
+    }
+}
 </style>
 {% endblock %}
