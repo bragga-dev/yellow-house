@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('vitrine', '0010_alter_souvenir_default_address'),
+        ('vitrine', '0009_defaultaddress_souvenir_default_address'),
     ]
 
     operations = [
