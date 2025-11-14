@@ -1,5 +1,6 @@
 import django_filters
 from vitrine.models import Souvenir, ArtWork, ArtworkCategory, SouvenirCategory
+from user.models import Artist
 
 class SouvenirFilter(django_filters.FilterSet):
     souvenir_category = django_filters.ModelChoiceFilter(queryset=SouvenirCategory.objects.all(),
@@ -16,7 +17,12 @@ class SouvenirFilter(django_filters.FilterSet):
         model = Souvenir
         fields = ['souvenir_category', 'size', 'price']
 
-class ArtWorkFilter(django_filters.FilterSet):
+class   ArtWorkFilter(django_filters.FilterSet):
+    artist = django_filters.ModelChoiceFilter(
+        queryset=Artist.objects.all(),
+        label='Artista',
+        empty_label='Todos os artistas'
+    )
     art_work_category = django_filters.ModelChoiceFilter(
         queryset=ArtworkCategory.objects.all(),
         label='Categoria',
@@ -27,4 +33,4 @@ class ArtWorkFilter(django_filters.FilterSet):
 
     class Meta:
         model = ArtWork
-        fields = ['art_work_category', 'price']
+        fields = ['artist', 'art_work_category', 'price']

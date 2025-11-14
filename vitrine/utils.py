@@ -66,7 +66,7 @@ def calcular_frete_item(origem_cep, destino_cep, package, valor_unitario, quanti
         return {"error": "Valor unitário inválido."}
 
     # 2️⃣ Cálculo total considerando quantidade
-    peso_total = round(package.weight * quantidade, 3)
+    peso_total = round(package.package_weight * quantidade, 3)
     valor_total = round(valor_unitario * quantidade, 2)
 
     # 3️⃣ Chamada à função de cálculo principal
@@ -74,9 +74,9 @@ def calcular_frete_item(origem_cep, destino_cep, package, valor_unitario, quanti
         origem_cep=origem_cep,
         destino_cep=destino_cep,
         peso=peso_total,
-        altura=package.height,
-        largura=package.width,
-        comprimento=package.length,
+        altura=package.package_height,
+        largura=package.package_width,
+        comprimento=package.package_length,
         valor=valor_total,
         quantidade=quantidade
     )
