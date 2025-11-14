@@ -1,33 +1,48 @@
 {% extends 'vitrine/base.html' %}
 
-{% block title %}Obras de Arte{% endblock %}
+{% block title %}Galeria de Obras de Arte{% endblock %}
+
+{% block meta_description %}Explore nossa exclusiva coleção de obras de arte originais. Pinturas, esculturas e obras de artistas consagrados e emergentes.{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-  <!-- Cabeçalho -->
-  <div class="row mb-4">
+  <!-- Cabeçalho da Galeria -->
+  <div class="row mb-5">
     <div class="col-12">
-      <h1 class="fw-bold text-primary mb-2">Nossas Obras</h1>
-      <p class="text-muted">Encontre a obra perfeita para sua coleção</p>
+      <div class="text-center">
+        <h1 class="fw-bold text-dark mb-3 display-4">Galeria de Arte</h1>
+        <p class="lead text-muted mb-4">Descubra obras exclusivas de artistas talentosos para sua coleção</p>
+      </div>
     </div>
   </div>
 
-  <!-- Filtros na parte superior -->
-  <div class="row mb-4">
+  <!-- Sistema de Filtros Simplificado -->
+  <div class="row mb-5">
     <div class="col-12">
       <div class="card shadow-sm border-0">
-        <div class="card-header bg-light py-3">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold">Filtrar Obras</h5>
-            <span class="badge bg-primary">{{ artworks.count }} obra{{ artworks.count|pluralize }} encontrada{{ artworks.count|pluralize:"s" }}</span>
+        <div class="card-header bg-white py-4 border-bottom">
+          <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+              <h5 class="mb-1 fw-bold text-dark">
+                <i class="bi bi-funnel me-2"></i>Filtrar Obras
+              </h5>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+              <span class="badge bg-primary fs-6 px-3 py-2">
+                {{ artworks.count }} obra{{ artworks.count|pluralize }} encontrada{{ artworks.count|pluralize:"s" }}
+              </span>
+            </div>
           </div>
         </div>
+        
         <div class="card-body">
-          <form method="get" class="row g-3">
+          <form method="get" class="row g-4" id="filter-form">
             <!-- Categoria -->
-            <div class="col-md-3">
-              <label class="form-label fw-semibold">Categoria</label>
-              <select name="art_work_category" class="form-select">
+            <div class="col-lg-4 col-md-6">
+              <label class="form-label fw-semibold text-dark mb-3">
+                <i class="bi bi-tags me-2"></i>Categoria
+              </label>
+              <select name="art_work_category" class="form-select form-select-lg">
                 <option value="">Todas as categorias</option>
                 {% for category in art_work_categories %}
                   <option value="{{ category.id }}" 
@@ -38,41 +53,53 @@
               </select>
             </div>
 
-            <!-- Preço -->
-            <div class="col-md-3">
-              <label class="form-label fw-semibold">Faixa de preço</label>
-              <div class="input-group">
-                <span class="input-group-text">R$</span>
+            <!-- Faixa de Preço -->
+            <div class="col-lg-4 col-md-6">
+              <label class="form-label fw-semibold text-dark mb-3">
+                <i class="bi bi-currency-dollar me-2"></i>Faixa de Preço
+              </label>
+              <div class="input-group input-group-lg">
+                <span class="input-group-text bg-light border-end-0">
+                  <small class="text-muted">De</small>
+                </span>
                 <input type="number" name="price_min" class="form-control" placeholder="Mínimo" 
-                       value="{{ request.GET.price_min }}">
-                <span class="input-group-text">-</span>
+                       value="{{ request.GET.price_min }}" min="0">
+                <span class="input-group-text bg-light border-start-0 border-end-0">
+                  <small class="text-muted">Até</small>
+                </span>
                 <input type="number" name="price_max" class="form-control" placeholder="Máximo" 
-                       value="{{ request.GET.price_max }}">
+                       value="{{ request.GET.price_max }}" min="0">
               </div>
             </div>
 
-            <!-- Estilo -->
-            <div class="col-md-3">
-              <label class="form-label fw-semibold">Estilo</label>
-              <select name="style" class="form-select">
-                <option value="">Todos os estilos</option>
-                {% for style in styles %}
-                  <option value="{{ style }}" 
-                    {% if request.GET.style == style %}selected{% endif %}>
-                    {{ style }}
+            <!-- Artista -->
+            <div class="col-lg-4 col-md-6">
+              <label class="form-label fw-semibold text-dark mb-3">
+                <i class="bi bi-person me-2"></i>Artista
+              </label>
+              <select name="artist" class="form-select form-select-lg">
+                <option value="">Todos os artistas</option>
+                {% for artist in artists %}
+                  <option value="{{ artist.id }}"
+                    {% if request.GET.artist == artist.id|stringformat:"s" %}selected{% endif %}>
+                    {{ artist.user.get_full_name }}
                   </option>
+                {% empty %}
+                  <option disabled>Nenhum artista encontrado</option>
                 {% endfor %}
               </select>
             </div>
 
-            <!-- Botões -->
-            <div class="col-md-3 d-flex align-items-end gap-2">
-              <button type="submit" class="btn btn-primary flex-fill">
-                <i class="bi bi-funnel"></i> Aplicar
-              </button>
-              <a href="{% url 'vitrine:list_artworks' %}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-clockwise"></i>
-              </a>
+            <!-- Botões de Ação -->
+            <div class="col-12">
+              <div class="d-flex justify-content-end align-items-center pt-3 border-top gap-2">
+                <a href="{% url 'vitrine:list_artworks' %}" class="btn btn-outline-secondary px-4">
+                  <i class="bi bi-arrow-clockwise me-2"></i>Limpar Filtros
+                </a>
+                <button type="submit" class="btn btn-primary px-4">
+                  <i class="bi bi-funnel me-2"></i> Aplicar Filtros
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -80,68 +107,288 @@
     </div>
   </div>
 
-  <!-- Grid de obras -->
-  <div class="row">
+  <!-- Resultados da Busca -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+          <h4 class="fw-bold text-dark mb-0">Obras em Destaque</h4>
+          {% if has_active_filters %}
+          <p class="text-muted mb-0 small">Resultados filtrados</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid de Obras -->
+  <div class="row" id="artworks-grid">
     {% if artworks %}
-      <div class="row g-4">
-        {% for artwork in artworks %}
-          <div class="col-xl-3 col-lg-4 col-md-6">
-            <div class="card h-100 shadow-sm border-0 artwork-card">
-              <div class="position-relative">
-                <img src="{{ artwork.images.first.image.url }}" class="card-img-top" alt="{{ artwork.title }}"
-                     style="height: 250px; object-fit: cover;">
-                {% if artwork.art_work_category %}
-                  <span class="position-absolute top-0 start-0 m-2 badge bg-primary bg-opacity-90">
-                    {{ artwork.art_work_category.name }}
-                  </span>
-                {% endif %}
-              </div>
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title fw-bold">{{ artwork.name }}</h5>
-                <p class="fw-bold text-success fs-5 mb-2">R$ Preço: {{ artwork.price }}</p>
-                <p class="card-text text-muted">Tamanho: {{ artwork.width }} cm x {{ artwork.height }} cm</p>
-                <div class="mt-auto">
+      {% for artwork in artworks %}
+        <div class="col-xl-3 col-lg-4 col-md-6 mb-4 artwork-item">
+          <div class="card h-100 shadow-sm border-0 artwork-card position-relative">
+            <!-- Badge de Edição Limitada (no topo) -->
+            {% if artwork.is_limited_edition %}
+            <div class="position-absolute top-0 start-0 end-0 p-2 d-flex justify-content-end">
+              <span class="badge bg-warning text-dark">
+                <i class="bi bi-award me-1"></i>Edição Limitada
+              </span>
+            </div>
+            {% endif %}
+
+            <!-- Imagem da Obra -->
+            <div class="position-relative overflow-hidden">
+              {% if artwork.images.first %}
+                <img src="{{ artwork.images.first.image.url }}" 
+                     class="card-img-top artwork-image" 
+                     alt="{{ artwork.name }}"
+                     loading="lazy"
+                     style="height: 280px; object-fit: cover;">
+              {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                     style="height: 280px;">
+                  <i class="bi bi-image text-muted display-4"></i>
+                </div>
+              {% endif %}
+              
+              <!-- Overlay de Ações -->
+              <div class="artwork-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                <div class="btn-group">
                   <a href="{% url 'vitrine:detail_artwork' artwork.slug artwork.id %}" 
-                     class="btn btn-outline-primary w-100">
-                    <i class="bi bi-eye"></i> Ver detalhes
+                     class="btn btn-light btn-sm">
+                    <i class="bi bi-eye me-1"></i>Detalhes
                   </a>
                 </div>
               </div>
             </div>
+
+            <!-- Informações da Obra -->
+            <div class="card-body d-flex flex-column">
+              <!-- Categoria da Obra -->
+              {% if artwork.art_work_category %}
+                <div class="mb-2">
+                  <span class="badge bg-primary bg-opacity-90 text-white fs-6">
+                    {{ artwork.art_work_category.name }}
+                  </span>
+                </div>
+              {% endif %}
+              
+              <h5 class="card-title fw-bold text-dark mb-2">{{ artwork.name }}</h5>
+              
+              <p class="card-text text-muted mb-2">
+                <i class="bi bi-person me-1"></i>
+                <span class="text-muted">
+                  {{ artwork.artist.user.get_full_name }}
+                </span>
+                {% if artwork.artist.verified %}
+                  <i class="bi bi-patch-check-fill text-primary ms-1" title="Artista Verificado"></i>
+                {% endif %}
+              </p>
+              
+              {% if artwork.technique %}
+              <p class="card-text text-muted small mb-2">
+                <i class="bi bi-brush me-1"></i>{{ artwork.technique }}
+              </p>
+              {% endif %}
+              
+              <p class="card-text text-muted small mb-3">
+                <i class="bi bi-arrows-fullscreen me-1"></i>
+                {{ artwork.width }} × {{ artwork.height }} cm
+                {% if artwork.year_created %}
+                  • {{ artwork.year_created|date:"Y" }}
+                {% endif %}
+              </p>
+
+              <!-- Preço e Ação -->
+              <div class="mt-auto">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="fw-bold text-success fs-5">R$ {{ artwork.price }}</span>
+                  {% if artwork.original_price and artwork.original_price > artwork.price %}
+                    <span class="text-muted text-decoration-line-through small">R$ {{ artwork.original_price }}</span>
+                  {% endif %}
+                </div>
+                
+                <a href="{% url 'vitrine:detail_artwork' artwork.slug artwork.id %}" 
+                   class="btn btn-outline-dark w-100 btn-hover-primary">
+                  <i class="bi bi-eye me-2"></i>Ver Detalhes
+                </a>
+              </div>
+            </div>
           </div>
-        {% endfor %}
-      </div>
+        </div>
+      {% endfor %}
     {% else %}
+      <!-- Estado Vazio -->
       <div class="col-12">
-        <div class="text-center py-5">
-          <i class="bi bi-search display-1 text-muted"></i>
-          <h3 class="mt-3 text-muted">Nenhuma obra encontrada</h3>
-          <p class="text-muted">Tente ajustar os filtros para ver mais resultados.</p>
-          <a href="{% url 'vitrine:list_artworks' %}" class="btn btn-primary mt-2">
-            Limpar filtros
-          </a>
+        <div class="text-center py-5 my-5">
+          <i class="bi bi-palette display-1 text-muted mb-4"></i>
+          <h3 class="text-muted mb-3">Nenhuma obra encontrada</h3>
+          <p class="text-muted mb-4">Tente ajustar os filtros para ver mais resultados ou explore nossa coleção completa.</p>
+          <div class="d-flex justify-content-center gap-2 flex-wrap">
+            <a href="{% url 'vitrine:list_artworks' %}" class="btn btn-primary">
+              <i class="bi bi-arrow-clockwise me-2"></i>Limpar Filtros
+            </a>
+            <a href="/" class="btn btn-outline-primary">
+              <i class="bi bi-house me-2"></i>Voltar ao Início
+            </a>
+          </div>
         </div>
       </div>
     {% endif %}
+  </div>
+
+  <!-- Paginação -->
+  {% if artworks.has_other_pages %}
+  <div class="row mt-5">
+    <div class="col-12">
+      <nav aria-label="Navegação de páginas">
+        <ul class="pagination justify-content-center">
+          {% if artworks.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ artworks.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                <i class="bi bi-chevron-left"></i>
+              </a>
+            </li>
+          {% endif %}
+
+          {% for i in artworks.paginator.page_range %}
+            {% if artworks.number == i %}
+              <li class="page-item active">
+                <span class="page-link">{{ i }}</span>
+              </li>
+            {% else %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if artworks.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ artworks.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Newsletter para Colecionadores -->
+<div class="bg-light py-5 mt-5">
+  <div class="container">
+    <div class="row justify-content-center text-center">
+      <div class="col-lg-6">
+        <h4 class="fw-bold mb-3">Receba Novas Obras em Primeira Mão</h4>
+        <p class="text-muted mb-4">Cadastre-se para ser notificado sobre novos lançamentos e obras exclusivas.</p>
+        <form class="d-flex gap-2">
+          <input type="email" class="form-control" placeholder="Seu melhor e-mail" required>
+          <button type="submit" class="btn btn-primary">Cadastrar</button>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 
 <style>
 .artwork-card {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  transition: all 0.3s ease;
+  border: 1px solid #f8f9fa;
 }
 
 .artwork-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+  transform: translateY(-8px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.15) !important;
+  border-color: #e9ecef;
 }
 
-.card-img-top {
+.artwork-image {
   transition: transform 0.3s ease;
 }
 
-.artwork-card:hover .card-img-top {
+.artwork-card:hover .artwork-image {
   transform: scale(1.05);
 }
+
+.artwork-overlay {
+  background: rgba(0,0,0,0.7);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.artwork-card:hover .artwork-overlay {
+  opacity: 1;
+}
+
+.btn-hover-primary:hover {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: white;
+}
+
+/* Badges com destaque */
+.badge {
+  font-size: 0.7em;
+  font-weight: 500;
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Animações suaves */
+.card {
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsividade melhorada */
+@media (max-width: 768px) {
+  .display-4 {
+    font-size: 2rem;
+  }
+  
+  .artwork-card {
+    margin-bottom: 1.5rem;
+  }
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Prevenir submissão automática do formulário
+  const filterForm = document.getElementById('filter-form');
+  const filterInputs = filterForm.querySelectorAll('select, input');
+  
+  // Remover qualquer evento de change que submeta automaticamente
+  filterInputs.forEach(input => {
+    // Substituir qualquer event listener de change
+    const newInput = input.cloneNode(true);
+    input.parentNode.replaceChild(newInput, input);
+  });
+
+  // Adicionar loading state apenas no submit
+  filterForm.addEventListener('submit', function() {
+    const artworksGrid = document.getElementById('artworks-grid');
+    if (artworksGrid) {
+      artworksGrid.classList.add('loading');
+    }
+  });
+});
+</script>
 {% endblock %}
