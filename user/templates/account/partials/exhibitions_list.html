@@ -1,0 +1,111 @@
+<div class="p-4">
+    {% if exhibitions %}
+        <div class="row">
+            {% for exhibition in exhibitions %}
+                <div class="col-xl-6 col-lg-12 mb-4">
+                    <div class="card h-100 shadow-sm border-0 exhibition-card">
+                        {% if exhibition.exhibition_banner %}
+                        <div class="position-relative overflow-hidden">
+                            <img src="{{ exhibition.exhibition_banner.url }}" 
+                                 class="card-img-top exhibition-image" 
+                                 alt="{{ exhibition.title }}"
+                                 style="height: 200px; object-fit: cover;">
+                        </div>
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                             style="height: 200px;">
+                            <i class="fas fa-calendar-alt text-muted display-4"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold text-dark mb-3">{{ exhibition.title }}</h5>
+                            
+                            <div class="exhibition-meta text-muted mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-map-marker-alt me-2"></i>
+                                    <small>{{ exhibition.location }}</small>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-calendar me-2"></i>
+                                    <small>{{ exhibition.date|date:"d/m/Y" }}</small>
+                                </div>
+                            </div>
+
+                            <p class="card-text text-muted small flex-grow-1">
+                                {{ exhibition.description|truncatewords:20 }}
+                            </p>
+
+                            <div class="mt-auto">
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm flex-fill" 
+                                            data-bs-toggle="modal" data-bs-target="#editExhibitionModal{{ exhibition.pk }}">
+                                        <i class="fas fa-edit me-1"></i>Editar
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm flex-fill"
+                                            data-bs-toggle="modal" data-bs-target="#deleteExhibitionModal{{ exhibition.pk }}">
+                                        <i class="fas fa-trash me-1"></i>Excluir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modais de Edição e Exclusão -->
+                {% include 'account/update_exhibition.html' with exhibition=exhibition %}
+                {% include 'account/confirm_delete_exhibition.html' with exhibition=exhibition %}
+            {% endfor %}
+        </div>
+
+        <!-- Paginação -->
+        {% if exhibitions.has_other_pages %}
+        <nav aria-label="Navegação de páginas das exposições" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if exhibitions.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" 
+                           hx-get="{% url 'artist:exhibitions_partial' slug=artist.user.slug pk=artist.user.pk %}?page={{ exhibitions.previous_page_number }}"
+                           hx-target="#exhibitions-section"
+                           hx-swap="innerHTML">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for i in exhibitions.paginator.page_range %}
+                    {% if exhibitions.number == i %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ i }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" 
+                               hx-get="{% url 'artist:exhibitions_partial' slug=artist.user.slug pk=artist.user.pk %}?page={{ i }}"
+                               hx-target="#exhibitions-section"
+                               hx-swap="innerHTML">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if exhibitions.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" 
+                           hx-get="{% url 'artist:exhibitions_partial' slug=artist.user.slug pk=artist.user.pk %}?page={{ exhibitions.next_page_number }}"
+                           hx-target="#exhibitions-section"
+                           hx-swap="innerHTML">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-alt display-1 text-muted mb-3"></i>
+            <h4 class="text-muted mb-3">Nenhuma exposição cadastrada</h4>
+            <p class="text-muted">Clique em "Nova Exposição" para criar sua primeira exposição.</p>
+        </div>
+    {% endif %}
+</div>

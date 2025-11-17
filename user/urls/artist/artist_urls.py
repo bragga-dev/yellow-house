@@ -4,7 +4,7 @@ from user.views.artist.dashboard_artist import dashboard_artist
 from user.views.artist.artists_list import artists_list
 from user.views.artist.artist_detail import artist_detail
 from user.views.artist.demote_to_client import demote_to_client
-from user.views.artist.collection import collection, create_exhibition, update_exhibition, delete_exhibition, exhibition_detail
+from user.views.artist.collection import collection, create_exhibition, update_exhibition, delete_exhibition, exhibition_detail, artworks_partial, exhibitions_partial
 
 app_name = 'artist'
 
@@ -28,5 +28,10 @@ urlpatterns = [
 
     # list of artists
     path('artists/', artists_list, name='artists_list'),
+
+
+    # partials
+    path('<slug:slug>/<uuid:pk>/artworks/', artworks_partial, name='artworks_partial'),
+    path('<slug:slug>/<uuid:pk>/exhibitions/', exhibitions_partial, name='exhibitions_partial'),
    
 ]

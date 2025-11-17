@@ -1,0 +1,152 @@
+<div class="p-4">
+    {% if artworks %}
+        <div class="row">
+            {% for artwork in artworks %}
+                <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0 artwork-card position-relative">
+                        <!-- Badge de Edição Limitada -->
+                        {% if artwork.is_limited_edition %}
+                        <div class="position-absolute top-0 start-0 end-0 p-2 d-flex justify-content-end">
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-award me-1"></i>Edição Limitada
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        <!-- Imagem da Obra -->
+                        <div class="position-relative overflow-hidden">
+                            {% if artwork.images.first %}
+                                <img src="{{ artwork.images.first.image.url }}" 
+                                     class="card-img-top artwork-image" 
+                                     alt="{{ artwork.name }}"
+                                     style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                     style="height: 200px;">
+                                    <i class="fas fa-image text-muted display-4"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Informações da Obra -->
+                        <div class="card-body d-flex flex-column">
+                            <!-- Categoria -->
+                            {% if artwork.art_work_category %}
+                                <div class="mb-2">
+                                    <span class="badge bg-primary bg-opacity-90 text-white">
+                                        {{ artwork.art_work_category.name }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                            
+                            <h5 class="card-title fw-bold text-dark mb-2">{{ artwork.name }}</h5>
+                            
+                            <p class="card-text text-muted small mb-3">
+                                <i class="fas fa-arrows-alt me-1"></i>
+                                {{ artwork.width }} × {{ artwork.height }} cm
+                            </p>
+
+                            <!-- Preço -->
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="fw-bold text-success">R$ {{ artwork.price }}</span>
+                                    {% if artwork.original_price and artwork.original_price > artwork.price %}
+                                        <span class="text-muted text-decoration-line-through small">R$ {{ artwork.original_price }}</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm flex-fill" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#updateArtworkModal{{ artwork.id }}">
+                                        <i class="fas fa-edit me-1"></i>Editar
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm flex-fill"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteArtworkModal{{ artwork.id }}">
+                                        <i class="fas fa-trash me-1"></i>Excluir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modais de Edição e Exclusão -->
+                {% include 'vitrine/update_artwork.html' with artwork=artwork %}
+                
+                <!-- Modal de exclusão -->
+                <div class="modal fade" id="deleteArtworkModal{{ artwork.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form method="post" action="{% url 'vitrine:delete_artwork' slug=artwork.slug artwork_id=artwork.id %}">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Excluir Obra</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Deseja realmente excluir a obra <strong>{{ artwork.name }}</strong>?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-danger">Excluir</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Paginação -->
+        {% if artworks.has_other_pages %}
+        <nav aria-label="Navegação de páginas das obras" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if artworks.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" 
+                           hx-get="{% url 'artist:artworks_partial' slug=artist.user.slug pk=artist.user.pk %}?page={{ artworks.previous_page_number }}"
+                           hx-target="#artworks-section"
+                           hx-swap="innerHTML">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for i in artworks.paginator.page_range %}
+                    {% if artworks.number == i %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ i }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" 
+                               hx-get="{% url 'artist:artworks_partial' slug=artist.user.slug pk=artist.user.pk %}?page={{ i }}"
+                               hx-target="#artworks-section"
+                               hx-swap="innerHTML">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if artworks.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" 
+                           hx-get="{% url 'artist:artworks_partial' slug=artist.user.slug pk=artist.user.pk %}?page={{ artworks.next_page_number }}"
+                           hx-target="#artworks-section"
+                           hx-swap="innerHTML">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-palette display-1 text-muted mb-3"></i>
+            <h4 class="text-muted mb-3">Nenhuma obra cadastrada</h4>
+            <p class="text-muted">Clique em "Nova Obra" para adicionar sua primeira obra.</p>
+        </div>
+    {% endif %}
+</div>

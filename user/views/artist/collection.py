@@ -6,6 +6,8 @@ from user.forms import ExhibitionForm
 from user.models import Exhibitions, Artist
 from vitrine.models import ArtWork, ArtworkCategory
 from vitrine.forms import ArtWorkForm, PackageForm
+from django.core.paginator import Paginator
+from django.http import JsonResponse
 
 
 @login_required
@@ -14,30 +16,15 @@ def collection(request, slug, pk):
     if artist.user != request.user:
         return redirect('account_login')
 
-    exhibitions = list(artist.exhibitions.all().order_by('id'))
-    artworks = list(artist.artworks.all().order_by('id'))
-    
-
     form_exhibition = ExhibitionForm()
     form_artwork = ArtWorkForm()
     form_package = PackageForm()
 
     form_artwork.fields['art_work_category'].queryset = ArtworkCategory.objects.all()
-   
-  
-    for artwork in artworks:
-        artwork.edit_form = ArtWorkForm(instance=artwork)
-        
 
-    for exhibition in exhibitions:
-        exhibition.edit_form = ExhibitionForm(instance=exhibition)
-
-   
     context = {
         'artist': artist,
-        'exhibitions': exhibitions,
         'form_exhibition': form_exhibition,
-        'artworks': artworks,
         'form_artwork': form_artwork,
         'form_package': form_package
     }
@@ -128,4 +115,48 @@ def exhibition_detail(request, slug, exhibition_id):
     return render(request, 'account/exhibition_detail.html', {'exhibition': exhibition})    
 
 
+@login_required
+def exhibitions_partial(request, slug, pk):
+    artist = get_object_or_404(Artist, user__slug=slug, user__pk=pk)
+    if artist.user != request.user:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    exhibitions = artist.exhibitions.all().order_by('-id')
+    paginator = Paginator(exhibitions, 4)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
+    for exhibition in page_obj:
+        exhibition.edit_form = ExhibitionForm(instance=exhibition)
+
+    return render(request, 'account/partials/exhibitions_list.html', {
+        'exhibitions': page_obj,
+        'artist': artist
+    })
+
+
+@login_required
+def artworks_partial(request, slug, pk):
+    artist = get_object_or_404(Artist, user__slug=slug, user__pk=pk)
+    if artist.user != request.user:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    artworks = artist.artworks.all().order_by('-id')
+    paginator = Paginator(artworks, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+   
+    for artwork in page_obj:
+        artwork.edit_form = ArtWorkForm(instance=artwork)
+
+        
+        try:
+            artwork.package = artwork.package  
+        except:
+            artwork.package = None
+
+    return render(request, 'account/partials/artworks_list.html', {
+        'artworks': page_obj,
+        'artist': artist
+    })
