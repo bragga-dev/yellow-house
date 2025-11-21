@@ -60,7 +60,6 @@ def remove_item_from_cart(request, item_id):
     cart = get_object_or_404(Cart, user=request.user)
     item = get_object_or_404(CartItem, id=item_id, cart=cart)
     item.delete()
-    cart.save()
     messages.success(request, "Item removido do carrinho.")
     return redirect('checkout:cart_detail')
 

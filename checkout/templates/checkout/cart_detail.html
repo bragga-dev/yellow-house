@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({
                 service_code: serviceCode,
-                shipping_price: parseFloat(shippingPrice)
+                shipping_price: Number(shippingPrice.replace(',', '.'))
 
             })
         })

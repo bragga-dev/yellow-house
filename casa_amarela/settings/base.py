@@ -20,7 +20,8 @@ INSTALLED_APPS = [
     # Apps locais
     'user',
     'vitrine',
-    'checkout',
+    'checkout.apps.CheckoutConfig',
+
 
     # Terceiros
     'allauth',

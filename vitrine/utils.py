@@ -8,6 +8,9 @@ from vitrine.services.frenet import calcular_frete
 from brazilcep import get_address_from_cep, WebService
 from brazilcep.exceptions import BrazilCEPException
 from django.core.exceptions import ValidationError
+from decimal import Decimal, ROUND_HALF_UP
+
+
 
 logger = logging.getLogger(__name__)
 # Ensure default media files are present in storage
@@ -95,7 +98,7 @@ def calcular_frete_item(origem_cep, destino_cep, package, valor_unitario, quanti
 
     # 6️⃣ Normalização de saída
     for s in fretes_validos:
-        s["ShippingPrice"] = round(float(s["ShippingPrice"]), 2)
+        s["ShippingPrice"] = Decimal(str(s["ShippingPrice"])).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
         s["DeliveryTime"] = int(s.get("DeliveryTime", 0))
 
     return {"fretes": fretes_validos}
