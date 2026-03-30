@@ -14,62 +14,63 @@
     <div class="row g-4">
       {% for artist in artists %}
         <div class="col-xl-3 col-lg-4 col-md-6">
-          <div class="card artist-card h-100 shadow-sm border-0">
-            <!-- Foto do Artista -->
-            <div class="artist-image-container position-relative">
-              {% if artist.user.photo %}
-                <img src="{{ artist.user.photo.url }}" 
-                     class="card-img-top artist-profile-img" 
-                     alt="Foto de {{ artist.user.get_full_name }}"
-                     style="height: 250px; object-fit: cover;">
-              {% else %}
-                <div class="default-artist-image d-flex align-items-center justify-content-center bg-light"
-                     style="height: 250px;">
-                  <div class="text-center text-muted">
-                    <i class="bi bi-person display-4 mb-2"></i>
-                    <p class="mb-0 small">Sem foto</p>
+          <!-- Link em toda a extensão do card -->
+          <a href="{% url 'artist:artist_detail' slug=artist.user.slug pk=artist.user.pk %}" 
+             class="text-decoration-none artist-card-link">
+            <div class="card artist-card h-100 shadow-sm border-0">
+              <!-- Foto do Artista -->
+              <div class="artist-image-container position-relative">
+                {% if artist.user.photo %}
+                  <img src="{{ artist.user.photo.url }}" 
+                       class="card-img-top artist-profile-img" 
+                       alt="Foto de {{ artist.user.get_full_name }}"
+                       style="height: 250px; object-fit: cover;">
+                {% else %}
+                  <div class="default-artist-image d-flex align-items-center justify-content-center bg-light"
+                       style="height: 250px;">
+                    <div class="text-center text-muted">
+                      <i class="bi bi-person display-4 mb-2"></i>
+                      <p class="mb-0 small">Sem foto</p>
+                    </div>
                   </div>
-                </div>
-              {% endif %}
-              
-              <!-- Badge de Verificação -->
-              {% if artist.is_verified %}
-                <div class="position-absolute top-0 end-0 m-3">
-                  <span class="badge bg-success px-2 py-1 verified-badge">
-                    <i class="bi bi-patch-check-fill me-1"></i>Verificado
-                  </span>
-                </div>
-              {% endif %}
-            </div>
-
-            <div class="card-body text-center d-flex flex-column">
-              <!-- Nome do Artista -->
-              <h5 class="card-title fw-bold text-dark mb-2">{{ artist.user.get_full_name }}</h5>
-              <p class="text-muted small mb-3">@{{ artist.user.username }}</p>
-              
-              <!-- Informações Adicionais -->
-              <div class="artist-stats mb-3">
-                <div class="row text-center">
-                  <div class="col-6">
-                    <small class="text-muted d-block">Obras</small>
-                    <span class="fw-bold text-primary">{{ artist.artworks.count }}</span>
+                {% endif %}
+                
+                <!-- Badge de Verificação -->
+                {% if artist.is_verified %}
+                  <div class="position-absolute top-0 end-0 m-3">
+                    <span class="badge bg-success px-2 py-1 verified-badge">
+                      <i class="bi bi-patch-check-fill me-1"></i>Verificado
+                    </span>
                   </div>
-                  <div class="col-6">
-                    <small class="text-muted d-block">Exposições</small>
-                    <span class="fw-bold text-primary">{{ artist.exhibitions.count }}</span>
-                  </div>
-                </div>
+                {% endif %}
               </div>
 
-              <!-- Botão de Ação -->
-              <div class="mt-auto">
-                <a href="{% url 'artist:artist_detail' slug=artist.user.slug pk=artist.user.pk %}" 
-                   class="btn btn-primary w-100 btn-view-profile">
-                  <i class="bi bi-eye me-2"></i>Ver Perfil
-                </a>
+              <div class="card-body text-center d-flex flex-column">
+                <!-- Nome do Artista -->
+                <h5 class="card-title fw-bold text-dark mb-2">{{ artist.user.get_full_name }}</h5>
+                <p class="text-muted small mb-3">@{{ artist.user.username }}</p>
+                
+                <!-- Informações Adicionais -->
+                <div class="artist-stats mb-3">
+                  <div class="row text-center">
+                    <div class="col-6">
+                      <small class="text-muted d-block">Obras</small>
+                      <span class="fw-bold text-primary">{{ artist.artworks.count }}</span>
+                    </div>
+                    <div class="col-6">
+                      <small class="text-muted d-block">Exposições</small>
+                      <span class="fw-bold text-primary">{{ artist.exhibitions.count }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Texto indicativo (removido o botão) -->
+                <div class="mt-auto">
+                  
+                </div>
               </div>
             </div>
-          </div>
+          </a>
         </div>
       {% empty %}
         <!-- Estado Vazio -->
@@ -149,9 +150,21 @@
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   border-radius: 12px;
   overflow: hidden;
+  cursor: pointer;
 }
 
-.artist-card:hover {
+.artist-card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.artist-card-link:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+.artist-card-link:hover .artist-card {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
 }
@@ -164,7 +177,7 @@
   transition: transform 0.3s ease-in-out;
 }
 
-.artist-card:hover .artist-profile-img {
+.artist-card-link:hover .artist-profile-img {
   transform: scale(1.05);
 }
 
@@ -178,15 +191,18 @@
   background-color: rgba(25, 135, 84, 0.95) !important;
 }
 
+/* Removido estilo do botão antigo */
 .btn-view-profile {
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  display: none;
 }
 
-.btn-view-profile:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+/* Estilo para texto indicativo */
+.text-primary {
+  transition: color 0.2s ease;
+}
+
+.artist-card-link:hover .text-primary {
+  color: var(--bs-primary-dark) !important;
 }
 
 .empty-state {

@@ -1,20 +1,142 @@
-{% extends "account/base_confirm_code.html" %}
+{% extends "vitrine/base.html" %}
 {% load i18n %}
 {% load allauth account %}
+
 {% block head_title %}
-    {% translate "Sign In" %}
+    {% translate "Código de Entrada" %}
 {% endblock head_title %}
-{% block title %}
-    {% translate "Enter Sign-In Code" %}
-{% endblock %}
-{% block recipient %}
-    {% if email %}
-        <a href="mailto:{{ email }}">{{ email }}</a>
-    {% else %}
-        <a href="tel:{{ phone }}">{{ phone }}</a>
-    {% endif %}
-{% endblock %}
-{% block action_url %}
-    {% url 'account_confirm_login_code' %}
-{% endblock %}
-{% block extra_tags %}login{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: #f6f9fc !important;
+    }
+    .login-container {
+        max-width: 480px;
+        margin: 40px auto;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 35px;
+        box-shadow: 0 2px 18px rgba(0,0,0,0.06);
+        font-family: "Segoe UI", sans-serif;
+    }
+    .login-title {
+        font-size: 26px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-align: center;
+        color: #333;
+    }
+    .recipient-text {
+        text-align: center;
+        margin-top: -5px;
+        margin-bottom: 25px;
+        font-size: 14px;
+        color: #555;
+    }
+    .code-label {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    .code-input {
+        width: 100%;
+        padding: 12px;
+        font-size: 18px;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        text-align: center;
+        letter-spacing: 2px;
+        outline: none;
+        margin-bottom: 20px;
+        transition: 0.2s;
+    }
+    .code-input:focus {
+        border-color: #4c6ef5;
+        box-shadow: 0 0 0 3px rgba(76,110,245,0.2);
+    }
+    .btn-container {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 10px;
+    }
+    .btn-primary {
+        padding: 10px 25px;
+        background-color: #4c6ef5;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
+        transition: 0.2s;
+    }
+    .btn-primary:hover {
+        background-color: #3b5bdb;
+    }
+    .btn-secondary {
+        padding: 10px 25px;
+        background-color: #e9ecef;
+        color: #333;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
+        transition: 0.2s;
+    }
+    .btn-secondary:hover {
+        background-color: #dde2e5;
+    }
+    .footer-note {
+        font-size: 12px;
+        color: #777;
+        text-align: center;
+        margin-top: 25px;
+    }
+</style>
+
+<div class="login-container">
+
+    <div class="login-title">
+        🔐 {% translate "Insira o Código de Entrada" %}
+    </div>
+
+    <div class="recipient-text">
+        {% if email %}
+            Um código foi enviado para <strong>{{ email }}</strong>.
+        {% else %}
+            Um código foi enviado para <strong>{{ phone }}</strong>.
+        {% endif %}
+        <br>
+       
+    </div>
+
+    <form method="post" action="{% url 'account_confirm_login_code' %}">
+        {% csrf_token %}
+
+        <label class="code-label">{% translate "Código" %}</label>
+        <input
+            type="text"
+            name="code"
+            maxlength="6"
+            class="code-input"
+            placeholder="000000"
+            required
+        >
+
+        <div class="btn-container">
+            <button class="btn-primary" type="submit">{% translate "Confirmar" %}</button>
+            <a href="{% url 'account_login' %}">
+                <button type="button" class="btn-secondary">{% translate "Cancelar" %}</button>
+            </a>
+        </div>
+    </form>
+
+    <div class="footer-note">
+        {% translate "Se você não solicitou este código, ignore esta página." %}
+    </div>
+
+</div>
+
+{% endblock content %}

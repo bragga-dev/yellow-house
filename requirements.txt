@@ -24,6 +24,7 @@ frozenlist==1.7.0
 gunicorn==23.0.0
 idna==3.10
 jmespath==1.0.1
+mercadopago==2.3.0
 multidict==6.6.3
 packaging==25.0
 phonenumbers==9.0.5

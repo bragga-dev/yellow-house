@@ -1,35 +1,160 @@
 {% extends "vitrine/base.html" %}
 {% load i18n %}
+
 {% block content %}
-<section id="signup-choose" class="my-5">
+<div class="min-vh-50 d-flex align-items-center py-5">
   <div class="container">
-    <div class="row justify-content-center text-center">
-      <div class="col-md-10 col-lg-8 col-xl-6">
-        <div class="card shadow rounded-4">
-          <div class="card-body p-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        
+        <div class="text-center mb-5">
+          <h1 class="display-5 fw-bold mb-3">Junte-se à Nossa Comunidade</h1>
+          <p class="lead text-muted">Selecione o tipo de conta para começar</p>
+        </div>
 
-            <h2 class="mb-4">{% trans "Como você deseja se cadastrar?" %}</h2>
-
-            <p class="lead mb-4">{% trans "Escolha o tipo de conta que deseja criar:" %}</p>
-
-            <div class="d-grid gap-3">
-              <a href="{% url 'shared:account_signup_client' %}" class="btn btn-outline-primary btn-lg">
-                {% trans "Sou Cliente" %}
-              </a>
-              <a href="{% url 'shared:account_signup_artist' %}" class="btn btn-outline-secondary btn-lg">
-                {% trans "Sou Artista" %}
-              </a>
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-body p-4 p-md-5">
+            
+            <!-- Opção Cliente -->
+            <div class="choice-card mb-4">
+              <div class="d-flex align-items-center p-4 rounded-3 border hover-shadow" 
+                   onclick="location.href='{% url 'shared:account_signup_client' %}'"
+                   style="cursor: pointer;">
+                <div class="choice-icon bg-primary bg-opacity-10 text-primary rounded-3 p-3 me-4">
+                  <i class="bi bi-person display-6"></i>
+                </div>
+                <div class="text-start">
+                  <h5 class="fw-bold mb-2">Conta de Cliente</h5>
+                  <p class="text-muted mb-0 small">
+                    Explore obras de arte, crie listas de desejos e compre diretamente dos artistas
+                  </p>
+                </div>
+                <div class="ms-auto">
+                  <i class="bi bi-chevron-right text-muted"></i>
+                </div>
+              </div>
             </div>
 
-            <p class="mt-4">
-              {% trans "Já possui uma conta?" %}
-              <a href="{% url 'account_login' %}">{% trans "Entrar" %}</a>
-            </p>
+            <!-- Opção Artista -->
+            <div class="choice-card">
+              <div class="d-flex align-items-center p-4 rounded-3 border hover-shadow"
+                   onclick="location.href='{% url 'shared:account_signup_artist' %}'"
+                   style="cursor: pointer;">
+                <div class="choice-icon bg-warning bg-opacity-10 text-warning rounded-3 p-3 me-4">
+                  <i class="bi bi-palette display-6"></i>
+                </div>
+                <div class="text-start">
+                  <h5 class="fw-bold mb-2">Conta de Artista</h5>
+                  <p class="text-muted mb-0 small">
+                    Exiba seu portfólio, venda suas obras e conecte-se com colecionadores
+                  </p>
+                </div>
+                <div class="ms-auto">
+                  <i class="bi bi-chevron-right text-muted"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Divisor -->
+            <div class="position-relative my-5">
+              <hr>
+              <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">
+                ou
+              </span>
+            </div>
+
+            <!-- Conta Existente -->
+            <div class="text-center">
+              <p class="mb-0">
+                Já tem uma conta?
+                <a href="{% url 'account_login' %}" class="fw-bold text-decoration-none">
+                  Entrar
+                </a>
+              </p>
+            </div>
 
           </div>
         </div>
+
+        <!-- Recursos -->
+        <div class="row mt-5 text-center">
+          <div class="col-md-4 mb-4">
+            <div class="p-3">
+              <i class="bi bi-shield-check text-primary fs-1 mb-3"></i>
+              <h6 class="fw-bold">Plataforma Segura</h6>
+              <p class="small text-muted mb-0">Seus dados estão protegidos</p>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="p-3">
+              <i class="bi bi-hand-thumbs-up text-primary fs-1 mb-3"></i>
+              <h6 class="fw-bold">Configuração Fácil</h6>
+              <p class="small text-muted mb-0">Comece em minutos</p>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="p-3">
+              <i class="bi bi-headset text-primary fs-1 mb-3"></i>
+              <h6 class="fw-bold">Suporte</h6>
+              <p class="small text-muted mb-0">Estamos aqui para ajudar</p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
-</section>
+</div>
+
+<style>
+.choice-card .hover-shadow {
+  transition: all 0.3s ease;
+  border-color: #dee2e6 !important;
+}
+
+.choice-card .hover-shadow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08) !important;
+  border-color: #0d6efd !important;
+}
+
+.choice-icon {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.min-vh-50 {
+  min-height: 50vh;
+}
+
+@media (max-width: 768px) {
+  .display-5 {
+    font-size: 2rem;
+  }
+  
+  .choice-card .d-flex {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .choice-icon {
+    margin: 0 auto 1rem !important;
+  }
+}
+</style>
+
+<script>
+// Adiciona feedback tátil aos cards
+document.querySelectorAll('.choice-card .hover-shadow').forEach(card => {
+  card.addEventListener('click', function() {
+    this.style.transform = 'scale(0.98)';
+    setTimeout(() => {
+      this.style.transform = '';
+    }, 150);
+  });
+});
+</script>
 {% endblock %}

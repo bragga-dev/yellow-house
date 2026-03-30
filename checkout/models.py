@@ -136,7 +136,7 @@ class OrderItem(models.Model):
     order_item_quantity = models.PositiveIntegerField((_("Quantidade")), default=1, validators=[MinValueValidator(1)], null=False, blank=False)
     order_item_price = models.DecimalField(_("Preço unitário"), max_digits=10, decimal_places=2, default=0)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    object_id = models.UUIDField()
     content_object = GenericForeignKey("content_type", "object_id")
 
     class Meta:

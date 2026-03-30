@@ -22,77 +22,64 @@
         {% if blogs %}
             {% for blog in blogs %}
                 <div class="col-xl-4 col-lg-6 col-md-6 mb-4 blog-item">
-                    <div class="card h-100 shadow-sm border-0 blog-card position-relative">
-                        <!-- Badge de Atualização -->
-                        {% if blog.updated_at != blog.created_at %}
-                        <div class="position-absolute top-0 start-0 end-0 p-2 d-flex justify-content-end">
-                            <span class="badge bg-warning text-dark">
-                                <i class="fas fa-sync-alt me-1"></i>Atualizado
-                            </span>
-                        </div>
-                        {% endif %}
-
-                        <!-- Imagem do Post -->
-                        <div class="position-relative overflow-hidden">
-                            {% if blog.image %}
-                                <img src="{{ blog.image.url }}" 
-                                     class="card-img-top blog-image" 
-                                     alt="{{ blog.title }}"
-                                     loading="lazy"
-                                     style="height: 250px; object-fit: cover;">
-                            {% else %}
-                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
-                                     style="height: 250px;">
-                                    <i class="fas fa-image text-muted display-4"></i>
-                                </div>
+                    <!-- Link que cobre todo o card -->
+                    <a href="{{ blog.get_absolute_url }}" class="text-decoration-none">
+                        <div class="card h-100 shadow-sm border-0 blog-card position-relative">
+                            <!-- Badge de Atualização -->
+                            {% if blog.updated_at != blog.created_at %}
+                            <div class="position-absolute top-0 start-0 end-0 p-2 d-flex justify-content-end z-2">
+                            </div>
                             {% endif %}
-                            
-                            <!-- Overlay de Ações -->
-                            <div class="blog-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                                <div class="btn-group">
-                                    <a href="{{ blog.get_absolute_url }}" 
-                                       class="btn btn-light btn-sm">
-                                        <i class="fas fa-eye me-1"></i>Ler Mais
-                                    </a>
+
+                            <!-- Imagem do Post -->
+                            <div class="position-relative overflow-hidden">
+                                {% if blog.image %}
+                                    <img src="{{ blog.image.url }}" 
+                                         class="card-img-top blog-image" 
+                                         alt="{{ blog.title }}"
+                                         loading="lazy"
+                                         style="height: 250px; object-fit: cover;">
+                                {% else %}
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                         style="height: 250px;">
+                                        <i class="fas fa-image text-muted display-4"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Informações do Post -->
+                            <div class="card-body d-flex flex-column">
+                                <!-- Título -->
+                                <h5 class="card-title fw-bold text-dark mb-3">{{ blog.title }}</h5>
+
+                                <!-- Data de Publicação -->
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center text-muted small">
+                                        <i class="far fa-calendar-alt me-2"></i>
+                                        <span>{{ blog.created_at|date:"d/m/Y" }}</span>
+                                        {% if blog.updated_at != blog.created_at %}
+                                        <span class="ms-3">
+                                            <i class="fas fa-sync-alt me-1"></i>
+                                            Atualizado em {{ blog.updated_at|date:"d/m/Y" }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Resumo -->
+                                <p class="card-text text-muted mb-4 flex-grow-1">
+                                    {{ blog.text|truncatewords:30 }}
+                                </p>
+
+                                <!-- Indicador de clique (opcional) -->
+                                <div class="mt-auto">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Informações do Post -->
-                        <div class="card-body d-flex flex-column">
-                        <!-- Título -->
-                            <h5 class="card-title fw-bold text-dark mb-3">{{ blog.title }}</h5>
-
-                            <!-- Data de Publicação -->
-                            <div class="mb-3">
-                                <div class="d-flex align-items-center text-muted small">
-                                    <i class="far fa-calendar-alt me-2"></i>
-                                    <span>{{ blog.created_at|date:"d/m/Y" }}</span>
-                                    {% if blog.updated_at != blog.created_at %}
-                                    <span class="ms-3">
-                                        <i class="fas fa-sync-alt me-1"></i>
-                                        Atualizado em {{ blog.updated_at|date:"d/m/Y" }}
-                                    </span>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            
-                            
-                            <!-- Resumo -->
-                            <p class="card-text text-muted mb-4 flex-grow-1">
-                                {{ blog.text|truncatewords:30 }}
-                            </p>
-
-                            <!-- Botão de Ação -->
-                            <div class="mt-auto">
-                                <a href="{{ blog.get_absolute_url }}" 
-                                   class="btn btn-outline-dark w-100 btn-hover-primary">
-                                    <i class="fas fa-book me-2"></i>Ler Artigo Completo
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             {% endfor %}
         {% else %}
@@ -156,12 +143,13 @@
 .blog-card {
   transition: all 0.3s ease;
   border: 1px solid #f8f9fa;
+  cursor: pointer;
 }
 
 .blog-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 35px rgba(0,0,0,0.15) !important;
-  border-color: #e9ecef;
+  border-color: #0d6efd;
 }
 
 .blog-image {
@@ -170,16 +158,6 @@
 
 .blog-card:hover .blog-image {
   transform: scale(1.05);
-}
-
-.blog-overlay {
-  background: rgba(0,0,0,0.7);
-  opacity: 0;
-  transition: all 0.3s ease;
-}
-
-.blog-card:hover .blog-overlay {
-  opacity: 1;
 }
 
 .btn-hover-primary:hover {
@@ -234,6 +212,24 @@
 .page-item.active .page-link {
   background-color: #0d6efd;
   border-color: #0d6efd;
+}
+
+/* Efeito de hover para o texto */
+.blog-card:hover .card-title {
+  color: #0d6efd !important;
+}
+
+.blog-card:hover .text-primary {
+  color: #0a58ca !important;
+}
+
+/* Remove o sublinhado padrão dos links */
+a {
+  color: inherit;
+}
+
+a:hover {
+  color: inherit;
 }
 </style>
 {% endblock %}

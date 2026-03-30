@@ -59,6 +59,11 @@ services:
       - minio
     env_file:
       - .env.dev
+    environment:
+      MP_PUBLIC_KEY: "${MP_PUBLIC_KEY}"
+      MP_ACCESS_TOKEN: "${MP_ACCESS_TOKEN}"
+      MP_WEBHOOK_URL: "${MP_WEBHOOK_URL}"
+
 
 volumes:
   postgres_data:

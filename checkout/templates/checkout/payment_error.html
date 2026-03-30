@@ -1,0 +1,54 @@
+{% extends "vitrine/base.html" %}
+
+{% block title %}Erro no Pagamento - Yellow House{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 text-center">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h3 class="mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Erro no Pagamento
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <i class="fas fa-exclamation-circle fa-5x text-danger mb-3"></i>
+                    <h4>Algo deu errado</h4>
+                    <p class="text-muted">
+                        Não foi possível processar seu pagamento. Tente novamente.
+                    </p>
+                </div>
+
+                <div class="alert alert-warning">
+                    <h6 class="alert-heading">Possíveis causas:</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li><i class="fas fa-credit-card"></i> Problemas com o cartão</li>
+                        <li><i class="fas fa-wifi"></i> Falha de conexão</li>
+                        <li><i class="fas fa-clock"></i> Tempo esgotado</li>
+                    </ul>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                    <a href="{% url 'checkout:checkout' %}" class="btn btn-primary me-md-2">
+                        <i class="fas fa-redo"></i> Tentar Novamente
+                    </a>
+                    <a href="{% url 'vitrine:home' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-home"></i> Voltar à Loja
+                    </a>
+                </div>
+
+                <!-- Suporte -->
+                <div class="mt-4">
+                    <p class="text-muted">
+                        Se o problema persistir, entre em contato com nosso suporte:
+                    </p>
+                    <a href="mailto:suporte@yellowhouse.com" class="btn btn-outline-danger">
+                        <i class="fas fa-life-ring"></i> Pedir Ajuda
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

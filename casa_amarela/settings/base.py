@@ -190,3 +190,9 @@ LOGGING = {
         'storages': {'handlers': ['console'], 'level': 'DEBUG', 'propagate': False},
     },
 }
+# ------------------------------------------------------------------------------
+# MERCADO PAGO
+# ------------------------------------------------------------------------------
+MP_PUBLIC_KEY = config("MP_PUBLIC_KEY")
+MP_ACCESS_TOKEN = config("MP_ACCESS_TOKEN")
+MP_WEBHOOK_URL = config("MP_WEBHOOK_URL", default="")

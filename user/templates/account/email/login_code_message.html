@@ -24,8 +24,13 @@
       font-weight: bold;
       margin-bottom: 20px;
     }
+    .code-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
     .code {
-      display: inline-block;
       background-color: #edf2ff;
       color: #364fc7;
       font-weight: bold;
@@ -33,6 +38,18 @@
       font-size: 22px;
       border-radius: 6px;
       letter-spacing: 2px;
+    }
+    .copy-btn {
+      padding: 10px 14px;
+      font-size: 14px;
+      background: #4c6ef5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .copy-btn:hover {
+      background: #3b5bdb;
     }
     .footer {
       margin-top: 30px;
@@ -51,8 +68,10 @@
     <p>Olá {{ user_display|default:"" }},</p>
 
     <p>Seu código de acesso é:</p>
-    <div style="text-align:center; margin: 20px 0;">
-      <span class="code">{{ code }}</span>
+
+    <div class="code-box">
+      <span class="code" id="codeText">{{ code }}</span>
+      <button class="copy-btn" onclick="copyCode()">Copiar</button>
     </div>
 
     <p>Digite este código na janela do navegador para continuar o login.</p>
@@ -63,5 +82,13 @@
       Obrigado por usar {{ current_site.domain }}
     </div>
   </div>
+
+  <script>
+    function copyCode() {
+      const code = document.getElementById("codeText").innerText;
+      navigator.clipboard.writeText(code);
+      alert("Código copiado: " + code);
+    }
+  </script>
 </body>
 </html>

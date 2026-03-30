@@ -2,380 +2,483 @@
 {% load static %}
 
 {% block content %}
-<section class="account section">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-8 col-xl-6">
-        <div class="card bg-surface rounded-4 shadow-sm border-0 overflow-hidden">
-          <div class="card-body p-4 p-lg-5">
-            
-            <!-- Card Header with Decorative Accent -->
-            <div class="text-center mb-4 pb-2 border-bottom">
-              <h2 class="heading-color mb-0" style="font-weight:700">Atualizar Perfil</h2>
-              <div class="accent-line mx-auto mt-3"></div>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 py-3">
+          <h4 class="h5 fw-bold mb-0">Atualizar Perfil - Artista</h4>
+        </div>
+        
+        <div class="card-body p-4">
+          <form id="profileForm" method="POST" enctype="multipart/form-data"
+                action="{% url 'artist:update_profile_artist' slug=user_form.instance.slug pk=user_form.instance.pk %}">
+            {% csrf_token %}
+
+            <!-- Erros gerais -->
+            {% if user_form.non_field_errors %}
+            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+              {{ user_form.non_field_errors }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
             </div>
+            {% endif %}
+            
+            {% if address_form.non_field_errors %}
+            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+              {{ address_form.non_field_errors }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+            </div>
+            {% endif %}
 
-            <form id="profileForm" method="POST" enctype="multipart/form-data"
-                  action="{% url 'artist:update_profile_artist' slug=user_form.instance.slug pk=user_form.instance.pk %}"
-                  class="needs-validation" novalidate>
-              {% csrf_token %}
-
-              <!-- Non-field Errors -->
-              {% if user_form.non_field_errors %}
-                <div class="alert alert-danger mb-4">
-                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                  {{ user_form.non_field_errors }}
-                </div>
-              {% endif %}
-              {% if address_form.non_field_errors %}
-                <div class="alert alert-danger mb-4">
-                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                  {{ address_form.non_field_errors }}
-                </div>
-              {% endif %}
-
-              <!-- Two Column Layout for Name Fields -->
-              <div class="row g-3 mb-4">
+            <!-- Seção: Informações Pessoais -->
+            <div class="mb-5">
+              <h6 class="text-uppercase text-muted small mb-3">Informações Pessoais</h6>
+              
+              <div class="row g-3">
                 <div class="col-md-6">
-                  <label for="{{ user_form.first_name.id_for_label }}" class="form-label">Primeiro nome</label>
-                  {{ user_form.first_name }}
+                  <label for="{{ user_form.first_name.id_for_label }}" class="form-label">Nome</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-person"></i>
+                    </span>
+                    {{ user_form.first_name }}
+                  </div>
                   {% for error in user_form.first_name.errors %}
-                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  <div class="text-danger small mt-1">{{ error }}</div>
                   {% endfor %}
                 </div>
                 
                 <div class="col-md-6">
-                  <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Último nome</label>
-                  {{ user_form.last_name }}
+                  <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Sobrenome</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-person-fill"></i>
+                    </span>
+                    {{ user_form.last_name }}
+                  </div>
                   {% for error in user_form.last_name.errors %}
-                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  <div class="text-danger small mt-1">{{ error }}</div>
                   {% endfor %}
                 </div>
               </div>
+            </div>
 
-              <!-- Username Field -->
-              <div class="mb-4">
-                <label for="{{ user_form.username.id_for_label }}" class="form-label">Usuário</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-person"></i></span>
-                  {{ user_form.username }}
-                </div>
-                {% for error in user_form.username.errors %}
-                  <div class="invalid-feedback d-block">{{ error }}</div>
-                {% endfor %}
-                {% if user_form.username.help_text %}
-                  <div class="form-text text-muted">{{ user_form.username.help_text }}</div>
-                {% endif %}
-              </div>
-
-              <!-- CPF Field -->
-              <div class="mb-4">
-                <label for="{{ user_form.cpf.id_for_label }}" class="form-label">CPF</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
-                  {{ user_form.cpf }}
-                </div>
-                {% for error in user_form.cpf.errors %}
-                  <div class="invalid-feedback d-block">{{ error }}</div>
-                {% endfor %}
-              </div>
-
-              <!-- Phone Field -->
-              <div class="mb-4">
-                <label for="{{ user_form.phone.id_for_label }}" class="form-label">Telefone</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                  {{ user_form.phone }}
-                </div>
-                {% for error in user_form.phone.errors %}
-                  <div class="invalid-feedback d-block">{{ error }}</div>
-                {% endfor %}
-                <div class="form-text text-muted">
-                  <i class="bi bi-info-circle me-1"></i> Digite um número com DDD. Ex: +55 11 91234-5678
-                </div>
-              </div>
-
-              <!-- Date of Birth Field -->
-              <div class="mb-4">
-                <label for="{{ user_form.date_of_birth.id_for_label }}" class="form-label">Data de Nascimento</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-calendar"></i></span>
-                  {{ user_form.date_of_birth }}
-                </div>
-                {% for error in user_form.date_of_birth.errors %}
-                  <div class="invalid-feedback d-block">{{ error }}</div>
-                {% endfor %}
-              </div>
-
-              <!-- Current Photo -->
-              <div class="mb-4">
-                <label class="form-label">Foto atual</label>
-                <div class="d-flex align-items-center gap-3">
-                  {% if user_form.instance.photo %}
-                    <img src="{{ user_form.instance.photo.url }}" alt="Foto atual"
-                         class="img-thumbnail rounded-circle" style="width:80px; height:80px; object-fit:cover;">
-                  {% else %}
-                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" 
-                         style="width:80px; height:80px;">
-                      <i class="bi bi-person text-muted" style="font-size:2rem;"></i>
-                    </div>
-                  {% endif %}
-                  <div class="flex-grow-1">
-                    <div class="form-text text-muted">
-                      {% if user_form.instance.photo %}
-                        Foto atual do perfil
-                      {% else %}
-                        Nenhuma foto enviada
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Photo Upload -->
-              <div class="mb-4">
-                <label for="{{ user_form.photo.id_for_label }}" class="form-label">Alterar foto</label>
-                <div class="file-input-group">
-                  {{ user_form.photo }}
-                  <label for="{{ user_form.photo.id_for_label }}" class="file-input-label">
-                    <span class="file-input-button btn btn-outline-accent">
-                      <i class="bi bi-upload me-2"></i>Selecionar arquivo
-                    </span>
-                    <span class="file-input-text text-muted ms-2">Nenhum arquivo selecionado</span>
-                  </label>
-                </div>
-                {% for error in user_form.photo.errors %}
-                  <div class="invalid-feedback d-block">{{ error }}</div>
-                {% endfor %}
-              </div>
-
-              <!-- Banner Upload -->
-              <div class="mb-4">
-                <label for="{{ artist_form.banner.id_for_label }}" class="form-label">Banner do Artista</label>
-                <div class="file-input-group">
-                  {{ artist_form.banner }}
-                  <label for="{{ artist_form.banner.id_for_label }}" class="file-input-label">
-                    <span class="file-input-button btn btn-outline-accent">
-                      <i class="bi bi-upload me-2"></i>Selecionar arquivo
-                    </span>
-                    <span class="file-input-text text-muted ms-2">Nenhum arquivo selecionado</span>
-                  </label>
-                </div>
-                {% for error in artist_form.banner.errors %}
-                  <div class="invalid-feedback d-block">{{ error }}</div>
-                {% endfor %}
-                <div class="form-text text-muted">
-                  <i class="bi bi-info-circle me-1"></i>
-                  Formato de arquivo: jpg, jpeg ou png.
-                </div>
-              </div>
-
-             <!-- Redes Sociais -->
-              <div class="mb-4">
-                <label class="form-label">Redes Sociais</label>
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <label for="{{ artist_form.instagram.id_for_label }}" class="form-label">Instagram</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="bi bi-instagram"></i></span>
-                      {{ artist_form.instagram }}
-                    </div>
-                    {% for error in artist_form.instagram.errors %}
-                      <div class="invalid-feedback d-block">{{ error }}</div>
-                    {% endfor %}
-                  </div>
-                  <div class="col-md-6">
-                    <label for="{{ artist_form.facebook.id_for_label }}" class="form-label">Facebook</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="bi bi-facebook"></i></span>
-                      {{ artist_form.facebook }}
-                    </div>
-                    {% for error in artist_form.facebook.errors %}
-                      <div class="invalid-feedback d-block">{{ error }}</div>
-                    {% endfor %}
-                  </div>
-                  <div class="col-md-6">
-                    <label for="{{ artist_form.twitter.id_for_label }}" class="form-label">Twitter</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="bi bi-twitter"></i></span>
-                      {{ artist_form.twitter }}
-                    </div>
-                    {% for error in artist_form.twitter.errors %}
-                      <div class="invalid-feedback d-block">{{ error }}</div>
-                    {% endfor %}
-                  </div>
-                  <div class="col-md-6">
-                    <label for="{{ artist_form.tiktok.id_for_label }}" class="form-label">TikTok</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="bi bi-tiktok"></i></span>
-                      {{ artist_form.tiktok }}
-                    </div>
-                    {% for error in artist_form.tiktok.errors %}
-                      <div class="invalid-feedback d-block">{{ error }}</div>
-                    {% endfor %}
-                  </div>
-                </div>
-              </div>  
+            <!-- Seção: Dados de Acesso -->
+            <div class="mb-5">
+              <h6 class="text-uppercase text-muted small mb-3">Dados de Acesso</h6>
               
-             <!-- Bio Field -->
-              <div class="mb-4">
-                <label for="quill-editor" class="form-label">Biografia</label>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="{{ user_form.username.id_for_label }}" class="form-label">Usuário</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-at"></i>
+                    </span>
+                    {{ user_form.username }}
+                  </div>
+                  {% for error in user_form.username.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                  {% if user_form.username.help_text %}
+                  <div class="form-text text-muted small">{{ user_form.username.help_text }}</div>
+                  {% endif %}
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="{{ user_form.cpf.id_for_label }}" class="form-label">CPF</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-person-badge"></i>
+                    </span>
+                    {{ user_form.cpf }}
+                  </div>
+                  {% for error in user_form.cpf.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
 
+            <!-- Seção: Contato -->
+            <div class="mb-5">
+              <h6 class="text-uppercase text-muted small mb-3">Contato</h6>
+              
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="{{ user_form.phone.id_for_label }}" class="form-label">Telefone</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-telephone"></i>
+                    </span>
+                    {{ user_form.phone }}
+                  </div>
+                  {% for error in user_form.phone.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                  <div class="form-text text-muted small">Ex: +55 11 91234-5678</div>
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="{{ user_form.date_of_birth.id_for_label }}" class="form-label">Data de Nascimento</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-calendar"></i>
+                    </span>
+                    {{ user_form.date_of_birth }}
+                  </div>
+                  {% for error in user_form.date_of_birth.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção: Fotos -->
+            <div class="mb-5">
+              <h6 class="text-uppercase text-muted small mb-3">Imagens do Perfil</h6>
+              
+              <div class="row g-4">
+                <!-- Foto do Perfil -->
+                <div class="col-md-6">
+                  <div class="border rounded p-3">
+                    <div class="d-flex align-items-start mb-3">
+                      <div class="flex-shrink-0">
+                        {% if user_form.instance.photo %}
+                          <img src="{{ user_form.instance.photo.url }}" 
+                               alt="Foto atual" 
+                               class="img-fluid rounded-circle"
+                               style="width: 80px; height: 80px; object-fit: cover;">
+                        {% else %}
+                          <div class="bg-light rounded-circle d-flex align-items-center justify-content-center"
+                               style="width: 80px; height: 80px;">
+                            <i class="bi bi-person text-muted fs-4"></i>
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div class="flex-grow-1 ms-3">
+                        <h6 class="fw-bold mb-1">Foto do Perfil</h6>
+                        <p class="text-muted small mb-2">
+                          {% if user_form.instance.photo %}
+                            Foto atual disponível
+                          {% else %}
+                            Nenhuma foto enviada
+                          {% endif %}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <label for="{{ user_form.photo.id_for_label }}" class="form-label small">Alterar Foto</label>
+                    <div class="input-group">
+                      <span class="input-group-text">
+                        <i class="bi bi-camera"></i>
+                      </span>
+                      {{ user_form.photo }}
+                    </div>
+                    {% for error in user_form.photo.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                    <div class="form-text text-muted small">
+                      Tamanho recomendado: 400x400px. Formatos: JPG, PNG.
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Banner do Artista -->
+                <div class="col-md-6">
+                  <div class="border rounded p-3">
+                    <div class="mb-3">
+                      <h6 class="fw-bold mb-1">Banner do Perfil</h6>
+                      <p class="text-muted small mb-2">
+                        {% if artist_form.instance.banner %}
+                          Banner atual disponível
+                        {% else %}
+                          Nenhum banner enviado
+                        {% endif %}
+                      </p>
+                    </div>
+                    
+                    <label for="{{ artist_form.banner.id_for_label }}" class="form-label small">Alterar Banner</label>
+                    <div class="input-group">
+                      <span class="input-group-text">
+                        <i class="bi bi-image"></i>
+                      </span>
+                      {{ artist_form.banner }}
+                    </div>
+                    {% for error in artist_form.banner.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                    <div class="form-text text-muted small">
+                      Tamanho recomendado: 1200x400px. Formatos: JPG, PNG.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção: Redes Sociais -->
+            <div class="mb-5">
+              <h6 class="text-uppercase text-muted small mb-3">Redes Sociais</h6>
+              
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="{{ artist_form.instagram.id_for_label }}" class="form-label">Instagram</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-instagram"></i>
+                    </span>
+                    {{ artist_form.instagram }}
+                  </div>
+                  {% for error in artist_form.instagram.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="{{ artist_form.facebook.id_for_label }}" class="form-label">Facebook</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-facebook"></i>
+                    </span>
+                    {{ artist_form.facebook }}
+                  </div>
+                  {% for error in artist_form.facebook.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="{{ artist_form.twitter.id_for_label }}" class="form-label">Twitter</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-twitter"></i>
+                    </span>
+                    {{ artist_form.twitter }}
+                  </div>
+                  {% for error in artist_form.twitter.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="{{ artist_form.tiktok.id_for_label }}" class="form-label">TikTok</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-tiktok"></i>
+                    </span>
+                    {{ artist_form.tiktok }}
+                  </div>
+                  {% for error in artist_form.tiktok.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção: Biografia -->
+            <div class="mb-5">
+              <h6 class="text-uppercase text-muted small mb-3">Biografia</h6>
+              
+              <div class="mb-3">
+                <label for="quill-editor" class="form-label">Conte sua história</label>
+                
                 <!-- Editor visual -->
-                <div id="quill-editor" style="min-height: 150px;">
+                <div id="quill-editor" style="min-height: 200px;">
                   {{ artist_form.bio.value|safe }}
                 </div>
-
-                <!-- Campo escondido que será enviado no form -->
-                <input type="hidden" name="bio" id="id_bio">
-
+                
+                <!-- Campo escondido que será enviado -->
+                <input type="hidden" name="bio" id="id_bio" value="{{ artist_form.bio.value|default:'' }}">
+                
                 {% for error in artist_form.bio.errors %}
-                  <div class="invalid-feedback d-block">{{ error }}</div>
+                <div class="text-danger small mt-1">{{ error }}</div>
                 {% endfor %}
-
-                <div class="form-text text-muted">
-                  <i class="bi bi-info-circle me-1"></i> Conte-nos mais sobre você.
+                
+                <div class="form-text text-muted small">
+                  Compartilhe sua trajetória artística, inspirações e conquistas.
                 </div>
               </div>
-              <!-- Form Actions -->
-              <div class="d-flex justify-content-between mt-5 pt-3 border-top">
+            </div>
+
+            <!-- Ações -->
+            <div class="border-top pt-4 mt-4">
+              <div class="d-flex justify-content-between">
                 <a href="{% url 'artist:dashboard_artist' slug=user_form.instance.slug pk=user_form.instance.pk %}"
-                   class="btn btn-outline-secondary px-4">
-                  <i class="bi bi-arrow-left me-2"></i>Cancelar
+                   class="btn btn-outline-secondary">
+                  <i class="bi bi-x-lg me-1"></i> Cancelar
                 </a>
-                <button type="submit" class="btn btn-accent px-4">
-                  <i class="bi bi-check-circle me-2"></i>Salvar Alterações
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-check-lg me-1"></i> Salvar Alterações
                 </button>
               </div>
-            </form>
-
-          </div>
+            </div>
+          </form>
         </div>
       </div>
     </div>
   </div>
-</section>
+</div>
+{% endblock %}
 
-<!-- Custom Styles for this Template -->
+{% block extra_css %}
 <style>
-  .accent-line {
-    width: 60px;
-    height: 3px;
-    background-color: var(--accent-color);
-    border-radius: 3px;
+  /* Estilização dos inputs do Django Form */
+  #profileForm input[type="text"],
+  #profileForm input[type="email"],
+  #profileForm input[type="tel"],
+  #profileForm input[type="date"],
+  #profileForm input[type="url"],
+  #profileForm select,
+  #profileForm textarea {
+    border: 1px solid #dee2e6;
+    border-left: 0;
+    padding: 0.75rem;
+    border-radius: 0 0.375rem 0.375rem 0;
+    width: 100%;
   }
   
-  .file-input-group {
-    position: relative;
+  #profileForm input:focus,
+  #profileForm select:focus,
+  #profileForm textarea:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    outline: 0;
   }
   
-  .file-input-group input[type="file"] {
-    position: absolute;
-    opacity: 0;
-    width: 0.1px;
-    height: 0.1px;
+  .input-group-text {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
   }
   
-  .file-input-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
+  /* Input file customizado */
+  #profileForm input[type="file"] {
+    border: 1px dashed #dee2e6;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    background-color: #f8f9fa;
+    width: 100%;
   }
   
-  .file-input-text {
-    font-size: 0.9rem;
+  #profileForm input[type="file"]:hover {
+    border-color: #86b7fe;
+    background-color: #f0f7ff;
   }
+  
+  /* Editor Quill */
+  #quill-editor {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+  }
+  
+  #quill-editor .ql-toolbar {
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 0.375rem 0.375rem 0 0;
+  }
+  
+  #quill-editor .ql-container {
+    border: none;
+    border-radius: 0 0 0.375rem 0.375rem;
+  }
+  
   #quill-editor .ql-editor {
-  max-height: 250px;   /* altura máxima */
-  overflow-y: auto;    /* ativa barra de rolagem vertical */
-}
-
+    min-height: 150px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  /* Placeholder */
+  ::placeholder {
+    color: #6c757d;
+    opacity: 0.6;
+  }
 </style>
+{% endblock %}
 
-<!-- Form Enhancement Script -->
+{% block extra_js %}
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('profileForm');
   if (!form) return;
 
-  // Add form-control class to all inputs, selects, textareas
-  form.querySelectorAll('input:not([type="file"]), select, textarea').forEach(el => {
-    el.classList.add('form-control');
+  // Adiciona classes Bootstrap aos campos
+  const fields = form.querySelectorAll('input:not([type="file"]), select, textarea');
+  fields.forEach(field => {
+    if (!field.classList.contains('form-control')) {
+      field.classList.add('form-control');
+    }
   });
 
- // Enhance file input display for all file inputs
-form.querySelectorAll('input[type="file"]').forEach(input => {
-  const group = input.closest('.file-input-group');
-  if (group) {
-    const fileNameDisplay = group.querySelector('.file-input-text');
-    input.addEventListener('change', function () {
-      if (this.files.length > 0) {
-        fileNameDisplay.textContent = this.files[0].name;
-      } else {
-        fileNameDisplay.textContent = 'Nenhum arquivo selecionado';
-      }
-    });
+  // Configura campo de data
+  const dobField = form.querySelector('[name*="date_of_birth"], [id*="date_of_birth"]');
+  if (dobField) {
+    try { 
+      dobField.type = 'date';
+    } catch(e) {}
+    
+    if (dobField.type !== 'date') {
+      dobField.placeholder = 'dd/mm/aaaa';
+    }
+    
+    dobField.autocomplete = 'bday';
   }
-});
 
-
-  // Date field enhancement
-  const dobFields = ['date_of_birth', 'user-date_of_birth'];
-  dobFields.forEach(name => {
-    const el = form.querySelector(`[name$="${name}"]`);
-    if (el) {
-      try { el.type = 'date'; } catch(e) {}
-      el.placeholder = 'DD/MM/AAAA';
-      el.autocomplete = 'bday';
-    }
+  // Preview de arquivos selecionados
+  form.querySelectorAll('input[type="file"]').forEach(input => {
+    input.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      // Cria alerta informativo
+      const fileInfo = document.createElement('div');
+      fileInfo.className = 'alert alert-info alert-dismissible fade show mt-2 small';
+      fileInfo.innerHTML = `
+        <i class="bi bi-info-circle me-1"></i>
+        Arquivo selecionado: <strong>${file.name}</strong> (${(file.size / 1024 / 1024).toFixed(2)} MB)
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      
+      // Remove alertas anteriores deste input
+      const parent = input.parentNode.parentNode;
+      const oldAlerts = parent.querySelectorAll('.file-info-alert');
+      oldAlerts.forEach(alert => alert.remove());
+      
+      fileInfo.classList.add('file-info-alert');
+      parent.appendChild(fileInfo);
+    });
   });
-  
-  // Form validation
-  form.addEventListener('submit', function(event) {
-    if (!form.checkValidity()) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    form.classList.add('was-validated');
-  }, false);
-});
 
-document.addEventListener("DOMContentLoaded", function () {
-  var quill = new Quill('#quill-editor', {
+  // Inicializar editor Quill
+  const quill = new Quill('#quill-editor', {
     theme: 'snow',
     modules: {
-      toolbar: [  
-        ['bold', 'italic', 'underline'],              // estilos básicos
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }], // listas
-        ['link', 'image', 'video'],                   // links e imagens
-        ['clean'],                                    // limpar formatação
-        [{ 'align': [] }],                            // alinhamento
-        [{ 'header': [1, 2, 3, false] }],             // headers
-        ['blockquote'],                               // citação
-        [{ 'color': [] }, { 'background': [] }], // <-- cores da fonte e do fundo
-        ['code-block'],                               // bloco de código
-        [{ 'direction': 'rtl' }, { 'indent': '-1'}, { 'indent': '+1' }], // direção e indent
-        ['emoji']                                     // botão de emoji (vem do plugin quill-emoji)
-      ],
-      "emoji-toolbar": true,      // habilita o botão de emoji na toolbar
-      "emoji-textarea": false,    // desativa painel separado
-      "emoji-shortname": true ,    // permite usar :smile: etc.
+      toolbar: [
+        ['bold', 'italic', 'underline'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['link', 'image'],
+        ['clean'],
+        [{ 'header': [1, 2, 3, false] }],
+        ['blockquote']
+      ]
     }
   });
 
-  // Inicializar campo escondido com conteúdo existente
-  var hiddenInput = document.getElementById('id_bio');
-  if (hiddenInput.value) {
-    quill.root.innerHTML = hiddenInput.value;
+  // Sincronizar editor com campo hidden
+  const hiddenBioInput = document.getElementById('id_bio');
+  const formElement = document.getElementById('profileForm');
+  
+  // Preencher editor com conteúdo existente
+  if (hiddenBioInput && hiddenBioInput.value) {
+    quill.root.innerHTML = hiddenBioInput.value;
   }
 
-  // Ao enviar formulário, atualizar campo escondido
-  document.getElementById('profileForm').addEventListener('submit', function() {
-    hiddenInput.value = quill.root.innerHTML;
+  // Atualizar campo hidden antes de enviar
+  formElement.addEventListener('submit', function() {
+    if (hiddenBioInput) {
+      hiddenBioInput.value = quill.root.innerHTML;
+    }
   });
 });
-
-
 </script>
-
 {% endblock %}

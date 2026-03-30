@@ -231,7 +231,7 @@
         <strong class="fs-4 text-primary cart-total">R$ {{ cart.total_geral|stringformat:".2f" }}</strong> </div>
 
                     <div class="d-grid gap-2">
-                        <a href="" class="btn btn-primary btn-lg">
+                        <a href="{% url 'checkout:checkout' %}" class="btn btn-primary btn-lg">
                             <i class="bi bi-credit-card me-2"></i> Finalizar Compra
                         </a>
                         <a href="" class="btn btn-outline-secondary">

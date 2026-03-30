@@ -1,0 +1,144 @@
+{% extends "vitrine/base.html" %}
+
+{% block title %}Pagamento PIX - Pedido {{ order.order_code }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-qrcode"></i> Pagamento via PIX
+                </h4>
+            </div>
+            <div class="card-body">
+                <!-- Informações do Pedido -->
+                <div class="alert alert-info">
+                    <h5 class="alert-heading">Pedido: {{ order.order_code }}</h5>
+                    <p class="mb-0">Total: <strong>R$ {{ order.total }}</strong></p>
+                </div>
+
+                <!-- QR Code -->
+                <div class="qr-code-container mb-4">
+                    <h5>Escaneie o QR Code abaixo:</h5>
+                    {% if qr_code_base64 %}
+                        <img src="data:image/png;base64,{{ qr_code_base64 }}" 
+                             alt="QR Code PIX" class="img-fluid mb-3" style="max-width: 300px;">
+                    {% else %}
+                        <div class="alert alert-warning">
+                            QR Code não disponível. Por favor, copie o código abaixo.
+                        </div>
+                    {% endif %}
+                    
+                    <p class="text-muted">
+                        Use o app do seu banco para escanear o código
+                    </p>
+                </div>
+
+                <!-- Código PIX Copia e Cola -->
+                <div class="mb-4">
+                    <label for="pixCode" class="form-label">
+                        <strong>Ou copie o código PIX:</strong>
+                    </label>
+                    <div class="input-group">
+                        <input type="text" 
+                               class="form-control" 
+                               id="pixCode" 
+                               value="{{ qr_copy }}" 
+                               readonly>
+                        <button class="btn btn-outline-primary" type="button" id="copyButton">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Instruções -->
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-info-circle"></i> Instruções:</h6>
+                    <ol class="mb-0">
+                        <li>Abra o app do seu banco</li>
+                        <li>Selecione a opção PIX</li>
+                        <li>Escaneie o QR Code ou cole o código</li>
+                        <li>Confirme o pagamento</li>
+                        <li>Aguarde a confirmação automática</li>
+                    </ol>
+                </div>
+
+                <!-- Status do Pagamento -->
+                <div class="text-center mt-4">
+                    <div id="paymentStatus" class="alert alert-info">
+                        <i class="fas fa-sync-alt fa-spin"></i>
+                        Aguardando pagamento...
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{% url 'checkout:checkout' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                        <button id="checkStatus" class="btn btn-outline-primary">
+                            <i class="fas fa-redo"></i> Verificar Status
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // Copiar código PIX
+    $('#copyButton').click(function() {
+        const pixCode = document.getElementById('pixCode');
+        pixCode.select();
+        document.execCommand('copy');
+        
+        // Feedback visual
+        const originalText = $(this).html();
+        $(this).html('<i class="fas fa-check"></i> Copiado!');
+        setTimeout(() => {
+            $(this).html(originalText);
+        }, 2000);
+    });
+
+    // Verificar status do pagamento
+    function checkPaymentStatus() {
+        $.ajax({
+            url: '{% url "checkout:mercadopago_webhook" %}', // Ajuste conforme sua URL
+            type: 'GET',
+            data: {
+                'order_id': '{{ order.id }}'
+            },
+            success: function(response) {
+                if (response.status === 'approved') {
+                    $('#paymentStatus').removeClass('alert-info').addClass('alert-success')
+                        .html('<i class="fas fa-check-circle"></i> Pagamento aprovado! Redirecionando...');
+                    
+                    setTimeout(() => {
+                        window.location.href = '{% url "checkout:payment_success" %}';
+                    }, 2000);
+                } else if (response.status === 'cancelled' || response.status === 'rejected') {
+                    $('#paymentStatus').removeClass('alert-info').addClass('alert-danger')
+                        .html('<i class="fas fa-times-circle"></i> Pagamento não aprovado.');
+                }
+                // Se ainda estiver pendente, continua aguardando
+            },
+            error: function() {
+                console.log('Erro ao verificar status');
+            }
+        });
+    }
+
+    // Verificar status a cada 10 segundos
+    setInterval(checkPaymentStatus, 10000);
+
+    // Verificar status manualmente
+    $('#checkStatus').click(checkPaymentStatus);
+
+    // Verificar status inicial
+    checkPaymentStatus();
+});
+</script>
+{% endblock %}

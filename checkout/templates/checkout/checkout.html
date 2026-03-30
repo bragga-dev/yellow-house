@@ -1,0 +1,399 @@
+{% extends "vitrine/base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'checkout:cart_detail' %}">Carrinho</a></li>
+                    <li class="breadcrumb-item active">Checkout</li>
+                </ol>
+            </nav>
+            <h1 class="h2">Finalizar Compra</h1>
+        </div>
+    </div>
+
+    <!-- Indicador de Passos -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="step-indicator">
+                        <div class="step completed">
+                            <div class="step-number">1</div>
+                            <div>Carrinho</div>
+                        </div>
+                        <div class="step active">
+                            <div class="step-number">2</div>
+                            <div>Pagamento</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div>Confirmação</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Resumo dos Itens -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-cart3 me-2"></i>
+                        Itens do Pedido ({{ cart.items.count }})
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% for item in cart.items.all %}
+                    <div class="p-3 border-bottom">
+                        <div class="row align-items-center">
+                            <div class="col-2">
+                                {% if item.artwork %}
+                                    {% with image=item.artwork.images.first %}
+                                        {% if image %}
+                                        <img src="{{ image.image.url }}" alt="{{ item.artwork.name }}" 
+                                            class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                            style="width: 60px; height: 60px;">
+                                            <i class="bi bi-image text-muted"></i>
+                                        </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% elif item.souvenir %}
+                                    {% with image=item.souvenir.images.first %}
+                                        {% if image %}
+                                        <img src="{{ image.image.url }}" alt="{{ item.souvenir.name }}" 
+                                            class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                            style="width: 60px; height: 60px;">
+                                            <i class="bi bi-image text-muted"></i>
+                                        </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endif %}
+                            </div>
+                            <div class="col-6">
+                                <h6 class="mb-1 fw-bold">
+                                    {% if item.artwork %}
+                                        {{ item.artwork.name }}
+                                    {% elif item.souvenir %}
+                                        {{ item.souvenir.name }}
+                                    {% endif %}
+                                </h6>
+                                <p class="text-muted small mb-0">
+                                    Quantidade: {{ item.quantity }}
+                                    {% if item.shipping_type %}
+                                        <br>Frete: {{ item.shipping_type }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-4 text-end">
+                                <strong class="h6">R$ {{ item.subtotal|floatformat:2 }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Métodos de Pagamento -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-credit-card me-2"></i>
+                        Método de Pagamento
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- PIX -->
+                        <div class="col-md-6 mb-3">
+                            <div class="payment-method-card p-3 border rounded" data-method="pix" style="cursor: pointer;">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <i class="bi bi-qr-code fs-2 text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">PIX</h6>
+                                        <small class="text-muted">Pagamento instantâneo</small>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-success">
+                                        <i class="bi bi-lightning-charge"></i> 5% de desconto
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cartão -->
+                        <div class="col-md-6 mb-3">
+                            <div class="payment-method-card p-3 border rounded" data-method="mercadopago" style="cursor: pointer;">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <i class="bi bi-credit-card fs-2 text-info"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">Cartão</h6>
+                                        <small class="text-muted">Crédito, débito ou Mercado Pago</small>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <img src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.18.9/mercadopago/logo__large@2x.png" 
+                                         alt="Mercado Pago" height="20" class="me-1">
+                                    <small class="text-muted">Processado por Mercado Pago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações de Segurança -->
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <i class="bi bi-shield-check text-success d-block fs-4"></i>
+                                <small class="text-muted">Seguro</small>
+                            </div>
+                            <div class="col-4">
+                                <i class="bi bi-lock text-primary d-block fs-4"></i>
+                                <small class="text-muted">Criptografia</small>
+                            </div>
+                            <div class="col-4">
+                                <i class="bi bi-arrow-repeat text-warning d-block fs-4"></i>
+                                <small class="text-muted">Garantia</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumo do Pedido -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-receipt me-2"></i>
+                        Resumo do Pedido
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Subtotal:</span>
+                        <span class="fw-semibold">R$ {{ cart.total_price|floatformat:2 }}</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Frete:</span>
+                        <span class="text-success fw-semibold">R$ {{ cart.total_shipping|floatformat:2 }}</span>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between mb-4">
+                        <strong class="fs-5">Total:</strong>
+                        <strong class="fs-4 text-primary">R$ {{ cart.total_geral|floatformat:2 }}</strong>
+                    </div>
+
+                    <button id="checkoutBtn" class="btn btn-primary btn-lg w-100 mb-3" disabled>
+                        <i class="bi bi-lock me-2"></i> Finalizar Pagamento
+                    </button>
+
+                    <div class="text-center">
+                        <small class="text-muted">
+                            <i class="bi bi-shield-check me-1"></i>
+                            Compra 100% segura
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-4">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+                <h5>Processando pagamento...</h5>
+                <p class="text-muted mb-0">Aguarde enquanto criamos seu pedido.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let selectedMethod = null;
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+
+    // Seleção de método de pagamento
+    document.querySelectorAll('.payment-method-card').forEach(card => {
+        card.addEventListener('click', function() {
+            // Remover seleção anterior
+            document.querySelectorAll('.payment-method-card').forEach(c => {
+                c.classList.remove('border-primary', 'bg-light');
+            });
+            
+            // Adicionar seleção atual
+            this.classList.add('border-primary', 'bg-light');
+            selectedMethod = this.getAttribute('data-method');
+            
+            // Habilitar botão e atualizar texto
+            checkoutBtn.disabled = false;
+            if (selectedMethod === 'pix') {
+                checkoutBtn.innerHTML = '<i class="bi bi-lock me-2"></i> Pagar com PIX';
+            } else {
+                checkoutBtn.innerHTML = '<i class="bi bi-lock me-2"></i> Pagar com Cartão';
+            }
+        });
+    });
+
+    // Finalizar compra
+    checkoutBtn.addEventListener('click', function() {
+        if (!selectedMethod) {
+            alert('Por favor, selecione um método de pagamento.');
+            return;
+        }
+
+        loadingModal.show();
+
+        if (selectedMethod === 'pix') {
+            createPixPayment();
+        } else if (selectedMethod === 'mercadopago') {
+            createMercadoPagoPayment();
+        }
+    });
+
+    function createPixPayment() {
+        fetch('{% url "checkout:create_pix_payment" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingModal.hide();
+            if (data.success) {
+                window.location.href = '{% url "checkout:pix_payment" "00000000-0000-0000-0000-000000000000" %}'.replace('00000000-0000-0000-0000-000000000000', data.order_id);
+            } else {
+                alert('Erro: ' + data.error);
+            }
+        })
+        .catch(error => {
+            loadingModal.hide();
+            alert('Erro ao processar pagamento PIX.');
+            console.error('Erro:', error);
+        });
+    }
+
+    function createMercadoPagoPayment() {
+        fetch('{% url "checkout:create_checkout" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingModal.hide();
+            if (data.payment_url) {
+                window.location.href = data.payment_url;
+            } else {
+                alert('Erro: ' + (data.error || 'Erro ao criar pagamento'));
+            }
+        })
+        .catch(error => {
+            loadingModal.hide();
+            alert('Erro ao processar pagamento.');
+            console.error('Erro:', error);
+        });
+    }
+});
+</script>
+
+<style>
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.step {
+    text-align: center;
+    flex: 1;
+    position: relative;
+}
+
+.step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 60%;
+    right: -40%;
+    height: 2px;
+    background: #dee2e6;
+    z-index: 1;
+}
+
+.step.completed:not(:last-child)::after {
+    background: #28a745;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    font-weight: bold;
+    position: relative;
+    z-index: 2;
+}
+
+.step.active .step-number {
+    background: #007bff;
+    color: white;
+}
+
+.step.completed .step-number {
+    background: #28a745;
+    color: white;
+}
+
+.payment-method-card {
+    transition: all 0.3s ease;
+}
+
+.payment-method-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.sticky-top {
+    position: sticky;
+    z-index: 10;
+}
+</style>
+{% endblock %}

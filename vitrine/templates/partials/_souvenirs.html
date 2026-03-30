@@ -1,82 +1,152 @@
-
-
-  <!-- Container principal para HTMX -->
-  <div id="souvenirs-container">
-    <div class="row g-3">
-      {% for souvenir in souvenirs %}
-        <div class="col-xl-3 col-lg-4 col-md-6">
-          <div class="card h-100 shadow-sm border-0 artwork-card">
-            {% if souvenir.images.first %}
-              <img src="{{ souvenir.images.first.image.url }}" class="card-img-top" alt="{{ souvenir.name }}" style="height: 200px; object-fit: cover;">
+<!-- Grid de Souvenirs -->
+<div class="row" id="souvenirs-grid">
+  {% if souvenirs %}
+    {% for souvenir in souvenirs %}
+      <div class="col-xl-3 col-lg-4 col-md-6 mb-4 souvenir-item">
+        <!-- Link em toda a extensão do card -->
+        <a href="{{ souvenir.get_absolute_url }}" 
+           class="text-decoration-none souvenir-card-link {% if souvenir.stock == 0 %}disabled-link{% endif %}"
+           {% if souvenir.stock == 0 %}aria-disabled="true" tabindex="-1"{% endif %}>
+          <div class="card h-100 shadow-sm border-0 souvenir-card position-relative">
+            <!-- Badge de Estoque Baixo (no topo) -->
+            {% if souvenir.stock <= 5 and souvenir.stock > 0 %}
+            <div class="position-absolute top-0 start-0 end-0 p-2 d-flex justify-content-end">
+              <span class="badge bg-warning text-dark">
+                <i class="bi bi-exclamation-triangle me-1"></i>Últimas Unidades
+              </span>
+            </div>
+            {% elif souvenir.stock == 0 %}
+            <div class="position-absolute top-0 start-0 end-0 p-2 d-flex justify-content-end">
+              <span class="badge bg-danger">
+                <i class="bi bi-x-circle me-1"></i>Esgotado
+              </span>
+            </div>
             {% endif %}
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">{{ souvenir.name|truncatewords:8 }}</h5>
-              <p class="text-success fw-bold">R$ {{ souvenir.price }}</p>
-              {% if souvenir.size %}
-                <p class="card-text text-muted mb-1"><strong>Tamanho:</strong> {{ souvenir.size }}</p>
+
+            <!-- Imagem do Souvenir -->
+            <div class="position-relative overflow-hidden">
+              {% if souvenir.images.first %}
+                <img src="{{ souvenir.images.first.image.url }}" 
+                     class="card-img-top souvenir-image" 
+                     alt="{{ souvenir.name }}"
+                     loading="lazy"
+                     style="height: 280px; object-fit: cover;">
+              {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                     style="height: 280px;">
+                  <i class="bi bi-gift text-muted display-4"></i>
+                </div>
               {% endif %}
+            </div>
+
+            <!-- Informações do Souvenir - TUDO ALINHADO À ESQUERDA -->
+            <div class="card-body d-flex flex-column text-start">
+              <!-- Categoria do Souvenir -->
+              {% if souvenir.souvenir_category %}
+                <div class="mb-2">
+                  <span class="badge bg-primary bg-opacity-90 text-white fs-6">
+                    {{ souvenir.souvenir_category.name }}
+                  </span>
+                </div>
+              {% endif %}
+              
+              <h5 class="card-title fw-bold text-dark mb-2">{{ souvenir.name }}</h5>
+              
               {% if souvenir.material %}
-                <p class="card-text text-muted mb-1"><strong>Material:</strong> {{ souvenir.material }}</p>
+              <p class="card-text text-muted small mb-2">
+                <i class="bi bi-gear me-1"></i>{{ souvenir.material }}
+              </p>
               {% endif %}
-              <p class="card-text text-muted mb-3">Estoque: {{ souvenir.stock }}</p>
+              
+              {% if souvenir.size %}
+              <p class="card-text text-muted small mb-2">
+                <i class="bi bi-arrows-fullscreen me-1"></i>{{ souvenir.size }}
+              </p>
+              {% endif %}
+              
+              <p class="card-text text-muted small mb-3">
+                <i class="bi bi-box me-1"></i>
+                {% if souvenir.stock > 5 %}
+                  Em estoque
+                {% elif souvenir.stock > 0 %}
+                  Apenas {{ souvenir.stock }} unidade{{ souvenir.stock|pluralize }}
+                {% else %}
+                  Esgotado
+                {% endif %}
+              </p>
+
+              <!-- Preço -->
               <div class="mt-auto">
-                <a href="{{ souvenir.get_absolute_url }}" 
-                   class="btn btn-outline-primary w-100">
-                  Ver detalhes
-                </a>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="fw-bold text-success fs-5">R$ {{ souvenir.price }}</span>
+                  {% if souvenir.original_price and souvenir.original_price > souvenir.price %}
+                    <span class="text-muted text-decoration-line-through small">R$ {{ souvenir.original_price }}</span>
+                  {% endif %}
+                </div>
               </div>
             </div>
           </div>
+        </a>
+      </div>
+    {% endfor %}
+  {% else %}
+    <!-- Estado Vazio -->
+    <div class="col-12">
+      <div class="text-center py-5 my-5">
+        <i class="bi bi-gift display-1 text-muted mb-4"></i>
+        <h3 class="text-muted mb-3">Nenhum souvenir encontrado</h3>
+        <p class="text-muted mb-4">Tente ajustar os filtros para ver mais resultados ou explore nossa coleção completa.</p>
+        <div class="d-flex justify-content-center gap-2 flex-wrap">
+          <a href="{% url 'vitrine:list_souvenirs' %}" class="btn btn-primary">
+            <i class="bi bi-arrow-clockwise me-2"></i>Limpar Filtros
+          </a>
+          <a href="/" class="btn btn-outline-primary">
+            <i class="bi bi-house me-2"></i>Voltar ao Início
+          </a>
         </div>
-      {% empty %}
-        <div class="col-12 text-center py-4">
-          <h5 class="text-muted">Nenhum souvenir encontrado</h5>
-        </div>
-      {% endfor %}
+      </div>
     </div>
+  {% endif %}
+</div>
 
-    {% if souvenirs.has_other_pages %}
-    <nav class="mt-4">
+<!-- Paginação -->
+{% if souvenirs.has_other_pages %}
+<div class="row mt-5">
+  <div class="col-12">
+    <nav aria-label="Navegação de páginas">
       <ul class="pagination justify-content-center">
         {% if souvenirs.has_previous %}
           <li class="page-item">
-            <a hx-get="{% url 'vitrine:souvenirs_partial' %}?page={{ souvenirs.previous_page_number }}"
-               hx-target="#souvenirs-container" hx-swap="outerHTML" class="page-link">&laquo;</a>
+            <a hx-get="{% url 'vitrine:souvenirs_partial' %}?page={{ souvenirs.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+               hx-target="#souvenirs-section" hx-swap="innerHTML" class="page-link">
+              <i class="bi bi-chevron-left"></i>
+            </a>
           </li>
         {% endif %}
+
         {% for i in souvenirs.paginator.page_range %}
-          <li class="page-item {% if souvenirs.number == i %}active{% endif %}">
-            <a hx-get="{% url 'vitrine:souvenirs_partial' %}?page={{ i }}"
-               hx-target="#souvenirs-container" hx-swap="outerHTML" class="page-link">{{ i }}</a>
-          </li>
+          {% if souvenirs.number == i %}
+            <li class="page-item active">
+              <span class="page-link">{{ i }}</span>
+            </li>
+          {% else %}
+            <li class="page-item">
+              <a hx-get="{% url 'vitrine:souvenirs_partial' %}?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                 hx-target="#souvenirs-section" hx-swap="innerHTML" class="page-link">{{ i }}</a>
+            </li>
+          {% endif %}
         {% endfor %}
+
         {% if souvenirs.has_next %}
           <li class="page-item">
-            <a hx-get="{% url 'vitrine:souvenirs_partial' %}?page={{ souvenirs.next_page_number }}"
-               hx-target="#souvenirs-container" hx-swap="outerHTML" class="page-link">&raquo;</a>
+            <a hx-get="{% url 'vitrine:souvenirs_partial' %}?page={{ souvenirs.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+               hx-target="#souvenirs-section" hx-swap="innerHTML" class="page-link">
+              <i class="bi bi-chevron-right"></i>
+            </a>
           </li>
         {% endif %}
       </ul>
     </nav>
-    {% endif %}
   </div>
 </div>
-
-<style>
-.artwork-card {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.artwork-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
-}
-
-.card-img-top {
-  transition: transform 0.3s ease;
-}
-
-.artwork-card:hover .card-img-top {
-  transform: scale(1.05);
-}
-</style>
+{% endif %}
